@@ -1,4 +1,4 @@
-import Plane from './Plane';
+import Plane from './Plane/Plane';
 
 describe('Plane', () => {
   it('should be in the air after calling inTheAir', () => {

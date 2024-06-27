@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import Airport from './Airport';
+import Airport from './Airport/Airport';
 
 function App() {
   return (
