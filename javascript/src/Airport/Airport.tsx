@@ -1,17 +1,16 @@
-// Airport.js
 import React, { useState } from 'react';
-import Plane from './Plane';
-import { isStormy } from './Weather';
+import Plane from '../Plane/Plane';
+import { isStormy } from '../Weather/Weather';
 import { Button, Box, Text } from '@chakra-ui/react';
 
 const DEFAULT_CAPACITY = 5;
 
-const Airport = () => {
-  const [hanger, setHanger] = useState([]);
-  const [capacity, setCapacity] = useState(DEFAULT_CAPACITY);
-  const [message, setMessage] = useState('');
+const Airport: React.FC = () => {
+  const [hanger, setHanger] = useState<Plane[]>([]);
+  const [capacity, setCapacity] = useState<number>(DEFAULT_CAPACITY);
+  const [message, setMessage] = useState<string>('');
 
-  const land = (plane) => {
+  const land = (plane: Plane) => {
     try {
       if (hangerFull()) {
         throw new Error('Hanger full, abort landing!');
@@ -26,11 +25,11 @@ const Airport = () => {
       setHanger([...hanger, plane]);
       setMessage('Plane landed successfully.');
     } catch (error) {
-      setMessage(error.message);
+      setMessage((error as Error).message);
     }
   };
 
-  const takeOff = (plane) => {
+  const takeOff = (plane: Plane) => {
     try {
       if (!landed(plane)) {
         throw new Error("That plane isn't here");
@@ -42,15 +41,15 @@ const Airport = () => {
       setHanger(hanger.filter(p => p !== plane));
       setMessage('Plane took off successfully.');
     } catch (error) {
-      setMessage(error.message);
+      setMessage((error as Error).message);
     }
   };
 
-  const hangerFull = () => {
+  const hangerFull = (): boolean => {
     return hanger.length >= capacity;
   };
 
-  const landed = (plane) => {
+  const landed = (plane: Plane): boolean => {
     return hanger.includes(plane);
   };
 

@@ -1,7 +1,9 @@
-// Plane.js
+// Plane.tsx
 
 class Plane {
-  constructor(airborn = false) {
+  airborn: boolean;
+
+  constructor(airborn: boolean = false) {
     this.airborn = airborn;
   }
 
