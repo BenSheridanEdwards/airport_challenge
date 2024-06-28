@@ -1,4 +1,4 @@
-import { isStormy } from './Weather';
+import { isStormy } from './Weather/Weather';
 
 describe('Weather', () => {
   it('should return true if the weather is stormy', () => {
