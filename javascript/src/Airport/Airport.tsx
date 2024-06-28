@@ -19,7 +19,7 @@ const Airport: React.FC = () => {
         throw new Error('That plane is already here');
       }
       if (isStormy()) {
-        throw new Error('Stormy weather, abort landing!');
+        throw new Error('Stormy weather, cannot land the plane!');
       }
       plane.landed();
       setHanger([...hanger, plane]);
@@ -35,7 +35,7 @@ const Airport: React.FC = () => {
         throw new Error("That plane isn't here");
       }
       if (isStormy()) {
-        throw new Error('Stormy weather, cannot take off');
+        throw new Error('Stormy weather, cannot take off the plane!');
       }
       plane.inTheAir();
       setHanger(hanger.filter(p => p !== plane));
