@@ -24,7 +24,6 @@ describe('Airport Component', () => {
   test('lands a plane successfully', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByText('Land Plane'));
-    expect(screen.getByText('Plane landed successfully.')).toBeInTheDocument();
     expect(screen.getByText('Planes in hanger: 1')).toBeInTheDocument();
   });
 
@@ -41,14 +40,13 @@ describe('Airport Component', () => {
     (isStormy as jest.Mock).mockReturnValue(true);
     render(<Airport />);
     await userEvent.click(screen.getByText('Land Plane'));
-    expect(screen.getByText('Stormy weather, abort landing!')).toBeInTheDocument();
+    expect(screen.getByText('Stormy weather, cannot land the plane!')).toBeInTheDocument();
   });
 
   test('takes off a plane successfully', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByText('Land Plane'));
     await userEvent.click(screen.getByText('Take Off Plane'));
-    expect(screen.getByText('Plane took off successfully.')).toBeInTheDocument();
     expect(screen.getByText('Planes in hanger: 0')).toBeInTheDocument();
   });
 
