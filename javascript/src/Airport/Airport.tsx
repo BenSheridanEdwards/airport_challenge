@@ -35,7 +35,7 @@ const Airport: React.FC = () => {
         throw new Error("That plane isn't here");
       }
       if (isStormy()) {
-        throw new Error('Stormy weather, cannot take off the plane!');
+        throw new Error('Stormy weather, unable to take off!');
       }
       plane.inTheAir();
       setHanger(hanger.filter(p => p !== plane));
