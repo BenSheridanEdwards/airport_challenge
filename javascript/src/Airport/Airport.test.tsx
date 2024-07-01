@@ -46,6 +46,7 @@ describe('Airport Component', () => {
 
   test('prevents landing when plane is already in hanger', async () => {
     render(<Airport />);
+    const planeId = 'test-plane-id';
     const landButton = screen.getByText('Land Plane');
     await userEvent.click(landButton);
     await userEvent.click(landButton);
@@ -54,6 +55,7 @@ describe('Airport Component', () => {
 
   test('takes off a plane successfully', async () => {
     render(<Airport />);
+    const planeId = 'test-plane-id';
     await userEvent.click(screen.getByText('Land Plane'));
     await userEvent.click(screen.getByText('Take Off Plane'));
     expect(await screen.findByText(/Planes in hanger: 0/)).toBeInTheDocument();
@@ -61,6 +63,7 @@ describe('Airport Component', () => {
 
   test('prevents takeoff when weather is stormy', async () => {
     render(<Airport />);
+    const planeId = 'test-plane-id';
     await userEvent.click(screen.getByText('Land Plane'));
     (isStormy as jest.Mock).mockReturnValue(true);
     await userEvent.click(screen.getByText('Take Off Plane'));
@@ -75,6 +78,7 @@ describe('Airport Component', () => {
 
   test('prevents takeoff when plane is not in hanger', async () => {
     render(<Airport />);
+    const planeId = 'test-plane-id';
     const landButton = screen.getByText('Land Plane');
     const takeOffButton = screen.getByText('Take Off Plane');
     await userEvent.click(landButton);
