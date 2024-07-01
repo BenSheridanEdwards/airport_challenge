@@ -90,8 +90,8 @@ const Airport: React.FC = () => {
       <Text fontSize="2xl">Airport</Text>
       <Text>Capacity: {capacity}</Text>
       <Text>Planes in hanger: {hanger.length}</Text>
-      <Button colorScheme="teal" onClick={() => handleLand()} m={2}>Land Plane</Button>
-      <Button colorScheme="red" onClick={() => handleTakeOff()} m={2}>Take Off Plane</Button>
+      <Button colorScheme="teal" onClick={() => handleLand('test-plane-id')} m={2}>Land Plane</Button>
+      <Button colorScheme="red" onClick={() => handleTakeOff('test-plane-id')} m={2}>Take Off Plane</Button>
       {message && <Text mt={4}>{message}</Text>}
     </Box>
   );

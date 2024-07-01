@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
-import Plane from '../Plane/Plane';
 
 jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
@@ -54,6 +53,7 @@ describe('Airport Component', () => {
   });
 
   test('takes off a plane successfully', async () => {
+    const planeId = 'test-plane-id';
     render(<Airport />);
     await userEvent.click(screen.getByText('Land Plane'));
     await userEvent.click(screen.getByText('Take Off Plane'));
@@ -61,6 +61,7 @@ describe('Airport Component', () => {
   });
 
   test('prevents takeoff when weather is stormy', async () => {
+    const planeId = 'test-plane-id';
     render(<Airport />);
     await userEvent.click(screen.getByText('Land Plane'));
     (isStormy as jest.Mock).mockReturnValue(true);
