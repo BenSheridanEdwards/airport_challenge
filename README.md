@@ -9,7 +9,6 @@
           `~-.__       __..----..__                  )
                 `---~~\___________/------------`````
                 =  ===(_________)
-
 ``````
 
 ## Instructions
@@ -23,9 +22,11 @@
 ## Steps
 
 1. Fork this repo, and clone to your local machine
-2. Run the command `gem install bundle` (if you don't have bundle already)
-3. When the installation completes, run `bundle`
-4. Complete the following task:
+2. Navigate to the `/javascript` folder
+3. Run the command `npm install` to install all dependencies
+4. Run the command `npm start` to start the development server
+5. Open your browser and navigate to `http://localhost:3000` to view the app
+6. Run the command `npm test` to execute the test suite
 
 ## Task
 
