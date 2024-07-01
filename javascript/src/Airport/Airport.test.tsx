@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
+import Plane from '../Plane/Plane';
 
 jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
@@ -46,6 +47,7 @@ describe('Airport Component', () => {
   test('prevents landing when plane is already in hanger', async () => {
     const planeId = 'test-plane-id';
     render(<Airport />);
+    const plane = new Plane(planeId);
     const landButton = screen.getByText('Land Plane');
     await userEvent.click(landButton);
     await userEvent.click(landButton);
@@ -76,6 +78,7 @@ describe('Airport Component', () => {
   test('prevents takeoff when plane is not in hanger', async () => {
     const planeId = 'test-plane-id';
     render(<Airport />);
+    const plane = new Plane(planeId);
     const landButton = screen.getByText('Land Plane');
     const takeOffButton = screen.getByText('Take Off Plane');
     await userEvent.click(landButton);
