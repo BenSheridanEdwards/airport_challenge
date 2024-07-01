@@ -11,26 +11,44 @@
                 =  ===(_________)
 ``````
 
-## Instructions
+## Introduction
 
-- Challenge time: rest of the day and weekend, until Monday 9am
-- Feel free to use google, your notes, books, etc. but work on your own
-- If you refer to the solution of another coach or student, please put a link to that in your README
-- If you have a partial solution, **still check in a partial solution**
-- You must submit a pull request to this repo with your code by 9am Monday morning
+This project is a challenge from Makers Academy to write software that controls the flow of planes at an airport. The planes can land and take off provided that the weather is sunny. Occasionally it may be stormy, in which case no planes can land or take off. The project includes both a Ruby version and a JavaScript version, each with a full test suite.
 
-## Steps
+## What I Did
 
-1. Fork this repo, and clone to your local machine
-2. Navigate to the `/javascript` folder
-3. Run the command `npm install` to install all dependencies
-4. Run the command `npm start` to start the development server
-5. Open your browser and navigate to `http://localhost:3000` to view the app
-6. Run the command `npm test` to execute the test suite
+I (Ben) have made the project my own by implementing the following features and improvements:
+- Developed a React application using TypeScript for the JavaScript version.
+- Ensured high test coverage (>95%) for both the Ruby and JavaScript versions.
+- Updated the stormy weather error messages for clarity.
+- Reorganized test files to be inside their respective component folders.
+- Updated test functions to use `async/await` and `userEvent` for better testing practices.
 
-## Task
+## Build Instructions
 
-We have a request from a client to write the software to control the flow of planes at an airport. The planes can land and take off provided that the weather is sunny. Occasionally it may be stormy, in which case no planes can land or take off. Here are the user stories that we worked out in collaboration with the client:
+### JavaScript Version
+
+1. Fork this repo, and clone to your local machine.
+2. Navigate to the `/javascript` folder.
+3. Run the command `npm install` to install all dependencies.
+4. Run the command `npm start` to start the development server.
+5. Open your browser and navigate to `http://localhost:3000` to view the app.
+6. Run the command `npm test` to execute the test suite.
+
+### Ruby Version
+
+1. Fork this repo, and clone to your local machine.
+2. Run the command `gem install bundle` (if you don't have bundle already).
+3. When the installation completes, run `bundle install`.
+4. Run the command `rspec` to execute the test suite.
+
+## Additional Details
+
+- The JavaScript version of the project uses React and TypeScript.
+- Both versions have a full test suite with over 95% test coverage.
+- The project includes user stories that were worked out in collaboration with the client to ensure the software meets their requirements.
+
+## User Stories
 
 ```
 As an air traffic controller
