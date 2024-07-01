@@ -7,7 +7,7 @@ const DEFAULT_CAPACITY = 5;
 
 const Airport: React.FC = () => {
   const [hanger, setHanger] = useState<Plane[]>([]);
-  const [capacity, setCapacity] = useState<number>(DEFAULT_CAPACITY);
+  const [capacity] = useState<number>(DEFAULT_CAPACITY);
   const [message, setMessage] = useState<string>('');
 
   const land = (plane: Plane) => {
@@ -53,17 +53,31 @@ const Airport: React.FC = () => {
     return hanger.some(p => p.id === plane.id);
   };
 
-  const handleLand = () => {
-    const plane = new Plane(generateUniqueId());
-    land(plane);
+  const handleLand = (planeId?: string) => {
+    if (planeId) {
+      const plane = new Plane(planeId);
+      land(plane);
+    } else {
+      const newPlane = new Plane(generateUniqueId());
+      land(newPlane);
+    }
   };
 
-  const handleTakeOff = () => {
-    if (hanger.length > 0) {
-      const plane = hanger[0];
-      takeOff(plane);
+  const handleTakeOff = (planeId?: string) => {
+    if (planeId) {
+      const plane = hanger.find(p => p.id === planeId);
+      if (plane) {
+        takeOff(plane);
+      } else {
+        setMessage("That plane isn't here");
+      }
     } else {
-      setMessage('No planes available for takeoff.');
+      if (hanger.length > 0) {
+        const plane = hanger[0];
+        takeOff(plane);
+      } else {
+        setMessage('No planes available for takeoff.');
+      }
     }
   };
 
@@ -76,8 +90,8 @@ const Airport: React.FC = () => {
       <Text fontSize="2xl">Airport</Text>
       <Text>Capacity: {capacity}</Text>
       <Text>Planes in hanger: {hanger.length}</Text>
-      <Button colorScheme="teal" onClick={handleLand} m={2}>Land Plane</Button>
-      <Button colorScheme="red" onClick={handleTakeOff} m={2}>Take Off Plane</Button>
+      <Button colorScheme="teal" onClick={() => handleLand()} m={2}>Land Plane</Button>
+      <Button colorScheme="red" onClick={() => handleTakeOff()} m={2}>Take Off Plane</Button>
       {message && <Text mt={4}>{message}</Text>}
     </Box>
   );
