@@ -23,6 +23,7 @@ describe('Airport Component', () => {
 
   test('lands a plane successfully', async () => {
     render(<Airport />);
+    const planeId = 'test-plane-id';
     await userEvent.click(screen.getByText('Land Plane'));
     expect(await screen.findByText(/Planes in hanger: 1/)).toBeInTheDocument();
   });
