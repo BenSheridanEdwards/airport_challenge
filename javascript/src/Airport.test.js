@@ -1,20 +1,16 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport/Airport';
 
 describe('Airport', () => {
   it('should display the correct initial capacity and planes in hanger', () => {
-    act(() => {
-      render(<Airport />);
-    });
+    render(<Airport />);
     expect(screen.getByText(/Capacity: 5/i)).toBeInTheDocument();
     expect(screen.getByText(/Planes in hanger: 0/i)).toBeInTheDocument();
   });
 
   it('should land a plane and update the hanger', async () => {
-    act(() => {
-      render(<Airport />);
-    });
+    render(<Airport />);
     const landButton = screen.getByText(/Land Plane/i);
     fireEvent.click(landButton);
     await waitFor(() => {
@@ -26,9 +22,7 @@ describe('Airport', () => {
   });
 
   it('should take off a plane and update the hanger', async () => {
-    act(() => {
-      render(<Airport />);
-    });
+    render(<Airport />);
     const landButton = screen.getByText(/Land Plane/i);
     fireEvent.click(landButton);
     const takeOffButton = screen.getByText(/Take Off Plane/i);
@@ -40,9 +34,7 @@ describe('Airport', () => {
 
   it('should display an error message when trying to land a plane in a full hanger', async () => {
     jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
-    act(() => {
-      render(<Airport />);
-    });
+    render(<Airport />);
     const landButton = screen.getByText(/Land Plane/i);
     for (let i = 0; i < 5; i++) {
       fireEvent.click(landButton);
@@ -58,28 +50,24 @@ describe('Airport', () => {
 
   it('should display an error message when trying to land a plane during stormy weather', async () => {
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
-    act(() => {
-      render(<Airport />);
-    });
+    render(<Airport />);
     const landButton = screen.getByText(/Land Plane/i);
     fireEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText(/Stormy weather, abort landing!/i)).toBeInTheDocument();
+      expect(screen.getByText(/Stormy weather, cannot land the plane!/i)).toBeInTheDocument();
     });
   });
 
   it('should display an error message when trying to take off a plane during stormy weather', async () => {
     jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
-    act(() => {
-      render(<Airport />);
-    });
+    render(<Airport />);
     const landButton = screen.getByText(/Land Plane/i);
     fireEvent.click(landButton);
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
     const takeOffButton = screen.getByText(/Take Off Plane/i);
     fireEvent.click(takeOffButton);
     await waitFor(() => {
-      expect(screen.getByText(/Stormy weather, cannot take off/i)).toBeInTheDocument();
+      expect(screen.getByText(/Stormy weather, unable to take off!/i)).toBeInTheDocument();
     });
   });
 });
