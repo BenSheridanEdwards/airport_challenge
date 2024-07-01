@@ -47,8 +47,8 @@ describe('Airport Component', () => {
     const planeId = 'test-plane-id';
     render(<Airport />);
     const landButton = screen.getByText('Land Plane');
-    userEvent.click(landButton);
-    userEvent.click(landButton);
+    await userEvent.click(landButton);
+    await userEvent.click(landButton);
     expect(await screen.findByText(/That plane is already here/)).toBeInTheDocument();
   });
 
@@ -78,9 +78,9 @@ describe('Airport Component', () => {
     render(<Airport />);
     const landButton = screen.getByText('Land Plane');
     const takeOffButton = screen.getByText('Take Off Plane');
-    userEvent.click(landButton);
-    userEvent.click(takeOffButton);
-    userEvent.click(takeOffButton);
+    await userEvent.click(landButton);
+    await userEvent.click(takeOffButton);
+    await userEvent.click(takeOffButton);
     expect(await screen.findByText(/That plane isn't here/)).toBeInTheDocument();
   });
 });
