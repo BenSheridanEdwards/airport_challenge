@@ -47,7 +47,6 @@ describe('Airport Component', () => {
   test('prevents landing when plane is already in hanger', async () => {
     const planeId = 'test-plane-id';
     render(<Airport />);
-    const plane = new Plane(planeId);
     const landButton = screen.getByText('Land Plane');
     await userEvent.click(landButton);
     await userEvent.click(landButton);
@@ -78,7 +77,6 @@ describe('Airport Component', () => {
   test('prevents takeoff when plane is not in hanger', async () => {
     const planeId = 'test-plane-id';
     render(<Airport />);
-    const plane = new Plane(planeId);
     const landButton = screen.getByText('Land Plane');
     const takeOffButton = screen.getByText('Take Off Plane');
     await userEvent.click(landButton);
