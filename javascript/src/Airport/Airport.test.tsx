@@ -46,8 +46,9 @@ describe('Airport Component', () => {
   test('prevents landing when plane is already in hanger', async () => {
     const planeId = 'test-plane-id';
     render(<Airport />);
-    await userEvent.click(screen.getByText('Land Plane'));
-    await userEvent.click(screen.getByText('Land Plane'));
+    const landButton = screen.getByText('Land Plane');
+    userEvent.click(landButton);
+    userEvent.click(landButton);
     expect(await screen.findByText(/That plane is already here/)).toBeInTheDocument();
   });
 
@@ -75,9 +76,11 @@ describe('Airport Component', () => {
   test('prevents takeoff when plane is not in hanger', async () => {
     const planeId = 'test-plane-id';
     render(<Airport />);
-    await userEvent.click(screen.getByText('Land Plane'));
-    await userEvent.click(screen.getByText('Take Off Plane'));
-    await userEvent.click(screen.getByText('Take Off Plane'));
+    const landButton = screen.getByText('Land Plane');
+    const takeOffButton = screen.getByText('Take Off Plane');
+    userEvent.click(landButton);
+    userEvent.click(takeOffButton);
+    userEvent.click(takeOffButton);
     expect(await screen.findByText(/That plane isn't here/)).toBeInTheDocument();
   });
 });
