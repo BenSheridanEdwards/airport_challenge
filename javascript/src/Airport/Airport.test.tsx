@@ -43,6 +43,13 @@ describe('Airport Component', () => {
     expect(screen.getByText('Stormy weather, cannot land the plane!')).toBeInTheDocument();
   });
 
+  test('prevents landing when plane is already in hanger', async () => {
+    render(<Airport />);
+    await userEvent.click(screen.getByText('Land Plane'));
+    await userEvent.click(screen.getByText('Land Plane'));
+    expect(screen.getByText('That plane is already here')).toBeInTheDocument();
+  });
+
   test('takes off a plane successfully', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByText('Land Plane'));
@@ -62,5 +69,13 @@ describe('Airport Component', () => {
     render(<Airport />);
     await userEvent.click(screen.getByText('Take Off Plane'));
     expect(screen.getByText('No planes available for takeoff.')).toBeInTheDocument();
+  });
+
+  test('prevents takeoff when plane is not in hanger', async () => {
+    render(<Airport />);
+    await userEvent.click(screen.getByText('Land Plane'));
+    await userEvent.click(screen.getByText('Take Off Plane'));
+    await userEvent.click(screen.getByText('Take Off Plane'));
+    expect(screen.getByText("That plane isn't here")).toBeInTheDocument();
   });
 });

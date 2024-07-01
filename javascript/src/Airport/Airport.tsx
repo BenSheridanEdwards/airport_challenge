@@ -38,7 +38,7 @@ const Airport: React.FC = () => {
         throw new Error('Stormy weather, unable to take off!');
       }
       plane.inTheAir();
-      setHanger(hanger.filter(p => p !== plane));
+      setHanger(hanger.filter(p => p.id !== plane.id));
       setMessage('Plane took off successfully.');
     } catch (error) {
       setMessage((error as Error).message);
@@ -50,11 +50,11 @@ const Airport: React.FC = () => {
   };
 
   const landed = (plane: Plane): boolean => {
-    return hanger.includes(plane);
+    return hanger.some(p => p.id === plane.id);
   };
 
   const handleLand = () => {
-    const plane = new Plane();
+    const plane = new Plane(generateUniqueId());
     land(plane);
   };
 
@@ -65,6 +65,10 @@ const Airport: React.FC = () => {
     } else {
       setMessage('No planes available for takeoff.');
     }
+  };
+
+  const generateUniqueId = (): string => {
+    return '_' + Math.random().toString(36).substr(2, 9);
   };
 
   return (

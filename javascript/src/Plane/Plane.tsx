@@ -1,9 +1,9 @@
-// Plane.tsx
-
 class Plane {
+  id: string;
   airborn: boolean;
 
-  constructor(airborn: boolean = false) {
+  constructor(id: string, airborn: boolean = false) {
+    this.id = id;
     this.airborn = airborn;
   }
 
