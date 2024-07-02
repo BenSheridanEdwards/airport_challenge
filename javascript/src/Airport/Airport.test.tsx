@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport';
@@ -26,28 +26,36 @@ describe('Airport Component', () => {
   it('lands a plane successfully', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    const element = await screen.findByText('Planes in hanger: 1');
-    expect(element).toBeInTheDocument();
+    await waitFor(async () => {
+      const element = await screen.findByRole('status', { name: /Planes in hanger: 1/i });
+      expect(element).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it('prevents landing when hanger is full', async () => {
     render(<Airport />);
     for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-      const element = await screen.findByText(`Planes in hanger: ${i + 1}`);
-      expect(element).toBeInTheDocument();
+      await waitFor(async () => {
+        const element = await screen.findByRole('status', { name: new RegExp(`Planes in hanger: ${i + 1}`, 'i') });
+        expect(element).toBeInTheDocument();
+      }, { timeout: 3000 });
     }
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    const element = await screen.findByText('Hanger full, abort landing!');
-    expect(element).toBeInTheDocument();
+    await waitFor(async () => {
+      const element = await screen.findByRole('status', { name: /Hanger full, abort landing!/i });
+      expect(element).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it('prevents landing when weather is stormy', async () => {
     (isStormy as jest.Mock).mockReturnValue(true);
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    const element = await screen.findByText('Stormy weather, cannot land the plane!');
-    expect(element).toBeInTheDocument();
+    await waitFor(async () => {
+      const element = await screen.findByRole('status', { name: /Stormy weather, cannot land the plane!/i });
+      expect(element).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it('prevents landing when plane is already in hanger', async () => {
@@ -55,16 +63,20 @@ describe('Airport Component', () => {
     const landButton = screen.getByRole('button', { name: /land plane/i });
     await userEvent.click(landButton);
     await userEvent.click(landButton);
-    const element = await screen.findByText('That plane is already here');
-    expect(element).toBeInTheDocument();
+    await waitFor(async () => {
+      const element = await screen.findByRole('status', { name: /That plane is already here/i });
+      expect(element).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it('takes off a plane successfully', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-    const element = await screen.findByText('Planes in hanger: 0');
-    expect(element).toBeInTheDocument();
+    await waitFor(async () => {
+      const element = await screen.findByRole('status', { name: /Planes in hanger: 0/i });
+      expect(element).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it('prevents takeoff when weather is stormy', async () => {
@@ -72,15 +84,19 @@ describe('Airport Component', () => {
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     (isStormy as jest.Mock).mockReturnValue(true);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-    const element = await screen.findByText('Stormy weather, unable to take off!');
-    expect(element).toBeInTheDocument();
+    await waitFor(async () => {
+      const element = await screen.findByRole('status', { name: /Stormy weather, unable to take off!/i });
+      expect(element).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it('prevents takeoff when no planes are available', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-    const element = await screen.findByText('No planes available for takeoff');
-    expect(element).toBeInTheDocument();
+    await waitFor(async () => {
+      const element = await screen.findByRole('status', { name: /No planes available for takeoff/i });
+      expect(element).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it('prevents takeoff when plane is not in hanger', async () => {
@@ -92,7 +108,9 @@ describe('Airport Component', () => {
     await userEvent.click(landButton);
     await userEvent.click(takeOffButton);
     await userEvent.click(takeOffButton);
-    const element = await screen.findByText('That plane isn\'t here');
-    expect(element).toBeInTheDocument();
+    await waitFor(async () => {
+      const element = await screen.findByRole('status', { name: /That plane isn't here/i });
+      expect(element).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 });
