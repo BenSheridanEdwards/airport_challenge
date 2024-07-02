@@ -40,6 +40,7 @@ describe('Airport Component', () => {
   test('prevents landing when weather is stormy', async () => {
     (isStormy as jest.Mock).mockReturnValue(true);
     render(<Airport />);
+    const planeId = 'test-plane-id';
     await userEvent.click(screen.getByText('Land Plane'));
     expect(await screen.findByText(/Stormy weather, cannot land the plane!/)).toBeInTheDocument();
   });
