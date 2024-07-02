@@ -39,13 +39,14 @@ describe('Airport', () => {
     const landButton = screen.getByText(/Land Plane/i);
     for (let i = 0; i < 5; i++) {
       userEvent.click(landButton);
-      await waitFor(() => {
-        expect(screen.getByText(new RegExp(`Planes in hanger: ${i + 1}`, 'i'))).toBeInTheDocument();
+      await waitFor(async () => {
+        expect(await screen.findByText((content) => content.includes(`Planes in hanger: ${i + 1}`))).toBeInTheDocument();
       });
     }
     userEvent.click(landButton);
-    const errorMessage = await screen.findByText((content) => content.includes('Hanger full, abort landing!'));
-    expect(errorMessage).toBeInTheDocument();
+    await waitFor(async () => {
+      expect(await screen.findByText((content) => content.includes('Hanger full, abort landing!'))).toBeInTheDocument();
+    });
   });
 
   it('should display an error message when trying to land a plane during stormy weather', async () => {
@@ -96,7 +97,8 @@ describe('Airport', () => {
     render(<Airport />);
     const takeOffButton = screen.getByText(/Take Off Plane/i);
     userEvent.click(takeOffButton);
-    const errorMessage = await screen.findByText((content) => content.includes('No planes available for takeoff.'));
-    expect(errorMessage).toBeInTheDocument();
+    await waitFor(async () => {
+      expect(await screen.findByText((content) => content.includes('No planes available for takeoff.'))).toBeInTheDocument();
+    });
   });
 });
