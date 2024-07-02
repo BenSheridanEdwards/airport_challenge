@@ -25,7 +25,9 @@ describe('Airport Component', () => {
     render(<Airport />);
     await userEvent.click(screen.getByText('Land Plane'));
     await waitFor(() => {
-      expect(screen.getByText('Planes in hanger: 1')).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element !== null && element.textContent !== null && element.textContent.includes('Planes in hanger: 1') && element.tagName.toLowerCase() === 'p';
+      })).toBeInTheDocument();
     });
   });
 
@@ -33,10 +35,17 @@ describe('Airport Component', () => {
     render(<Airport />);
     for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByText('Land Plane'));
+      await waitFor(() => {
+        expect(screen.getByText((content, element) => {
+          return element !== null && element.textContent !== null && element.textContent.includes(`Planes in hanger: ${i + 1}`) && element.tagName.toLowerCase() === 'p';
+        })).toBeInTheDocument();
+      });
     }
     await userEvent.click(screen.getByText('Land Plane'));
     await waitFor(() => {
-      expect(screen.getByText(/Hanger full, abort landing!/)).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element !== null && element.textContent !== null && element.textContent.includes('Hanger full, abort landing!') && element.tagName.toLowerCase() === 'p';
+      })).toBeInTheDocument();
     });
   });
 
@@ -45,7 +54,9 @@ describe('Airport Component', () => {
     render(<Airport />);
     await userEvent.click(screen.getByText('Land Plane'));
     await waitFor(() => {
-      expect(screen.getByText(/Stormy weather, cannot land the plane!/)).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element !== null && element.textContent !== null && element.textContent.includes('Stormy weather, cannot land the plane!') && element.tagName.toLowerCase() === 'p';
+      })).toBeInTheDocument();
     });
   });
 
@@ -55,7 +66,9 @@ describe('Airport Component', () => {
     await userEvent.click(landButton);
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText((content, element) => content.includes('That plane is already here'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element !== null && element.textContent !== null && element.textContent.includes('That plane is already here') && element.tagName.toLowerCase() === 'p';
+      })).toBeInTheDocument();
     });
   });
 
@@ -64,7 +77,9 @@ describe('Airport Component', () => {
     await userEvent.click(screen.getByText('Land Plane'));
     await userEvent.click(screen.getByText('Take Off Plane'));
     await waitFor(() => {
-      expect(screen.getByText('Planes in hanger: 0')).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element !== null && element.textContent !== null && element.textContent.includes('Planes in hanger: 0') && element.tagName.toLowerCase() === 'p';
+      })).toBeInTheDocument();
     });
   });
 
@@ -74,7 +89,9 @@ describe('Airport Component', () => {
     (isStormy as jest.Mock).mockReturnValue(true);
     await userEvent.click(screen.getByText('Take Off Plane'));
     await waitFor(() => {
-      expect(screen.getByText(/Stormy weather, unable to take off!/)).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element !== null && element.textContent !== null && element.textContent.includes('Stormy weather, unable to take off!') && element.tagName.toLowerCase() === 'p';
+      })).toBeInTheDocument();
     });
   });
 
@@ -82,7 +99,9 @@ describe('Airport Component', () => {
     render(<Airport />);
     await userEvent.click(screen.getByText('Take Off Plane'));
     await waitFor(() => {
-      expect(screen.getByText(/No planes available for takeoff./)).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element !== null && element.textContent !== null && element.textContent.includes('No planes available for takeoff') && element.tagName.toLowerCase() === 'p';
+      })).toBeInTheDocument();
     });
   });
 
@@ -94,7 +113,9 @@ describe('Airport Component', () => {
     await userEvent.click(takeOffButton);
     await userEvent.click(takeOffButton);
     await waitFor(() => {
-      expect(screen.getByText((content, element) => content.includes('That plane isn\'t here'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element !== null && element.textContent !== null && element.textContent.includes('That plane isn\'t here') && element.tagName.toLowerCase() === 'p';
+      })).toBeInTheDocument();
     });
   });
 });

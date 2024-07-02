@@ -19,7 +19,7 @@ describe('Airport', () => {
     const landButton = screen.getByText(/Land Plane/i);
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('Planes in hanger: 1'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Planes in hanger: 1') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
   });
 
@@ -28,12 +28,12 @@ describe('Airport', () => {
     const landButton = screen.getByText(/Land Plane/i);
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('Planes in hanger: 1'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Planes in hanger: 1') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
     const takeOffButton = screen.getByText(/Take Off Plane/i);
     await userEvent.click(takeOffButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('Planes in hanger: 0'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Planes in hanger: 0') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
   });
 
@@ -44,12 +44,12 @@ describe('Airport', () => {
     for (let i = 0; i < 5; i++) {
       await userEvent.click(landButton);
       await waitFor(() => {
-        expect(screen.getByText((content) => content.includes(`Planes in hanger: ${i + 1}`))).toBeInTheDocument();
+        expect(screen.getByText((content, element) => content.includes(`Planes in hanger: ${i + 1}`) && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
       });
     }
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('Hanger full, abort landing!'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Hanger full, abort landing!') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
   });
 
@@ -59,7 +59,7 @@ describe('Airport', () => {
     const landButton = screen.getByText(/Land Plane/i);
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('Stormy weather, cannot land the plane!'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Stormy weather, cannot land the plane!') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
   });
 
@@ -69,13 +69,13 @@ describe('Airport', () => {
     const landButton = screen.getByText(/Land Plane/i);
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('Planes in hanger: 1'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Planes in hanger: 1') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
     const takeOffButton = screen.getByText(/Take Off Plane/i);
     await userEvent.click(takeOffButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('Stormy weather, unable to take off!'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Stormy weather, unable to take off!') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
   });
 
@@ -84,11 +84,11 @@ describe('Airport', () => {
     const landButton = screen.getByText(/Land Plane/i);
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('Planes in hanger: 1'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Planes in hanger: 1') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('That plane is already here'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('That plane is already here') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
   });
 
@@ -97,7 +97,7 @@ describe('Airport', () => {
     const takeOffButton = screen.getByText(/Take Off Plane/i);
     await userEvent.click(takeOffButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes("That plane isn't here"))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('No planes available for takeoff') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
   });
 
@@ -106,7 +106,7 @@ describe('Airport', () => {
     const takeOffButton = screen.getByText(/Take Off Plane/i);
     await userEvent.click(takeOffButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.includes('No planes available for takeoff.'))).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('No planes available for takeoff') && element.tagName.toLowerCase() === 'p')).toBeInTheDocument();
     });
   });
 });
