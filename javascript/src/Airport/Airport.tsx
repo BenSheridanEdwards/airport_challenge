@@ -22,7 +22,7 @@ const Airport: React.FC = () => {
         throw new Error('Stormy weather, cannot land the plane!');
       }
       plane.landed();
-      setHanger([...hanger, plane]);
+      setHanger(prevHanger => [...prevHanger, plane]);
       setMessage('Plane landed successfully.');
     } catch (error) {
       setMessage((error as Error).message);
@@ -38,7 +38,7 @@ const Airport: React.FC = () => {
         throw new Error('Stormy weather, unable to take off!');
       }
       plane.inTheAir();
-      setHanger(hanger.filter(p => p.id !== plane.id));
+      setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
       setMessage('Plane took off successfully.');
     } catch (error) {
       setMessage((error as Error).message);
@@ -89,10 +89,10 @@ const Airport: React.FC = () => {
     <Box p={4}>
       <Text fontSize="2xl">Airport</Text>
       <Text>Capacity: {capacity}</Text>
-      <Text>Planes in hanger: {hanger.length}</Text>
+      <Text role="status">Planes in hanger: {hanger.length}</Text>
       <Button colorScheme="teal" onClick={() => handleLand()} m={2}>Land Plane</Button>
       <Button colorScheme="red" onClick={() => handleTakeOff()} m={2}>Take Off Plane</Button>
-      {message && <Text mt={4}>{message}</Text>}
+      {message && <Text role="status" mt={4}>{message}</Text>}
     </Box>
   );
 };
