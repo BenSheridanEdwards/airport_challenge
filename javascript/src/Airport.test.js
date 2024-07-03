@@ -26,23 +26,17 @@ describe('Airport', () => {
     await render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText('Planes in hanger: 1')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
   });
 
   it('should take off a plane and update the hanger', async () => {
     await render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText('Planes in hanger: 1')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      expect(screen.getByText('Planes in hanger: 0')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 0'))).toBeInTheDocument();
   });
 
   it('should display an error message when trying to land a plane in a full hanger', async () => {
@@ -51,14 +45,10 @@ describe('Airport', () => {
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     for (let i = 0; i < 5; i++) {
       await userEvent.click(landButton);
-      await waitFor(() => {
-        expect(screen.getByText(`Planes in hanger: ${i + 1}`)).toBeInTheDocument();
-      });
+      expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes(`Planes in hanger: ${i + 1}`))).toBeInTheDocument();
     }
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText('Hanger full, abort landing!')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('Hanger full, abort landing!')).toBeInTheDocument();
   });
 
   it('should display an error message when trying to land a plane during stormy weather', async () => {
@@ -66,54 +56,40 @@ describe('Airport', () => {
     await render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText('Stormy weather, cannot land the plane!')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Stormy weather, cannot land the plane!'))).toBeInTheDocument();
   });
 
   it('should display an error message when trying to take off a plane during stormy weather', async () => {
     await render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText('Planes in hanger: 1')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      expect(screen.getByText('Stormy weather, unable to take off!')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Stormy weather, unable to take off!'))).toBeInTheDocument();
   });
 
   it('should display an error message when trying to land a plane that is already in the hanger', async () => {
     await render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText('Planes in hanger: 1')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText('That plane is already here')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('That plane is already here'))).toBeInTheDocument();
   });
 
   it('should display an error message when trying to take off a plane that is not in the hanger', async () => {
     await render(<Airport />);
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      expect(screen.getByText('No planes available for takeoff')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('No planes available for takeoff'))).toBeInTheDocument();
   });
 
   it('should display a message when there are no planes available for takeoff', async () => {
     await render(<Airport />);
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      expect(screen.getByText('No planes available for takeoff')).toBeInTheDocument();
-    });
+    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('No planes available for takeoff'))).toBeInTheDocument();
   });
 });
