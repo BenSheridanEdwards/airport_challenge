@@ -58,8 +58,9 @@ describe('Airport', () => {
     // Attempt one more landing to ensure the hanger is full
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText(/Hanger full, abort landing!/)).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Hanger full, abort landing!'))).toBeInTheDocument();
     });
+    jest.restoreAllMocks(); // Restore Math.random mock
   });
 
   it('should display an error message when trying to take off a plane during stormy weather', async () => {
@@ -73,7 +74,7 @@ describe('Airport', () => {
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
     await waitFor(() => {
-      expect(screen.getByText(/Stormy\s+weather,\s+unable\s+to\s+take\s+off!/)).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('Stormy weather, unable to take off!'))).toBeInTheDocument();
     });
   });
 
@@ -87,7 +88,7 @@ describe('Airport', () => {
     // Attempt to land the same plane again
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText(/That plane is already here/)).toBeInTheDocument();
+      expect(screen.getByText((content, element) => content.includes('That plane is already here'))).toBeInTheDocument();
     });
   });
 

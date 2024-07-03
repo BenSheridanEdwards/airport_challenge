@@ -63,9 +63,7 @@ describe('Airport Component', () => {
     await userEvent.click(landButton);
     await waitFor(async () => {
       const hangerContainer = screen.getByTestId('hanger-container');
-      console.log('Hanger Container:', hangerContainer.innerHTML);
-      const alreadyHereMessage = await within(hangerContainer).findByText(/Plane\s+landed\s+successfully\./);
-      console.log('Already Here Message:', alreadyHereMessage);
+      const alreadyHereMessage = await within(hangerContainer).findByText(/That\s+plane\s+is\s+already\s+here/);
       expect(alreadyHereMessage).toBeInTheDocument();
     });
   });
@@ -113,9 +111,7 @@ describe('Airport Component', () => {
     await userEvent.click(takeOffButton);
     await waitFor(async () => {
       const hangerContainer = screen.getByTestId('hanger-container');
-      console.log('Hanger Container:', hangerContainer.innerHTML);
       const notHereMessage = await within(hangerContainer).findByText(/No\s+planes\s+available\s+for\s+takeoff/);
-      console.log('Not Here Message:', notHereMessage);
       expect(notHereMessage).toBeInTheDocument();
     });
   });
