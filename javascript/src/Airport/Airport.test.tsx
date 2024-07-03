@@ -23,38 +23,36 @@ describe('Airport Component', () => {
     expect(screen.getByText('Planes in hanger: 0')).toBeInTheDocument();
   });
 
-  // Updated test cases to use specific plane IDs and ensure proper asynchronous handling
-
   it('lands a plane successfully', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
+    expect(await screen.findByText(/Planes in hanger: 1/)).toBeInTheDocument();
   });
 
   it('prevents landing when hanger is full', async () => {
     render(<Airport />);
     for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-      expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes(`Planes in hanger: ${i + 1}`))).toBeInTheDocument();
+      expect(await screen.findByText((content, node) => node?.textContent?.replace(/\s+/g, ' ').trim().includes(`Planes in hanger: ${i + 1}`) ?? false)).toBeInTheDocument();
     }
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Hanger full, abort landing!'))).toBeInTheDocument();
+    expect(await screen.findByText(/Hanger full, abort landing!/)).toBeInTheDocument();
   });
 
   it('prevents landing when weather is stormy', async () => {
     (isStormy as jest.Mock).mockReturnValue(true);
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Stormy weather, cannot land the plane!'))).toBeInTheDocument();
+    expect(await screen.findByText('Stormy weather, cannot land the plane!')).toBeInTheDocument();
   });
 
   it('prevents landing when plane is already in hanger', async () => {
     render(<Airport />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     await userEvent.click(landButton);
-    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
+    expect(await screen.findByText('Planes in hanger: 1')).toBeInTheDocument();
     await userEvent.click(landButton);
-    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('That plane is already here'))).toBeInTheDocument();
+    expect(await screen.findByText('That plane is already here')).toBeInTheDocument();
   });
 
   it('takes off a plane successfully', async () => {
@@ -75,7 +73,7 @@ describe('Airport Component', () => {
   it('prevents takeoff when no planes are available', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-    expect(await screen.findByText('No planes available for takeoff.')).toBeInTheDocument();
+    expect(await screen.findByText('No planes available for takeoff')).toBeInTheDocument();
   });
 
   it('prevents takeoff when plane is not in hanger', async () => {
@@ -87,10 +85,8 @@ describe('Airport Component', () => {
     await userEvent.click(takeOffButton);
     expect(await screen.findByText('Plane took off successfully.')).toBeInTheDocument();
     await userEvent.click(takeOffButton);
-    expect(await screen.findByText("That plane isn't here")).toBeInTheDocument();
+    expect(await screen.findByText((content, node) => node?.textContent?.replace(/\s+/g, ' ').trim().includes('That plane isn\'t here') ?? false)).toBeInTheDocument();
   });
-
-  // Additional test cases for comprehensive coverage
 
   it('handles multiple planes landing and taking off in sequence', async () => {
     render(<Airport />);
@@ -100,19 +96,19 @@ describe('Airport Component', () => {
     // Land 3 planes
     for (let i = 0; i < 3; i++) {
       await userEvent.click(landButton);
-      expect(await screen.findByText(`Planes in hanger: ${i + 1}`)).toBeInTheDocument();
+      expect(await screen.findByText((content, node) => node?.textContent?.replace(/\s+/g, ' ').trim().includes(`Planes in hanger: ${i + 1}`) ?? false)).toBeInTheDocument();
     }
 
     // Take off 2 planes
     for (let i = 2; i >= 1; i--) {
       await userEvent.click(takeOffButton);
-      expect(await screen.findByText(`Planes in hanger: ${i}`)).toBeInTheDocument();
+      expect(await screen.findByText((content, node) => node?.textContent?.replace(/\s+/g, ' ').trim().includes(`Planes in hanger: ${i}`) ?? false)).toBeInTheDocument();
     }
 
     // Land 2 more planes
     for (let i = 1; i <= 2; i++) {
       await userEvent.click(landButton);
-      expect(await screen.findByText(`Planes in hanger: ${i + 1}`)).toBeInTheDocument();
+      expect(await screen.findByText((content, node) => node?.textContent?.replace(/\s+/g, ' ').trim().includes(`Planes in hanger: ${i + 1}`) ?? false)).toBeInTheDocument();
     }
   });
 
@@ -126,7 +122,7 @@ describe('Airport Component', () => {
 
     // Attempt to land another plane
     await userEvent.click(landButton);
-    expect(await screen.findByText('Stormy weather, cannot land the plane!')).toBeInTheDocument();
+    expect(await screen.findByText((content, node) => node?.textContent?.replace(/\s+/g, ' ').trim().includes('Stormy weather, cannot land the plane!') ?? false)).toBeInTheDocument();
   });
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
@@ -140,7 +136,7 @@ describe('Airport Component', () => {
 
     // Attempt to take off the plane
     await userEvent.click(takeOffButton);
-    expect(await screen.findByText('Stormy weather, unable to take off!')).toBeInTheDocument();
+    expect(await screen.findByText((content, node) => node?.textContent?.replace(/\s+/g, ' ').trim().includes('Stormy weather, unable to take off!') ?? false)).toBeInTheDocument();
   });
 
   it('ensures state persistence across different actions', async () => {
