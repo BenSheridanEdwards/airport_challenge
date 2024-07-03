@@ -86,13 +86,13 @@ const Airport: React.FC = () => {
   };
 
   return (
-    <Box p={4}>
+    <Box p={4} data-testid="hanger-container">
       <Text fontSize="2xl">Airport</Text>
       <Text>Capacity: {capacity}</Text>
-      <Text role="status">Planes in hanger: {hanger.length}</Text>
-      <Button colorScheme="teal" onClick={() => handleLand('plane-1')} m={2}>Land Plane</Button>
-      <Button colorScheme="red" onClick={() => handleTakeOff('plane-1')} m={2}>Take Off Plane</Button>
-      {message && <Text role="status" mt={4}>{message}</Text>}
+      <Text role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</Text>
+      <Button colorScheme="teal" onClick={() => handleLand()} m={2}>Land Plane</Button>
+      <Button colorScheme="red" onClick={() => handleTakeOff()} m={2} data-testid="takeoff-container">Take Off Plane</Button>
+      {message && <Text role="status" mt={4} data-testid="hanger-1">{message}</Text>}
     </Box>
   );
 };
