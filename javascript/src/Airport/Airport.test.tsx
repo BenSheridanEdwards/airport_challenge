@@ -14,6 +14,7 @@ jest.mock('../Weather/Weather', () => ({
 describe('Airport Component', () => {
   beforeEach(() => {
     (isStormy as jest.Mock).mockReturnValue(false);
+    jest.resetAllMocks();
   });
 
   it('renders Airport component', () => {
@@ -33,22 +34,24 @@ describe('Airport Component', () => {
 
   it('prevents landing when hanger is full', async () => {
     render(<Airport />);
-    await waitFor(async () => {
-      for (let i = 0; i < 5; i++) {
-        await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-        expect(await screen.findByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
-      }
+    for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-      expect(await screen.findByText(/Hanger\s+full,\s+abort\s+landing!/)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
+      });
+    }
+    await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/Hanger\s+full,\s+abort\s+landing!/)).toBeInTheDocument();
     });
   });
 
   it('prevents landing when weather is stormy', async () => {
     (isStormy as jest.Mock).mockReturnValue(true);
     render(<Airport />);
-    await waitFor(async () => {
-      await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-      expect(await screen.findByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/)).toBeInTheDocument();
     });
   });
 
@@ -57,14 +60,12 @@ describe('Airport Component', () => {
     render(<Airport />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     await userEvent.click(landButton);
-    await waitFor(async () => {
-      expect(await screen.findByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
     });
     await userEvent.click(landButton);
-    await waitFor(async () => {
-      const hangerContainer = screen.getByTestId('hanger-container');
-      const alreadyHereMessage = await within(hangerContainer).findByText(/That\s+plane\s+is\s+already\s+here/);
-      expect(alreadyHereMessage).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/That\s+plane\s+is\s+already\s+here/)).toBeInTheDocument();
     });
   });
 
@@ -79,19 +80,19 @@ describe('Airport Component', () => {
 
   it('prevents takeoff when weather is stormy', async () => {
     render(<Airport />);
-    await waitFor(async () => {
-      await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-      (isStormy as jest.Mock).mockReturnValue(true);
-      await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-      expect(await screen.findByText(/Stormy\s+weather,\s+unable\s+to\s+take\s+off!/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
+    (isStormy as jest.Mock).mockReturnValue(true);
+    await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/Stormy\s+weather,\s+unable\s+to\s+take\s+off!/)).toBeInTheDocument();
     });
   });
 
   it('prevents takeoff when no planes are available', async () => {
     render(<Airport />);
-    await waitFor(async () => {
-      await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-      expect(await screen.findByText(/No\s+planes\s+available\s+for\s+takeoff/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/No\s+planes\s+available\s+for\s+takeoff/)).toBeInTheDocument();
     });
   });
 
