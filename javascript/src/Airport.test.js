@@ -75,7 +75,7 @@ describe('Airport', () => {
     // Attempt to land the same plane again
     await userEvent.click(landButton);
     await waitFor(() => {
-      const errorMessage = screen.getByText(/That\s+plane\s+is\s+already\s+here/);
+      const errorMessage = screen.getByText((content, element) => content.includes('That plane is already here'));
       expect(errorMessage).toBeInTheDocument();
     });
   });
