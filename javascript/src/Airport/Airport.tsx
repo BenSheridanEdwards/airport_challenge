@@ -69,9 +69,12 @@ const Airport: React.FC = () => {
     }
     if (planeId) {
       const plane = new Plane(planeId);
+      console.log(`Landing plane with provided ID: ${planeId}`);
       await land(plane);
     } else {
-      const newPlane = new Plane(generateUniqueId());
+      const newPlaneId = generateUniqueId();
+      const newPlane = new Plane(newPlaneId);
+      console.log(`Landing plane with generated ID: ${newPlaneId}`);
       await land(newPlane);
     }
   };
