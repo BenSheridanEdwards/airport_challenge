@@ -5,28 +5,27 @@ import Airport from './Airport/Airport';
 
 let mockIdCounter = 0;
 
+jest.mock('./Airport/Airport', () => {
+  const originalModule = jest.requireActual('./Airport/Airport');
+  return {
+    __esModule: true,
+    ...originalModule,
+    generateUniqueId: jest.fn(() => {
+      const id = `test-plane-id-${mockIdCounter++}`;
+      console.log(`Generated unique ID: ${id}`);
+      return id;
+    }),
+  };
+});
+
 describe('Airport', () => {
   beforeEach(() => {
     jest.clearAllMocks(); // Clear all mocks before each test
     jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
     mockIdCounter = 0; // Reset mockIdCounter before each test
-
-    jest.mock('./Airport/Airport', () => {
-      const originalModule = jest.requireActual('./Airport/Airport');
-      return {
-        __esModule: true,
-        ...originalModule,
-        generateUniqueId: jest.fn(() => {
-          const id = `test-plane-id-${mockIdCounter++}`;
-          console.log(`Generated unique ID: ${id}`);
-          return id;
-        }),
-      };
-    });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
     cleanup();
   });
 
