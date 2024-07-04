@@ -72,14 +72,11 @@ const Airport: React.FC<AirportProps> = ({ generateUniqueId = defaultGenerateUni
       return;
     }
     if (planeId) {
-      const plane = new Plane(planeId);
-      console.log(`Landing plane with provided ID: ${planeId}`);
-      await land(plane);
+      const plane = createPlane(planeId);
+      land(plane);
     } else {
-      const newPlaneId = generateUniqueId();
-      const newPlane = new Plane(newPlaneId);
-      console.log(`Landing plane with generated ID: ${newPlaneId}`);
-      await land(newPlane);
+      const newPlane = createPlane(generateUniqueId());
+      land(newPlane);
     }
   };
 
@@ -99,6 +96,14 @@ const Airport: React.FC<AirportProps> = ({ generateUniqueId = defaultGenerateUni
         setMessage('No planes available for takeoff.');
       }
     }
+  };
+
+  const createPlane = (id: string): Plane => {
+    return new Plane(id);
+  };
+
+  const generateUniqueId = (): string => {
+    return '_' + Math.random().toString(36).substr(2, 9);
   };
 
   return (

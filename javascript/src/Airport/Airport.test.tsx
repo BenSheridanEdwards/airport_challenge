@@ -5,6 +5,18 @@ import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
 
+jest.mock('../Plane/Plane', () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(function (this: MockPlane, id: string) {
+      this.id = id;
+      this.airborn = false;
+      this.landed = jest.fn().mockReturnThis();
+      this.inTheAir = jest.fn().mockReturnThis();
+    }),
+  };
+});
+
 jest.setTimeout(10000);
 
 jest.mock('../Weather/Weather', () => ({
@@ -17,22 +29,6 @@ interface MockPlane {
   landed: jest.Mock;
   inTheAir: jest.Mock;
 }
-
-jest.mock('../Plane/Plane', () => {
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(function (this: MockPlane, id: string) {
-      this.id = id;
-      this.airborn = false;
-      this.landed = jest.fn(function (this: MockPlane) {
-        this.airborn = false;
-      });
-      this.inTheAir = jest.fn(function (this: MockPlane) {
-        this.airborn = true;
-      });
-    }),
-  };
-});
 
 describe('Airport Component', () => {
   beforeEach(() => {
