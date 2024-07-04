@@ -61,6 +61,9 @@ const Airport: React.FC = () => {
       const newPlane = new Plane(generateUniqueId());
       await land(newPlane);
     }
+    if (hangerFull()) {
+      setMessage('Hanger full, abort landing!');
+    }
   };
 
   const handleTakeOff = async (planeId?: string) => {
