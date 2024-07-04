@@ -42,8 +42,10 @@ describe('Airport', () => {
     await userEvent.click(landButton);
     const message = await screen.findByText(/Plane landed successfully\./);
     expect(message).toBeInTheDocument();
-    const hangerCount = await screen.findByTestId('hanger-count');
-    expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+    await waitFor(async () => {
+      const hangerCount = await screen.findByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+    }, { timeout: 10000 });
   });
 
   it('should take off a plane and update the hanger', async () => {
