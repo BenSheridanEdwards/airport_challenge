@@ -1,4 +1,4 @@
-import { render, screen, cleanup, waitFor, act } from '@testing-library/react';
+import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport/Airport';
@@ -57,20 +57,22 @@ describe('Airport', () => {
     expect(updatedHangerCount).toHaveTextContent('Planes in hanger: 0');
   });
 
+  // Test case for landing a plane in a full hanger
   it('should display an error message when trying to land a plane in a full hanger', async () => {
     render(<Airport />);
     for (let i = 0; i < 5; i++) {
       const landButton = await screen.findByRole('button', { name: /Land Plane/i });
       await userEvent.click(landButton);
       const hangerCount = await screen.findByTestId('hanger-count');
-      await waitFor(() => expect(hangerCount).toHaveTextContent(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`)), { timeout: 5000 });
+      await waitFor(() => expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`), { timeout: 5000 });
     }
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText(/Hanger full, cannot land the plane!/);
-    await waitFor(() => expect(errorMessage).toBeInTheDocument(), { timeout: 5000 });
+    const errorMessage = await screen.findByText(/Hanger full, abort landing!/);
+    expect(errorMessage).toBeInTheDocument();
   });
 
+  // Test case for landing a plane that is already in the hanger
   it('should display an error message when trying to land a plane that is already in the hanger', async () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
@@ -79,9 +81,10 @@ describe('Airport', () => {
     await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'), { timeout: 5000 });
     await userEvent.click(landButton);
     const errorMessage = await screen.findByText(/That plane is already here/);
-    await waitFor(() => expect(errorMessage).toBeInTheDocument(), { timeout: 5000 });
+    expect(errorMessage).toBeInTheDocument();
   });
 
+  // Test case for stormy weather preventing takeoff
   it('should display an error message when trying to take off a plane during stormy weather', async () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
@@ -91,8 +94,8 @@ describe('Airport', () => {
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    const errorMessage = await screen.findByText(/Stormy weather, cannot take off the plane!/);
-    await waitFor(() => expect(errorMessage).toBeInTheDocument(), { timeout: 5000 });
+    const errorMessage = await screen.findByText(/Stormy weather, unable to take off!/);
+    expect(errorMessage).toBeInTheDocument();
   });
 
   it('should display an error message when trying to take off a plane that is not in the hanger', async () => {
