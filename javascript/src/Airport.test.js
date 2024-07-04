@@ -12,19 +12,37 @@ jest.mock('./Airport/Airport', () => {
     ...originalModule,
     generateUniqueId: jest.fn(() => {
       const id = `test-plane-id-${mockIdCounter}`;
-      console.log(`Generating unique ID: ${id} with counter: ${mockIdCounter}`);
+      console.log(`Mocking generateUniqueId: ${id} with counter: ${mockIdCounter}`);
       mockIdCounter++;
+      console.log(`Updated mockIdCounter: ${mockIdCounter}`);
       return id;
     }),
   };
 });
+
+const { generateUniqueId } = require('./Airport/Airport');
 
 describe('Airport', () => {
   beforeEach(() => {
     jest.resetModules(); // Reset the state of all modules before each test
     jest.clearAllMocks(); // Clear all mocks before each test
     mockIdCounter = 0; // Reset mockIdCounter before each test
+    console.log(`Reset mockIdCounter: ${mockIdCounter}`);
     jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
+    jest.mock('./Airport/Airport', () => {
+      const originalModule = jest.requireActual('./Airport/Airport');
+      return {
+        __esModule: true,
+        ...originalModule,
+        generateUniqueId: jest.fn(() => {
+          const id = `test-plane-id-${mockIdCounter}`;
+          console.log(`Mocking generateUniqueId: ${id} with counter: ${mockIdCounter}`);
+          mockIdCounter++;
+          console.log(`Updated mockIdCounter: ${mockIdCounter}`);
+          return id;
+        }),
+      };
+    });
   });
 
   afterEach(() => {
@@ -50,6 +68,8 @@ describe('Airport', () => {
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
       console.log(`Updated hanger count: ${hangerCount.textContent}`);
     }, { timeout: 10000 });
+    console.log(`Generated IDs: ${mockIdCounter}`);
+    console.log(`Mocked generateUniqueId calls: ${generateUniqueId.mock.calls.length}`);
   });
 
   it('should take off a plane and update the hanger', async () => {
