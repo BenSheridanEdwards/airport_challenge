@@ -88,7 +88,7 @@ describe('Airport', () => {
     // Attempt to land the same plane again
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText(/That plane is already here/)).toBeInTheDocument();
+      expect(screen.getByText((content) => content.includes('That plane is already here'))).toBeInTheDocument();
     });
   });
 
