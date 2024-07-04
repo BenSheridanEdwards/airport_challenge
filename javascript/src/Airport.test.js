@@ -12,6 +12,7 @@ jest.mock('./Airport/Airport', () => {
     ...originalModule,
     generateUniqueId: jest.fn(() => {
       const id = `test-plane-id-${mockIdCounter}`;
+      console.log(`Generating unique ID: ${id} with counter: ${mockIdCounter}`);
       mockIdCounter++;
       return id;
     }),
