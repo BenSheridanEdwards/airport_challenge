@@ -26,7 +26,12 @@ const Airport: React.FC = () => {
         throw new Error('Stormy weather, cannot land the plane!');
       }
       plane.landed();
-      setHanger(prevHanger => [...prevHanger, plane]);
+      setHanger(prevHanger => {
+        const newHanger = [...prevHanger, plane];
+        console.log(`Landed plane ID: ${plane.id}`);
+        console.log(`New hanger state: ${JSON.stringify(newHanger)}`);
+        return newHanger;
+      });
       setMessage('Plane landed successfully.');
     } catch (error) {
       setMessage((error as Error).message);
