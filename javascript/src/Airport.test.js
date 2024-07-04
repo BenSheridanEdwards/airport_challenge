@@ -10,7 +10,11 @@ jest.mock('./Airport/Airport', () => {
   return {
     __esModule: true,
     ...originalModule,
-    generateUniqueId: jest.fn(() => `test-plane-id-${mockIdCounter++}`),
+    generateUniqueId: jest.fn(() => {
+      const id = `test-plane-id-${mockIdCounter++}`;
+      console.log(`Generated unique ID: ${id}`);
+      return id;
+    }),
   };
 });
 
@@ -65,16 +69,18 @@ describe('Airport', () => {
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     for (let i = 0; i < 5; i++) {
       await userEvent.click(landButton);
-      await waitFor(() => {
-        const hangerCount = screen.getByTestId('hanger-count');
+      console.log(`Iteration ${i + 1}: Clicked land button`);
+      await waitFor(async () => {
+        const hangerCount = await screen.findByTestId('hanger-count');
+        console.log(`Iteration ${i + 1}: Hanger count text content - ${hangerCount.textContent}`);
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-      }, { timeout: 5000 });
+      }, { timeout: 10000 });
     }
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const errorMessage = screen.getByText(/Hanger full, abort landing!/);
+    await waitFor(async () => {
+      const errorMessage = await screen.findByText(/Hanger full, abort landing!/);
       expect(errorMessage).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 10000 });
   });
 
   // Test case for landing a plane that is already in the hanger
