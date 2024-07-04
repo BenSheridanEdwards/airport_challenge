@@ -51,7 +51,7 @@ describe('Airport Component', () => {
     render(<Airport PlaneClass={Plane} />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     const hangerContainer = screen.getByTestId('hanger-container');
-    expect(await within(hangerContainer).findByText(function (content, element) { return content.includes('Planes in hanger: 1'); })).toBeInTheDocument();
+    expect(await within(hangerContainer).findByText((content) => content.includes('Planes in hanger: 1'))).toBeInTheDocument();
   });
 
   it('prevents landing when hanger is full', async () => {
@@ -59,7 +59,7 @@ describe('Airport Component', () => {
     for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
       const hangerContainer = screen.getByTestId('hanger-container');
-      expect(await within(hangerContainer).findByText(function (content, element) { return content.includes(`Planes in hanger: ${i + 1}`); })).toBeInTheDocument();
+      expect(await within(hangerContainer).findByText((content) => content.includes(`Planes in hanger: ${i + 1}`))).toBeInTheDocument();
     }
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     const hangerContainer = screen.getByTestId('hanger-container');
@@ -81,7 +81,7 @@ describe('Airport Component', () => {
     const landButton = screen.getByRole('button', { name: /land plane/i });
     await userEvent.click(landButton);
     const hangerContainer = screen.getByTestId('hanger-container');
-    expect(await within(hangerContainer).findByText(function (content, element) { return content.includes('Planes in hanger: 1'); })).toBeInTheDocument();
+    expect(await within(hangerContainer).findByText((content) => content.includes('Planes in hanger: 1'))).toBeInTheDocument();
     await userEvent.click(landButton);
     expect(await within(hangerContainer).findByText('That plane is already here')).toBeInTheDocument();
   });
@@ -91,7 +91,7 @@ describe('Airport Component', () => {
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
     const hangerContainer = screen.getByTestId('hanger-container');
-    expect(await within(hangerContainer).findByText(function (content, element) { return content.includes('Planes in hanger: 0'); })).toBeInTheDocument();
+    expect(await within(hangerContainer).findByText((content) => content.includes('Planes in hanger: 0'))).toBeInTheDocument();
   });
 
   it('prevents takeoff when weather is stormy', async () => {
@@ -100,14 +100,14 @@ describe('Airport Component', () => {
     (isStormy as jest.Mock).mockReturnValue(true);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
     const hangerContainer = screen.getByTestId('hanger-container');
-    expect(await within(hangerContainer).findByText(function (content, element) { return content.includes('Stormy weather, unable to take off!'); })).toBeInTheDocument();
+    expect(await within(hangerContainer).findByText((content) => content.includes('Stormy weather, unable to take off!'))).toBeInTheDocument();
   });
 
   it('prevents takeoff when no planes are available', async () => {
     render(<Airport PlaneClass={Plane} />);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
     const hangerContainer = screen.getByTestId('hanger-container');
-    expect(await within(hangerContainer).findByText(function (content, element) { return content.includes('No planes available for takeoff'); })).toBeInTheDocument();
+    expect(await within(hangerContainer).findByText((content) => content.includes('No planes available for takeoff'))).toBeInTheDocument();
   });
 
   it('prevents takeoff when plane is not in hanger', async () => {
@@ -118,11 +118,11 @@ describe('Airport Component', () => {
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
     await userEvent.click(landButton);
     const hangerContainer = screen.getByTestId('hanger-container');
-    expect(await within(hangerContainer).findByText(function (content, element) { return content.includes('Plane landed successfully.'); })).toBeInTheDocument();
+    expect(await within(hangerContainer).findByText((content) => content.includes('Plane landed successfully.'))).toBeInTheDocument();
     await userEvent.click(takeOffButton);
-    expect(await within(hangerContainer).findByText(function (content, element) { return content.includes('Plane took off successfully.'); })).toBeInTheDocument();
+    expect(await within(hangerContainer).findByText((content) => content.includes('Plane took off successfully.'))).toBeInTheDocument();
     await userEvent.click(takeOffButton);
-    const notHereMessage = await within(hangerContainer).findByText(function (content, element) { return content.includes('No planes available for takeoff'); });
+    const notHereMessage = await within(hangerContainer).findByText((content) => content.includes('No planes available for takeoff'));
     expect(notHereMessage).toBeInTheDocument();
   });
 
@@ -135,21 +135,21 @@ describe('Airport Component', () => {
     for (let i = 0; i < 3; i++) {
       await userEvent.click(landButton);
       const hangerContainer = screen.getByTestId('hanger-container');
-      expect(await within(hangerContainer).findByText(function (content, element) { return content.includes(`Planes in hanger: ${i + 1}`); })).toBeInTheDocument();
+      expect(await within(hangerContainer).findByText((content) => content.includes(`Planes in hanger: ${i + 1}`))).toBeInTheDocument();
     }
 
     // Take off 2 planes
     for (let i = 2; i >= 1; i--) {
       await userEvent.click(takeOffButton);
       const hangerContainer = screen.getByTestId('hanger-container');
-      expect(await within(hangerContainer).findByText(function (content, element) { return content.includes(`Planes in hanger: ${i}`); })).toBeInTheDocument();
+      expect(await within(hangerContainer).findByText((content) => content.includes(`Planes in hanger: ${i}`))).toBeInTheDocument();
     }
 
     // Land 2 more planes
     for (let i = 1; i <= 2; i++) {
       await userEvent.click(landButton);
       const hangerContainer = screen.getByTestId('hanger-container');
-      expect(await within(hangerContainer).findByText(function (content, element) { return content.includes(`Planes in hanger: ${i + 1}`); })).toBeInTheDocument();
+      expect(await within(hangerContainer).findByText((content) => content.includes(`Planes in hanger: ${i + 1}`))).toBeInTheDocument();
     }
   });
 
@@ -168,7 +168,7 @@ describe('Airport Component', () => {
     // Attempt to land another plane
     await userEvent.click(landButton);
     await waitFor(async () => {
-      expect(await screen.findByText(function (content, element) { return content.includes('Stormy weather, cannot land the plane!'); })).toBeInTheDocument();
+      expect(await screen.findByText((content) => content.includes('Stormy weather, cannot land the plane!'))).toBeInTheDocument();
     });
   });
 
@@ -183,7 +183,7 @@ describe('Airport Component', () => {
 
     // Attempt to take off the plane
     await waitFor(async () => {
-      expect(await screen.findByText(function (content, element) { return content.includes('Stormy weather, unable to take off!'); })).toBeInTheDocument();
+      expect(await screen.findByText((content) => content.includes('Stormy weather, unable to take off!'))).toBeInTheDocument();
     });
   });
 
@@ -195,15 +195,15 @@ describe('Airport Component', () => {
 
     // Land a plane
     await userEvent.click(landButton);
-    await expect(await screen.findByText(function (content, element) { return content.includes('Planes in hanger: 1'); })).toBeInTheDocument();
+    await expect(await screen.findByText((content) => content.includes('Planes in hanger: 1'))).toBeInTheDocument();
 
     // Take off the plane
     await userEvent.click(takeOffButton);
-    await expect(await screen.findByText(function (content, element) { return content.includes('Planes in hanger: 0'); })).toBeInTheDocument();
+    await expect(await screen.findByText((content) => content.includes('Planes in hanger: 0'))).toBeInTheDocument();
 
     // Land another plane
     await userEvent.click(landButton);
-    await expect(await screen.findByText(function (content, element) { return content.includes('Planes in hanger: 1'); })).toBeInTheDocument();
+    await expect(await screen.findByText((content) => content.includes('Planes in hanger: 1'))).toBeInTheDocument();
   });
 
   it('verifies that isStormy mock function is called', async () => {
