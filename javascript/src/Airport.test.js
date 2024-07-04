@@ -45,7 +45,9 @@ describe('Airport', () => {
     expect(message).toBeInTheDocument();
     await waitFor(async () => {
       const hangerCount = await screen.findByTestId('hanger-count');
+      console.log(`Current hanger count: ${hangerCount.textContent}`);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+      console.log(`Updated hanger count: ${hangerCount.textContent}`);
     }, { timeout: 10000 });
   });
 
