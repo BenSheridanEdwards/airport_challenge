@@ -48,6 +48,7 @@ describe('Airport', () => {
     expect(message).toBeInTheDocument();
     const hangerCount = await screen.findByTestId('hanger-count');
     expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+    jest.spyOn(Math, 'random').mockReturnValue(0.5); // Ensure sunny weather for takeoff
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
     const takeOffMessage = await screen.findByText(/Plane took off successfully\./);
