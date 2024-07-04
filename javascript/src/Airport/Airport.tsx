@@ -101,4 +101,5 @@ const Airport: React.FC = () => {
   );
 };
 
+export { generateUniqueId };
 export default Airport;
