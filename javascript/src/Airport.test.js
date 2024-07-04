@@ -46,6 +46,7 @@ describe('Airport', () => {
     expect(updatedHangerCount).toHaveTextContent('Planes in hanger: 0');
   });
 
+  // Test case for landing a plane in a full hanger
   it('should display an error message when trying to land a plane in a full hanger', async () => {
     jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
     render(<Airport />);
@@ -66,6 +67,7 @@ describe('Airport', () => {
     jest.restoreAllMocks(); // Restore Math.random mock
   });
 
+  // Test case for landing a plane that is already in the hanger
   it('should display an error message when trying to land a plane that is already in the hanger', async () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
