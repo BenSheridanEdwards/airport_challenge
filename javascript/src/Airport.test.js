@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport/Airport';
 
-// Set global timeout for all tests
-jest.setTimeout(10000);
+// Remove the redundant global timeout
+// jest.setTimeout(10000);
 
 describe('Airport', () => {
   afterEach(() => {
@@ -26,12 +26,12 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const message = screen.getByText(/Plane landed successfully./);
+    await waitFor(async () => {
+      const message = await screen.findByText(/Plane landed successfully./);
       expect(message).toBeInTheDocument();
     });
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
+    await waitFor(async () => {
+      const hangerCount = await screen.findByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 15000 });
   });
@@ -40,22 +40,22 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const message = screen.getByText(/Plane landed successfully./);
+    await waitFor(async () => {
+      const message = await screen.findByText(/Plane landed successfully./);
       expect(message).toBeInTheDocument();
     });
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
+    await waitFor(async () => {
+      const hangerCount = await screen.findByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 15000 });
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      const takeOffMessage = screen.getByText(/Plane took off successfully./);
+    await waitFor(async () => {
+      const takeOffMessage = await screen.findByText(/Plane took off successfully./);
       expect(takeOffMessage).toBeInTheDocument();
     });
-    await waitFor(() => {
-      const updatedHangerCount = screen.getByTestId('hanger-count');
+    await waitFor(async () => {
+      const updatedHangerCount = await screen.findByTestId('hanger-count');
       expect(updatedHangerCount).toHaveTextContent('Planes in hanger: 0');
     }, { timeout: 15000 });
   });
@@ -66,15 +66,15 @@ describe('Airport', () => {
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     for (let i = 0; i < 5; i++) {
       await userEvent.click(landButton);
-      await waitFor(() => {
-        const hangerCount = screen.getByTestId('hanger-count');
+      await waitFor(async () => {
+        const hangerCount = await screen.findByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 15000 });
     }
     // Attempt one more landing to ensure the hanger is full
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const errorMessage = screen.getByText(/Hanger full, abort landing!/);
+    await waitFor(async () => {
+      const errorMessage = await screen.findByText(/Hanger full, abort landing!/);
       expect(errorMessage).toBeInTheDocument();
     }, { timeout: 15000 });
     jest.restoreAllMocks(); // Restore Math.random mock
@@ -84,14 +84,14 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
+    await waitFor(async () => {
+      const hangerCount = await screen.findByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 15000 });
     // Attempt to land the same plane again
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const errorMessage = screen.getByText((content, element) => {
+    await waitFor(async () => {
+      const errorMessage = await screen.findByText((content, element) => {
         return element.textContent.includes('That plane is already here');
       });
       expect(errorMessage).toBeInTheDocument();
@@ -102,15 +102,15 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
+    await waitFor(async () => {
+      const hangerCount = await screen.findByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 15000 });
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      const errorMessage = screen.getByText(/Stormy weather, unable to take off!/);
+    await waitFor(async () => {
+      const errorMessage = await screen.findByText(/Stormy weather, unable to take off!/);
       expect(errorMessage).toBeInTheDocument();
     }, { timeout: 15000 });
     jest.restoreAllMocks(); // Restore Math.random mock
@@ -120,8 +120,8 @@ describe('Airport', () => {
     render(<Airport />);
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      expect(screen.getByText(/No planes available for takeoff/)).toBeInTheDocument();
+    await waitFor(async () => {
+      expect(await screen.findByText(/No planes available for takeoff/)).toBeInTheDocument();
     });
   });
 
@@ -129,8 +129,8 @@ describe('Airport', () => {
     render(<Airport />);
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      expect(screen.getByText(/No planes available for takeoff/)).toBeInTheDocument();
+    await waitFor(async () => {
+      expect(await screen.findByText(/No planes available for takeoff/)).toBeInTheDocument();
     });
   });
 });
