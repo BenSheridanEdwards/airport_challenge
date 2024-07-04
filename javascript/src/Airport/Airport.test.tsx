@@ -54,7 +54,11 @@ describe('Airport Component', () => {
     await userEvent.click(landButton);
     expect(await screen.findByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
     await userEvent.click(landButton);
-    expect(await screen.findByText(/That\s+plane\s+is\s+already\s+here/)).toBeInTheDocument();
+    await waitFor(async () => {
+      const hangerContainer = screen.getByTestId('hanger-container');
+      const alreadyHereMessage = await within(hangerContainer).findByText(/That\s+plane\s+is\s+already\s+here/);
+      expect(alreadyHereMessage).toBeInTheDocument();
+    });
   });
 
   it('takes off a plane successfully', async () => {
