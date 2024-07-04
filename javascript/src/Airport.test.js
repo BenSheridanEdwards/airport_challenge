@@ -1,4 +1,4 @@
-import { render, screen, cleanup, waitFor } from '@testing-library/react';
+import { render, screen, cleanup, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport/Airport';
@@ -59,12 +59,13 @@ describe('Airport', () => {
 
   it('should display an error message when trying to land a plane in a full hanger', async () => {
     render(<Airport />);
-    const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     for (let i = 0; i < 5; i++) {
+      const landButton = await screen.findByRole('button', { name: /Land Plane/i });
       await userEvent.click(landButton);
       const hangerCount = await screen.findByTestId('hanger-count');
       await waitFor(() => expect(hangerCount).toHaveTextContent(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`)), { timeout: 5000 });
     }
+    const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
     const errorMessage = await screen.findByText(/Hanger full, cannot land the plane!/);
     await waitFor(() => expect(errorMessage).toBeInTheDocument(), { timeout: 5000 });
