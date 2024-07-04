@@ -22,26 +22,26 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText((content, element) => content.includes('Plane landed successfully.'));
-    expect(message).toBeInTheDocument();
+    const message = await screen.findByText(/Plane landed successfully\./);
+    await waitFor(() => expect(message).toBeInTheDocument());
     const hangerCount = await screen.findByTestId('hanger-count');
-    expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+    await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'));
   });
 
   it('should take off a plane and update the hanger', async () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText(/Plane\s+landed\s+successfully\./);
-    expect(message).toBeInTheDocument();
+    const message = await screen.findByText(/Plane landed successfully\./);
+    await waitFor(() => expect(message).toBeInTheDocument());
     const hangerCount = await screen.findByTestId('hanger-count');
-    expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+    await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'));
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    const takeOffMessage = await screen.findByText(/Plane took off successfully./);
-    expect(takeOffMessage).toBeInTheDocument();
+    const takeOffMessage = await screen.findByText(/Plane took off successfully\./);
+    await waitFor(() => expect(takeOffMessage).toBeInTheDocument());
     const updatedHangerCount = await screen.findByTestId('hanger-count');
-    expect(updatedHangerCount).toHaveTextContent('Planes in hanger: 0');
+    await waitFor(() => expect(updatedHangerCount).toHaveTextContent('Planes in hanger: 0'));
   });
 
   // Test case for landing a plane in a full hanger
@@ -56,7 +56,7 @@ describe('Airport', () => {
     }
     // Attempt one more landing to ensure the hanger is full
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText((content, element) => content.includes('Hanger full, abort landing!'));
+    const errorMessage = await screen.findByText(/Hanger full, abort landing!/);
     await waitFor(() => expect(errorMessage).toBeInTheDocument());
     jest.restoreAllMocks(); // Restore Math.random mock
   });
@@ -70,7 +70,7 @@ describe('Airport', () => {
     await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'));
     // Attempt to land the same plane again
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText((content, element) => content.includes('That plane is already here'));
+    const errorMessage = await screen.findByText(/That plane is already here/);
     await waitFor(() => expect(errorMessage).toBeInTheDocument());
   });
 
@@ -83,7 +83,7 @@ describe('Airport', () => {
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    const errorMessage = await screen.findByText((content, element) => content.includes('Stormy weather, unable to take off!'));
+    const errorMessage = await screen.findByText(/Stormy weather, unable to take off!/);
     await waitFor(() => expect(errorMessage).toBeInTheDocument());
     jest.restoreAllMocks(); // Restore Math.random mock
   });
@@ -92,7 +92,8 @@ describe('Airport', () => {
     render(<Airport />);
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    expect(await screen.findByText(/No planes available for takeoff/)).toBeInTheDocument();
+    const errorMessage = await screen.findByText(/No planes available for takeoff/);
+    await waitFor(() => expect(errorMessage).toBeInTheDocument());
   });
 
   it('should display a message when there are no planes available for takeoff', async () => {
