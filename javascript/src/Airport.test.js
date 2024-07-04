@@ -63,8 +63,10 @@ describe('Airport', () => {
     for (let i = 0; i < 5; i++) {
       const landButton = await screen.findByRole('button', { name: /Land Plane/i });
       await userEvent.click(landButton);
-      const hangerCount = await screen.findByTestId('hanger-count');
-      await waitFor(() => expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`), { timeout: 5000 });
+      await waitFor(async () => {
+        const hangerCount = await screen.findByTestId('hanger-count');
+        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
+      }, { timeout: 5000 });
     }
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
@@ -79,7 +81,7 @@ describe('Airport', () => {
     await userEvent.click(landButton);
     const hangerCount = await screen.findByTestId('hanger-count');
     await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'), { timeout: 5000 });
-    await userEvent.click(landButton);
+    await userEvent.click(landButton); // Attempt to land the same plane again
     const errorMessage = await screen.findByText(/That plane is already here/);
     expect(errorMessage).toBeInTheDocument();
   });
