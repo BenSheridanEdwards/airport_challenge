@@ -1,4 +1,4 @@
-import { render, screen, cleanup, waitFor } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport/Airport';
@@ -22,7 +22,7 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText(/Plane\s+landed\s+successfully\./);
+    const message = await screen.findByText((content, element) => content.includes('Plane landed successfully.'));
     expect(message).toBeInTheDocument();
     const hangerCount = await screen.findByTestId('hanger-count');
     expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
@@ -38,10 +38,8 @@ describe('Airport', () => {
     expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      const takeOffMessage = screen.getByText(/Plane took off successfully./);
-      expect(takeOffMessage).toBeInTheDocument();
-    });
+    const takeOffMessage = await screen.findByText(/Plane took off successfully./);
+    expect(takeOffMessage).toBeInTheDocument();
     const updatedHangerCount = await screen.findByTestId('hanger-count');
     expect(updatedHangerCount).toHaveTextContent('Planes in hanger: 0');
   });
@@ -53,17 +51,13 @@ describe('Airport', () => {
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     for (let i = 0; i < 5; i++) {
       await userEvent.click(landButton);
-      await waitFor(() => {
-        const hangerCount = screen.getByTestId('hanger-count');
-        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-      });
+      const hangerCount = await screen.findByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
     }
     // Attempt one more landing to ensure the hanger is full
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const errorMessage = screen.getByText(/Hanger\s+full,\s+abort\s+landing!/);
-      expect(errorMessage).toBeInTheDocument();
-    });
+    const errorMessage = await screen.findByText((content, element) => content.includes('Hanger full, abort landing!'));
+    expect(errorMessage).toBeInTheDocument();
     jest.restoreAllMocks(); // Restore Math.random mock
   });
 
@@ -76,10 +70,8 @@ describe('Airport', () => {
     expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     // Attempt to land the same plane again
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const errorMessage = screen.getByText(/That plane is already here/);
-      expect(errorMessage).toBeInTheDocument();
-    });
+    const errorMessage = await screen.findByText((content, element) => content.includes('That plane is already here'));
+    expect(errorMessage).toBeInTheDocument();
   });
 
   it('should display an error message when trying to take off a plane during stormy weather', async () => {
@@ -91,10 +83,8 @@ describe('Airport', () => {
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      const errorMessage = screen.getByText(/Stormy\s+weather,\s+unable\s+to\s+take\s+off!/);
-      expect(errorMessage).toBeInTheDocument();
-    });
+    const errorMessage = await screen.findByText((content, element) => content.includes('Stormy weather, unable to take off!'));
+    expect(errorMessage).toBeInTheDocument();
     jest.restoreAllMocks(); // Restore Math.random mock
   });
 
