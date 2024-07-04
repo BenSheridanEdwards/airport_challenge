@@ -18,6 +18,7 @@ describe('Airport', () => {
     expect(await screen.findByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
   });
 
+  // Test case for landing a plane and updating the hanger
   it('should land a plane and update the hanger', async () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
@@ -28,6 +29,7 @@ describe('Airport', () => {
     await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'));
   });
 
+  // Test case for taking off a plane and updating the hanger
   it('should take off a plane and update the hanger', async () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
@@ -74,6 +76,7 @@ describe('Airport', () => {
     await waitFor(() => expect(errorMessage).toBeInTheDocument());
   });
 
+  // Test case for taking off a plane during stormy weather
   it('should display an error message when trying to take off a plane during stormy weather', async () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
