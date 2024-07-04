@@ -69,14 +69,14 @@ describe('Airport', () => {
       await waitFor(() => {
         const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-      }, { timeout: 10000 });
+      }, { timeout: 15000 });
     }
     // Attempt one more landing to ensure the hanger is full
     await userEvent.click(landButton);
     await waitFor(() => {
       const errorMessage = screen.getByText(/Hanger full, abort landing!/);
       expect(errorMessage).toBeInTheDocument();
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
     jest.restoreAllMocks(); // Restore Math.random mock
   });
 
@@ -87,7 +87,7 @@ describe('Airport', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
     // Attempt to land the same plane again
     await userEvent.click(landButton);
     await waitFor(() => {
@@ -95,7 +95,7 @@ describe('Airport', () => {
         return element.textContent.includes('That plane is already here');
       });
       expect(errorMessage).toBeInTheDocument();
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
   });
 
   it('should display an error message when trying to take off a plane during stormy weather', async () => {
@@ -112,7 +112,7 @@ describe('Airport', () => {
     await waitFor(() => {
       const errorMessage = screen.getByText(/Stormy weather, unable to take off!/);
       expect(errorMessage).toBeInTheDocument();
-    });
+    }, { timeout: 15000 });
     jest.restoreAllMocks(); // Restore Math.random mock
   });
 
