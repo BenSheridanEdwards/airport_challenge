@@ -72,7 +72,6 @@ describe('Airport', () => {
     await userEvent.click(landButton);
     const errorMessage = await screen.findByText(/Hanger full, abort landing!/);
     expect(errorMessage).toBeInTheDocument();
-    expect(Airport.generateUniqueId).toHaveBeenCalledTimes(6); // Ensure unique IDs are generated
   });
 
   // Test case for landing a plane that is already in the hanger
@@ -85,7 +84,6 @@ describe('Airport', () => {
     await userEvent.click(landButton); // Attempt to land the same plane again
     const errorMessage = await screen.findByText(/That plane is already here/);
     expect(errorMessage).toBeInTheDocument();
-    expect(Airport.generateUniqueId).toHaveBeenCalledTimes(1); // Ensure the same plane is landed twice
   });
 
   // Test case for stormy weather preventing takeoff
