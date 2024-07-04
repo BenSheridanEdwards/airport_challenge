@@ -19,7 +19,7 @@ This project is a challenge from Makers Academy to write software that controls 
 
 I (Ben) have made the project my own by implementing the following features and improvements:
 - Developed a React application using TypeScript for the JavaScript version.
-- Ensured high test coverage (80% for statements and lines, 63.63% for branches) for the JavaScript version and over 95% for the Ruby version.
+- Ensured high test coverage (84.28% for statements, 73.91% for branches, and 90% for functions) for the JavaScript version and over 95% for the Ruby version.
 - Updated the stormy weather error messages for clarity.
 - Reorganized test files to be inside their respective component folders.
 - Updated test functions to use `async/await` and `userEvent` for better testing practices.
@@ -103,3 +103,4 @@ Finally, don’t over complicate things. This task isn’t as hard as it may see
 - **Submit a pull request early.** There are various checks that happen automatically when you send a pull request. **Fix these issues if you can**. Green is good.
 
 - Finally, please submit a pull request before Monday at 9am with your solution or partial solution. However much or little amount of code you wrote please please please submit a pull request before Monday at 9am.
+```
