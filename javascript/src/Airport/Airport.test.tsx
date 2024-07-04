@@ -27,32 +27,24 @@ describe('Airport Component', () => {
   it('lands a plane successfully', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
   });
 
   it('prevents landing when hanger is full', async () => {
     render(<Airport />);
     for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-      await waitFor(() => {
-        expect(screen.getByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
-      });
+      expect(await screen.findByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
     }
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/Hanger\s+full,\s+abort\s+landing!/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Hanger\s+full,\s+abort\s+landing!/)).toBeInTheDocument();
   });
 
   it('prevents landing when weather is stormy', async () => {
     (isStormy as jest.Mock).mockReturnValue(true);
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/)).toBeInTheDocument();
   });
 
   it('prevents landing when plane is already in hanger', async () => {
@@ -60,22 +52,16 @@ describe('Airport Component', () => {
     render(<Airport />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText(/That\s+plane\s+is\s+already\s+here/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/That\s+plane\s+is\s+already\s+here/)).toBeInTheDocument();
   });
 
   it('takes off a plane successfully', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/Planes\s+in\s+hanger:\s*0/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Planes\s+in\s+hanger:\s*0/)).toBeInTheDocument();
   });
 
   it('prevents takeoff when weather is stormy', async () => {
@@ -83,17 +69,13 @@ describe('Airport Component', () => {
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     (isStormy as jest.Mock).mockReturnValue(true);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/Stormy\s+weather,\s+unable\s+to\s+take\s+off!/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Stormy\s+weather,\s+unable\s+to\s+take\s+off!/)).toBeInTheDocument();
   });
 
   it('prevents takeoff when no planes are available', async () => {
     render(<Airport />);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/No\s+planes\s+available\s+for\s+takeoff/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/No\s+planes\s+available\s+for\s+takeoff/)).toBeInTheDocument();
   });
 
   it('prevents takeoff when plane is not in hanger', async () => {
@@ -102,19 +84,13 @@ describe('Airport Component', () => {
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      expect(screen.getByText(/Plane\s+landed\s+successfully\./)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Plane\s+landed\s+successfully\./)).toBeInTheDocument();
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      expect(screen.getByText(/Plane\s+took\s+off\s+successfully\./)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Plane\s+took\s+off\s+successfully\./)).toBeInTheDocument();
     await userEvent.click(takeOffButton);
-    await waitFor(() => {
-      const hangerContainer = screen.getByTestId('hanger-container');
-      const notHereMessage = within(hangerContainer).getByText(/No\s+planes\s+available\s+for\s+takeoff/);
-      expect(notHereMessage).toBeInTheDocument();
-    });
+    const hangerContainer = screen.getByTestId('hanger-container');
+    const notHereMessage = await within(hangerContainer).findByText(/No\s+planes\s+available\s+for\s+takeoff/);
+    expect(notHereMessage).toBeInTheDocument();
   });
 
   it('handles multiple planes landing and taking off in sequence', async () => {
@@ -126,27 +102,21 @@ describe('Airport Component', () => {
     for (let i = 0; i < 3; i++) {
       await userEvent.click(landButton);
       const hangerContainer = screen.getByTestId('hanger-container');
-      await waitFor(() => {
-        expect(within(hangerContainer).getByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
-      });
+      expect(await within(hangerContainer).findByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
     }
 
     // Take off 2 planes
     for (let i = 2; i >= 1; i--) {
       await userEvent.click(takeOffButton);
       const hangerContainer = screen.getByTestId('hanger-container');
-      await waitFor(() => {
-        expect(within(hangerContainer).getByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i}`))).toBeInTheDocument();
-      });
+      expect(await within(hangerContainer).findByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i}`))).toBeInTheDocument();
     }
 
     // Land 2 more planes
     for (let i = 1; i <= 2; i++) {
       await userEvent.click(landButton);
       const hangerContainer = screen.getByTestId('hanger-container');
-      await waitFor(() => {
-        expect(within(hangerContainer).getByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
-      });
+      expect(await within(hangerContainer).findByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
     }
   });
 
