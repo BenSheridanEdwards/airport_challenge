@@ -12,12 +12,12 @@ jest.mock('../Plane/Plane', () => {
     default: jest.fn().mockImplementation(function (this: any, id: string) {
       this.id = id || '_' + Math.random().toString(36).substr(2, 9);
       this.airborn = false;
-      this.landed = jest.fn().mockReturnThis().mockImplementation(() => {
+      this.landed = jest.fn().mockImplementation(() => {
         console.log('landed method called on:', this);
         this.airborn = false;
         return this;
       });
-      this.inTheAir = jest.fn().mockReturnThis().mockImplementation(() => {
+      this.inTheAir = jest.fn().mockImplementation(() => {
         console.log('inTheAir method called on:', this);
         this.airborn = true;
         return this;
@@ -34,8 +34,9 @@ jest.mock('../Weather/Weather', () => ({
 describe('Airport Component', () => {
   beforeEach(() => {
     jest.resetModules();
+    jest.resetAllMocks();
+    jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
-    jest.clearAllMocks();
   });
 
   it('renders Airport component', () => {
