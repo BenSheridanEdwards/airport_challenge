@@ -123,3 +123,4 @@ describe('Airport', () => {
     expect(await screen.findByText(/No planes available for takeoff/)).toBeInTheDocument();
   });
 });
+// End of test cases for Airport component
