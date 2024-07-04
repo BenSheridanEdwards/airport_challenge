@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1720101563891" clover="3.2.0">
-  <project timestamp="1720101563891" name="All files">
+<coverage generated="1720103234584" clover="3.2.0">
+  <project timestamp="1720103234584" name="All files">
     <metrics statements="55" coveredstatements="44" conditionals="22" coveredconditionals="14" methods="15" coveredmethods="14" elements="92" coveredelements="72" complexity="0" loc="55" ncloc="55" packages="1" files="1" classes="1"/>
     <file name="Airport.tsx" path="/home/ubuntu/airport_challenge/javascript/src/Airport/Airport.tsx">
       <metrics statements="55" coveredstatements="44" conditionals="22" coveredconditionals="14" methods="15" coveredmethods="14"/>
