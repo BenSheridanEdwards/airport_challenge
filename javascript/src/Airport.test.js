@@ -76,20 +76,27 @@ describe('Airport', () => {
       }, { timeout: 10000 });
     }
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText(/Hanger full, abort landing!/);
+    const errorMessage = await screen.findByText(/Hanger\s+full,\s+abort\s+landing!/);
     expect(errorMessage).toBeInTheDocument();
+    jest.restoreAllMocks(); // Restore Math.random mock
   });
 
   // Test case for landing a plane that is already in the hanger
   it('should display an error message when trying to land a plane that is already in the hanger', async () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
+    const mockPlane = { id: 'plane-1', airborn: true };
+    // Mock the plane creation to always return the same plane
+    jest.spyOn(global.Math, 'random').mockReturnValue(0.5); // Ensure sunny weather
+    jest.spyOn(global, 'Date').mockImplementation(() => ({ getTime: () => mockPlane.id }));
     await userEvent.click(landButton);
     const hangerCount = await screen.findByTestId('hanger-count');
-    await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'), { timeout: 10000 });
-    await userEvent.click(landButton); // Attempt to land the same plane again
-    const errorMessage = await screen.findByText(/That plane is already here/);
+    expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+    // Attempt to land the same plane again
+    await userEvent.click(landButton);
+    const errorMessage = await screen.findByText(/That\s+plane\s+is\s+already\s+here/);
     expect(errorMessage).toBeInTheDocument();
+    jest.restoreAllMocks(); // Restore mocks
   });
 
   // Test case for stormy weather preventing takeoff
