@@ -11,8 +11,8 @@ jest.mock('./Airport/Airport', () => {
     __esModule: true,
     ...originalModule,
     generateUniqueId: jest.fn(() => {
-      const id = `test-plane-id-${mockIdCounter++}`;
-      console.log(`Generated unique ID: ${id}`);
+      const id = `test-plane-id-${mockIdCounter}`;
+      mockIdCounter++;
       return id;
     }),
   };
@@ -71,10 +71,8 @@ describe('Airport', () => {
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     for (let i = 0; i < 5; i++) {
       await userEvent.click(landButton);
-      console.log(`Iteration ${i + 1}: Clicked land button`);
       await waitFor(async () => {
         const hangerCount = await screen.findByTestId('hanger-count');
-        console.log(`Iteration ${i + 1}: Hanger count text content - ${hangerCount.textContent}`);
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 10000 });
     }
