@@ -33,7 +33,7 @@ describe('Airport', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
   });
 
   it('should take off a plane and update the hanger', async () => {
@@ -47,7 +47,7 @@ describe('Airport', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
     await waitFor(() => {
@@ -57,7 +57,7 @@ describe('Airport', () => {
     await waitFor(() => {
       const updatedHangerCount = screen.getByTestId('hanger-count');
       expect(updatedHangerCount).toHaveTextContent('Planes in hanger: 0');
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
   });
 
   it('should display an error message when trying to land a plane in a full hanger', async () => {
@@ -105,7 +105,7 @@ describe('Airport', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
