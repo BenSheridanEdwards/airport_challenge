@@ -23,7 +23,6 @@ describe('Airport', () => {
   beforeEach(() => {
     jest.resetModules(); // Reset the state of all modules before each test
     jest.clearAllMocks(); // Clear all mocks before each test
-    mockIdCounter = 0; // Reset mockIdCounter before each test
     console.log(`Reset mockIdCounter: ${mockIdCounter}`);
     jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
   });
