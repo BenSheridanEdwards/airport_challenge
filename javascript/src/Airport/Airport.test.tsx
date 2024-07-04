@@ -12,11 +12,11 @@ jest.mock('../Plane/Plane', () => {
     default: jest.fn().mockImplementation(function (this: MockPlane, id: string) {
       this.id = id;
       this.airborn = false;
-      this.landed = jest.fn().mockImplementation(function (this: MockPlane) {
+      this.landed = jest.fn().mockReturnThis().mockImplementation(function (this: MockPlane) {
         this.airborn = false;
         return this;
       });
-      this.inTheAir = jest.fn().mockImplementation(function (this: MockPlane) {
+      this.inTheAir = jest.fn().mockReturnThis().mockImplementation(function (this: MockPlane) {
         this.airborn = true;
         return this;
       });
