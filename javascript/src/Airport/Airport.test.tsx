@@ -13,8 +13,14 @@ jest.mock('../Plane/Plane', () => {
       return {
         id: 'mock-id',
         airborn: false,
-        landed: jest.fn().mockReturnThis(),
-        inTheAir: jest.fn().mockReturnThis(),
+        landed: jest.fn(function() {
+          this.airborn = false;
+          return this;
+        }),
+        inTheAir: jest.fn(function() {
+          this.airborn = true;
+          return this;
+        }),
       };
     }),
   };
@@ -27,6 +33,7 @@ jest.mock('../Weather/Weather', () => ({
 describe('Airport Component', () => {
   beforeEach(() => {
     (isStormy as jest.Mock).mockReturnValue(false);
+    (Plane as jest.Mock).mockClear();
   });
 
   it('renders Airport component', () => {
