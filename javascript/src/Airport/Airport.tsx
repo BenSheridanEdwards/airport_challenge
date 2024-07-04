@@ -10,7 +10,7 @@ const Airport: React.FC = () => {
   const [capacity] = useState<number>(DEFAULT_CAPACITY);
   const [message, setMessage] = useState<string>('');
 
-  const land = (plane: Plane) => {
+  const land = async (plane: Plane) => {
     try {
       if (hangerFull()) {
         throw new Error('Hanger full, abort landing!');
@@ -29,7 +29,7 @@ const Airport: React.FC = () => {
     }
   };
 
-  const takeOff = (plane: Plane) => {
+  const takeOff = async (plane: Plane) => {
     try {
       if (!landed(plane)) {
         throw new Error("No planes available for takeoff");
@@ -53,28 +53,28 @@ const Airport: React.FC = () => {
     return hanger.some(p => p.id === plane.id);
   };
 
-  const handleLand = (planeId?: string) => {
+  const handleLand = async (planeId?: string) => {
     if (planeId) {
       const plane = new Plane(planeId);
-      land(plane);
+      await land(plane);
     } else {
       const newPlane = new Plane(generateUniqueId());
-      land(newPlane);
+      await land(newPlane);
     }
   };
 
-  const handleTakeOff = (planeId?: string) => {
+  const handleTakeOff = async (planeId?: string) => {
     if (planeId) {
       const plane = hanger.find(p => p.id === planeId);
       if (plane) {
-        takeOff(plane);
+        await takeOff(plane);
       } else {
         setMessage("No planes available for takeoff");
       }
     } else {
       if (hanger.length > 0) {
         const plane = hanger[0];
-        takeOff(plane);
+        await takeOff(plane);
       } else {
         setMessage('No planes available for takeoff.');
       }
