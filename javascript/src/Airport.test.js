@@ -52,8 +52,10 @@ describe('Airport', () => {
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     for (let i = 0; i < 5; i++) {
       await userEvent.click(landButton);
-      const hangerCount = await screen.findByTestId('hanger-count');
-      expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
+      await waitFor(() => {
+        const hangerCount = screen.getByTestId('hanger-count');
+        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
+      });
     }
     // Attempt one more landing to ensure the hanger is full
     await userEvent.click(landButton);
