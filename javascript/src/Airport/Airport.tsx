@@ -5,20 +5,21 @@ import { Button, Box, Text } from '@chakra-ui/react';
 
 const DEFAULT_CAPACITY = 5;
 
+interface AirportProps {
+  PlaneClass?: typeof Plane;
+  generateUniqueId?: () => string;
+}
+
 const defaultGenerateUniqueId = (): string => {
   return '_' + Math.random().toString(36).substr(2, 9);
 };
 
-interface AirportProps {
-  generateUniqueId?: () => string;
-}
-
-const Airport: React.FC<AirportProps> = ({ generateUniqueId = defaultGenerateUniqueId }) => {
-  const [hanger, setHanger] = useState<Plane[]>([]);
+const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
+  const [hanger, setHanger] = useState<InstanceType<typeof PlaneClass>[]>([]);
   const [capacity] = useState<number>(DEFAULT_CAPACITY);
   const [message, setMessage] = useState<string>('');
 
-  const land = async (plane: Plane) => {
+  const land = (plane: InstanceType<typeof PlaneClass>) => {
     try {
       if (hangerFull()) {
         throw new Error('Hanger full, abort landing!');
@@ -29,20 +30,22 @@ const Airport: React.FC<AirportProps> = ({ generateUniqueId = defaultGenerateUni
       if (isStormy()) {
         throw new Error('Stormy weather, cannot land the plane!');
       }
-      plane.landed();
-      setHanger(prevHanger => {
-        const newHanger = [...prevHanger, plane];
-        console.log(`Landed plane ID: ${plane.id}`);
-        console.log(`New hanger state: ${JSON.stringify(newHanger)}`);
-        return newHanger;
-      });
+      console.log('landed method called on:', plane);
+      console.log('plane object:', plane);
+      console.log('plane.landed:', plane.landed);
+      if (typeof plane.landed === 'function') {
+        plane.landed();
+      } else {
+        throw new Error('Plane does not have a landed method');
+      }
+      setHanger(prevHanger => [...prevHanger, plane]);
       setMessage('Plane landed successfully.');
     } catch (error) {
       setMessage((error as Error).message);
     }
   };
 
-  const takeOff = async (plane: Plane) => {
+  const takeOff = (plane: InstanceType<typeof PlaneClass>) => {
     try {
       if (!landed(plane)) {
         throw new Error("No planes available for takeoff");
@@ -50,7 +53,14 @@ const Airport: React.FC<AirportProps> = ({ generateUniqueId = defaultGenerateUni
       if (isStormy()) {
         throw new Error('Stormy weather, unable to take off!');
       }
-      plane.inTheAir();
+      console.log('inTheAir method called on:', plane);
+      console.log('plane object:', plane);
+      console.log('plane.inTheAir:', plane.inTheAir);
+      if (typeof plane.inTheAir === 'function') {
+        plane.inTheAir();
+      } else {
+        throw new Error('Plane does not have an inTheAir method');
+      }
       setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
       setMessage('Plane took off successfully.');
     } catch (error) {
@@ -62,7 +72,7 @@ const Airport: React.FC<AirportProps> = ({ generateUniqueId = defaultGenerateUni
     return hanger.length >= capacity;
   };
 
-  const landed = (plane: Plane): boolean => {
+  const landed = (plane: InstanceType<typeof PlaneClass>): boolean => {
     return hanger.some(p => p.id === plane.id);
   };
 
@@ -98,13 +108,10 @@ const Airport: React.FC<AirportProps> = ({ generateUniqueId = defaultGenerateUni
     }
   };
 
-  const createPlane = (id: string): Plane => {
-    return new Plane(id);
+  const createPlane = (id: string): InstanceType<typeof PlaneClass> => {
+    return new PlaneClass(id);
   };
 
-  const generateUniqueId = (): string => {
-    return '_' + Math.random().toString(36).substr(2, 9);
-  };
 
   return (
     <Box p={4} data-testid="hanger-container">
