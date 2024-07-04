@@ -15,14 +15,11 @@ jest.mock('../Plane/Plane', () => {
       this.landed = jest.fn().mockImplementation(() => {
         this.airborn = false;
         return this;
-      });
+      }).bind(this);
       this.inTheAir = jest.fn().mockImplementation(() => {
         this.airborn = true;
         return this;
-      });
-      // Ensure methods are correctly bound to the mock instance
-      this.landed.bind(this);
-      this.inTheAir.bind(this);
+      }).bind(this);
     }),
   };
 });
