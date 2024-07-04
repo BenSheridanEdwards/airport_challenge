@@ -60,15 +60,12 @@ describe('Airport', () => {
   // Test case for landing a plane in a full hanger
   it('should display an error message when trying to land a plane in a full hanger', async () => {
     render(<Airport />);
-    for (let i = 0; i < 5; i++) {
-      const landButton = await screen.findByRole('button', { name: /Land Plane/i });
-      await userEvent.click(landButton);
-      await waitFor(async () => {
-        const hangerCount = await screen.findByTestId('hanger-count');
-        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-      }, { timeout: 5000 });
-    }
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
+    for (let i = 0; i < 5; i++) {
+      await userEvent.click(landButton);
+      const hangerCount = await screen.findByTestId('hanger-count');
+      await waitFor(() => expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`), { timeout: 5000 });
+    }
     await userEvent.click(landButton);
     const errorMessage = await screen.findByText(/Hanger full, abort landing!/);
     expect(errorMessage).toBeInTheDocument();
