@@ -40,7 +40,7 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText(/Plane landed successfully\./);
+    const message = await screen.findByText((content) => content.includes('Plane landed successfully.'));
     expect(message).toBeInTheDocument();
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
@@ -52,7 +52,7 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText(/Plane landed successfully\./);
+    const message = await screen.findByText((content) => content.includes('Plane landed successfully.'));
     expect(message).toBeInTheDocument();
     const hangerCount = await screen.findByTestId('hanger-count');
     expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
@@ -62,6 +62,22 @@ describe('Airport', () => {
     expect(takeOffMessage).toBeInTheDocument();
     const updatedHangerCount = await screen.findByTestId('hanger-count');
     expect(updatedHangerCount).toHaveTextContent('Planes in hanger: 0');
+  });
+
+  it('should display an error message when trying to take off a plane during stormy weather', async () => {
+    render(<Airport />);
+    const landButton = await screen.findByRole('button', { name: /Land Plane/i });
+    await userEvent.click(landButton);
+    const hangerCount = await screen.findByTestId('hanger-count');
+    await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'), { timeout: 5000 });
+    jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
+    const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
+    await userEvent.click(takeOffButton);
+    await waitFor(() => {
+      const errorMessage = screen.getByText((content) => content.includes('Stormy weather, unable to take off!'));
+      expect(errorMessage).toBeInTheDocument();
+    });
+    jest.restoreAllMocks(); // Restore Math.random mock
   });
 
   // Test case for landing a plane in a full hanger
@@ -76,7 +92,7 @@ describe('Airport', () => {
       }, { timeout: 10000 });
     }
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText(/Hanger\s+full,\s+abort\s+landing!/);
+    const errorMessage = await screen.findByText((content) => content.includes('Hanger full, abort landing!'));
     expect(errorMessage).toBeInTheDocument();
     jest.restoreAllMocks(); // Restore Math.random mock
   });
@@ -94,23 +110,9 @@ describe('Airport', () => {
     expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     // Attempt to land the same plane again
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText(/That\s+plane\s+is\s+already\s+here/);
+    const errorMessage = await screen.findByText((content) => content.includes('That plane is already here'));
     expect(errorMessage).toBeInTheDocument();
     jest.restoreAllMocks(); // Restore mocks
-  });
-
-  // Test case for stormy weather preventing takeoff
-  it('should display an error message when trying to take off a plane during stormy weather', async () => {
-    render(<Airport />);
-    const landButton = await screen.findByRole('button', { name: /Land Plane/i });
-    await userEvent.click(landButton);
-    const hangerCount = await screen.findByTestId('hanger-count');
-    await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'), { timeout: 5000 });
-    jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
-    const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
-    await userEvent.click(takeOffButton);
-    const errorMessage = await screen.findByText(/Stormy weather, unable to take off!/);
-    expect(errorMessage).toBeInTheDocument();
   });
 
   it('should display an error message when trying to take off a plane that is not in the hanger', async () => {
