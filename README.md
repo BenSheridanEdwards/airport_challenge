@@ -19,7 +19,7 @@ This project is a challenge from Makers Academy to write software that controls 
 
 I (Ben) have made the project my own by implementing the following features and improvements:
 - Developed a React application using TypeScript for the JavaScript version.
-- Ensured high test coverage (>95%) for both the Ruby and JavaScript versions.
+- Ensured high test coverage (80% for statements and lines, 63.63% for branches) for the JavaScript version and over 95% for the Ruby version.
 - Updated the stormy weather error messages for clarity.
 - Reorganized test files to be inside their respective component folders.
 - Updated test functions to use `async/await` and `userEvent` for better testing practices.
@@ -45,7 +45,7 @@ I (Ben) have made the project my own by implementing the following features and 
 ## Additional Details
 
 - The JavaScript version of the project uses React and TypeScript.
-- Both versions have a full test suite with over 95% test coverage.
+- The JavaScript version has a full test suite with 80% test coverage for statements and lines, and 63.63% for branches. The Ruby version has over 95% test coverage.
 - The project includes user stories that were worked out in collaboration with the client to ensure the software meets their requirements.
 
 ## User Stories
