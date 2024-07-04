@@ -1,7 +1,7 @@
 import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
-import Airport from './Airport/Airport';
+import Airport, { generateUniqueId } from './Airport/Airport';
 
 let mockIdCounter = 0;
 
@@ -79,10 +79,8 @@ describe('Airport', () => {
       }, { timeout: 10000 });
     }
     await userEvent.click(landButton);
-    await waitFor(async () => {
-      const errorMessage = await screen.findByText(/Hanger full, abort landing!/);
-      expect(errorMessage).toBeInTheDocument();
-    }, { timeout: 10000 });
+    const errorMessage = await screen.findByText(/Hanger full, abort landing!/);
+    expect(errorMessage).toBeInTheDocument();
   });
 
   // Test case for landing a plane that is already in the hanger
@@ -90,15 +88,11 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
-      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 5000 });
+    const hangerCount = await screen.findByTestId('hanger-count');
+    expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     await userEvent.click(landButton); // Attempt to land the same plane again
-    await waitFor(() => {
-      const errorMessage = screen.getByText(/That plane is already here/);
-      expect(errorMessage).toBeInTheDocument();
-    }, { timeout: 5000 });
+    const errorMessage = await screen.findByText(/That plane is already here/);
+    expect(errorMessage).toBeInTheDocument();
   });
 
   // Test case for stormy weather preventing takeoff
