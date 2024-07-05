@@ -92,8 +92,10 @@ describe('Airport', () => {
       }, { timeout: 10000 });
     }
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText((content) => content.includes('Hanger full, abort landing!'));
-    expect(errorMessage).toBeInTheDocument();
+    await waitFor(() => {
+      const errorMessage = screen.getByText((content) => content.includes('Hanger full, abort landing!'));
+      expect(errorMessage).toBeInTheDocument();
+    });
     jest.restoreAllMocks(); // Restore Math.random mock
   });
 
