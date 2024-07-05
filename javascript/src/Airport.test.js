@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport/Airport';
 
-let mockIdCounter = 0;
+let mockIdCounter;
 
 jest.mock('./Airport/Airport', () => {
   const originalModule = jest.requireActual('./Airport/Airport');
@@ -18,11 +18,8 @@ jest.mock('./Airport/Airport', () => {
   };
 });
 
-beforeAll(() => {
-  mockIdCounter = 0; // Reset the counter before all tests
-});
-
 beforeEach(() => {
+  mockIdCounter = 0; // Reset the counter before each test
   jest.clearAllMocks(); // Clear all mocks before each test
   jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
 });
