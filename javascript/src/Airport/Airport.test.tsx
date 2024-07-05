@@ -148,6 +148,7 @@ describe('Airport Component', () => {
     }
   });
 
+  // Test case to display appropriate error message when weather turns stormy during landing
   it('displays appropriate error message when weather turns stormy during landing', async () => {
     const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
     render(<Airport generateUniqueId={generateUniqueId} />);
@@ -159,10 +160,8 @@ describe('Airport Component', () => {
 
     // Attempt to land another plane
     await userEvent.click(landButton);
-    await waitFor(async () => {
-      const errorMessage = await screen.findByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/);
-      expect(errorMessage).toBeInTheDocument();
-    });
+    const errorMessage = await screen.findByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/);
+    expect(errorMessage).toBeInTheDocument();
   });
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
