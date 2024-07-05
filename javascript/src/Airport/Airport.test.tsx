@@ -44,10 +44,10 @@ describe('Airport Component', () => {
     render(<Airport generateUniqueId={generateUniqueId} />);
     for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-      expect(await screen.findByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
+      expect(await screen.findByText(`Planes in hanger: ${i + 1}`)).toBeInTheDocument();
     }
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    expect(await screen.findByText(/Hanger\s+full,\s+abort\s+landing!/)).toBeInTheDocument();
+    expect(await screen.findByText('Hanger full, abort landing!')).toBeInTheDocument();
   });
 
   it('prevents landing when weather is stormy', async () => {
@@ -116,7 +116,12 @@ describe('Airport Component', () => {
   });
 
   it('handles multiple planes landing and taking off in sequence', async () => {
-    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    const generateUniqueId = jest.fn()
+      .mockReturnValueOnce('mocked-plane-id-1')
+      .mockReturnValueOnce('mocked-plane-id-2')
+      .mockReturnValueOnce('mocked-plane-id-3')
+      .mockReturnValueOnce('mocked-plane-id-4')
+      .mockReturnValueOnce('mocked-plane-id-5');
     render(<Airport generateUniqueId={generateUniqueId} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
@@ -153,9 +158,9 @@ describe('Airport Component', () => {
     (isStormy as jest.Mock).mockReturnValue(true);
 
     // Attempt to land another plane
-    await waitFor(async () => {
-      await userEvent.click(landButton);
-      expect(await screen.findByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/)).toBeInTheDocument();
+    await userEvent.click(landButton);
+    await waitFor(() => {
+      expect(screen.getByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/)).toBeInTheDocument();
     });
   });
 
