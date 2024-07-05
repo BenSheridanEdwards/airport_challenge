@@ -30,6 +30,7 @@ describe('Airport Component', () => {
     jest.resetAllMocks();
     jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
+    console.log = jest.fn(); // Mock console.log to track logs
   });
 
   it('renders Airport component', () => {
