@@ -30,9 +30,6 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       if (isStormy()) {
         throw new Error('Stormy weather, cannot land the plane!');
       }
-      console.log('landed method called on:', plane);
-      console.log('plane object:', plane);
-      console.log('plane.landed:', plane.landed);
       if (typeof plane.landed === 'function') {
         plane.landed();
       } else {
@@ -53,9 +50,6 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       if (isStormy()) {
         throw new Error('Stormy weather, unable to take off!');
       }
-      console.log('inTheAir method called on:', plane);
-      console.log('plane object:', plane);
-      console.log('plane.inTheAir:', plane.inTheAir);
       if (typeof plane.inTheAir === 'function') {
         plane.inTheAir();
       } else {
