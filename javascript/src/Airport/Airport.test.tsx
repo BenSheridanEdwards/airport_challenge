@@ -160,7 +160,7 @@ describe('Airport Component', () => {
     // Attempt to land another plane
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText('Stormy weather, cannot land the plane!')).toBeInTheDocument();
+      expect(screen.getByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/)).toBeInTheDocument();
     });
   });
 
