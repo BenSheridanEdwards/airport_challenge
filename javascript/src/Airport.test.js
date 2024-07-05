@@ -1,6 +1,7 @@
 import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
+import Airport from './Airport/Airport'; // Move the import statement to the top
 
 let mockIdCounter = 0;
 
@@ -31,7 +32,6 @@ describe('Airport', () => {
   });
 
   it('should display the correct initial capacity and planes in hanger', async () => {
-    const { default: Airport } = await import('./Airport/Airport');
     render(<Airport />);
     expect(await screen.findByText('Capacity: 5')).toBeInTheDocument();
     expect(await screen.findByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
@@ -39,7 +39,6 @@ describe('Airport', () => {
 
   // Test case for landing a plane and updating the hanger
   it('should land a plane and update the hanger', async () => {
-    const { default: Airport } = await import('./Airport/Airport');
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
@@ -52,7 +51,6 @@ describe('Airport', () => {
   });
 
   it('should take off a plane and update the hanger', async () => {
-    const { default: Airport } = await import('./Airport/Airport');
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
@@ -71,7 +69,6 @@ describe('Airport', () => {
 
   // Test case for landing a plane in a full hanger
   it('should display an error message when trying to land a plane in a full hanger', async () => {
-    const { default: Airport } = await import('./Airport/Airport');
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     for (let i = 0; i < 5; i++) {
@@ -88,7 +85,6 @@ describe('Airport', () => {
 
   // Test case for landing a plane that is already in the hanger
   it('should display an error message when trying to land a plane that is already in the hanger', async () => {
-    const { default: Airport } = await import('./Airport/Airport');
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
@@ -101,7 +97,6 @@ describe('Airport', () => {
 
   // Test case for stormy weather preventing takeoff
   it('should display an error message when trying to take off a plane during stormy weather', async () => {
-    const { default: Airport } = await import('./Airport/Airport');
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
@@ -115,7 +110,6 @@ describe('Airport', () => {
   });
 
   it('should display an error message when trying to take off a plane that is not in the hanger', async () => {
-    const { default: Airport } = await import('./Airport/Airport');
     render(<Airport />);
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
@@ -124,7 +118,6 @@ describe('Airport', () => {
   });
 
   it('should display a message when there are no planes available for takeoff', async () => {
-    const { default: Airport } = await import('./Airport/Airport');
     render(<Airport />);
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
