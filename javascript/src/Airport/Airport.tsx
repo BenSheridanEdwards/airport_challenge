@@ -137,7 +137,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       <Text role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</Text>
       <Button colorScheme="teal" onClick={() => handleLand()} m={2}>Land Plane</Button>
       <Button colorScheme="red" onClick={() => handleTakeOff()} m={2} data-testid="takeoff-container">Take Off Plane</Button>
-      {message && <Text role="status" mt={4} data-testid="hanger-1">{message}</Text>}
+      {message && <Text role="status" mt={4} data-testid="message">{message}</Text>}
     </Box>
   );
 };

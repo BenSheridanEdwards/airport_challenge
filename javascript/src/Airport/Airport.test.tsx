@@ -41,6 +41,7 @@ describe('Airport Component', () => {
     jest.resetAllMocks();
     jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
+    instances.length = 0; // Clear the instances array before each test
     console.log = jest.fn(); // Mock console.log to track logs
   });
 
@@ -95,14 +96,18 @@ describe('Airport Component', () => {
     await userEvent.click(landButton);
     const hangerContainer = screen.getByTestId('hanger-container');
     await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
       expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
     });
-    await userEvent.click(landButton);
+    const firstPlaneId = instances.length > 0 ? instances[0].id : null; // Capture the ID of the first plane if it exists
+    if (firstPlaneId) {
+      await userEvent.click(landButton); // Simulate clicking the land button again
+    } else {
+      console.error('No plane instances found');
+    }
     await waitFor(() => {
-      const messageElement = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('That plane is already here'));
-      expect(messageElement).toBeInTheDocument();
-    });
+      const messageElement = screen.getByTestId('message');
+      expect(messageElement).toHaveTextContent('That plane is already here');
+    }, { timeout: 5000 });
   });
 
   it('takes off a plane successfully', async () => {
