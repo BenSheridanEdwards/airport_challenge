@@ -53,7 +53,9 @@ describe('Airport Component', () => {
     const landButton = screen.getByRole('button', { name: /land plane/i });
     await userEvent.click(landButton);
     expect(await screen.findByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
+    console.log('Hanger state after first landing:', screen.getByTestId('hanger-container').textContent);
     await userEvent.click(landButton);
+    console.log('Hanger state after second landing attempt:', screen.getByTestId('hanger-container').textContent);
     await waitFor(async () => {
       const hangerContainer = screen.getByTestId('hanger-container');
       const alreadyHereMessage = await within(hangerContainer).findByText(/That\s+plane\s+is\s+already\s+here/);
