@@ -11,14 +11,6 @@ jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
 }));
 
-jest.mock('./Airport', () => {
-  const originalModule = jest.requireActual('./Airport');
-  return {
-    ...originalModule,
-    generateUniqueId: jest.fn().mockReturnValue('mocked-plane-id'),
-  };
-});
-
 describe('Airport Component', () => {
   beforeEach(() => {
     (isStormy as jest.Mock).mockReturnValue(false);
@@ -26,20 +18,30 @@ describe('Airport Component', () => {
   });
 
   it('renders Airport component', () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     expect(screen.getByText('Airport')).toBeInTheDocument();
     expect(screen.getByText('Capacity: 5')).toBeInTheDocument();
     expect(screen.getByText('Planes in hanger: 0')).toBeInTheDocument();
   });
 
   it('lands a plane successfully', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn()
+      .mockReturnValueOnce('mocked-plane-id-1')
+      .mockReturnValueOnce('mocked-plane-id-2');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     expect(await screen.findByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
   });
 
   it('prevents landing when hanger is full', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn()
+      .mockReturnValueOnce('mocked-plane-id-1')
+      .mockReturnValueOnce('mocked-plane-id-2')
+      .mockReturnValueOnce('mocked-plane-id-3')
+      .mockReturnValueOnce('mocked-plane-id-4')
+      .mockReturnValueOnce('mocked-plane-id-5');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
       expect(await screen.findByText(new RegExp(`Planes\\s+in\\s+hanger:\\s*${i + 1}`))).toBeInTheDocument();
@@ -49,15 +51,17 @@ describe('Airport Component', () => {
   });
 
   it('prevents landing when weather is stormy', async () => {
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
     (isStormy as jest.Mock).mockReturnValue(true);
-    render(<Airport />);
+    render(<Airport generateUniqueId={generateUniqueId} />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     expect(await screen.findByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/)).toBeInTheDocument();
   });
 
   it('prevents landing when plane is already in hanger', async () => {
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
     (isStormy as jest.Mock).mockReturnValue(false);
-    render(<Airport />);
+    render(<Airport generateUniqueId={generateUniqueId} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     await userEvent.click(landButton);
     expect(await screen.findByText(/Planes\s+in\s+hanger:\s*1/)).toBeInTheDocument();
@@ -72,14 +76,16 @@ describe('Airport Component', () => {
   });
 
   it('takes off a plane successfully', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
     expect(await screen.findByText(/Planes\s+in\s+hanger:\s*0/)).toBeInTheDocument();
   });
 
   it('prevents takeoff when weather is stormy', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     (isStormy as jest.Mock).mockReturnValue(true);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
@@ -87,14 +93,16 @@ describe('Airport Component', () => {
   });
 
   it('prevents takeoff when no planes are available', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
     expect(await screen.findByText(/No\s+planes\s+available\s+for\s+takeoff/)).toBeInTheDocument();
   });
 
   it('prevents takeoff when plane is not in hanger', async () => {
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
     (isStormy as jest.Mock).mockReturnValue(false);
-    render(<Airport />);
+    render(<Airport generateUniqueId={generateUniqueId} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
     await userEvent.click(landButton);
@@ -108,7 +116,8 @@ describe('Airport Component', () => {
   });
 
   it('handles multiple planes landing and taking off in sequence', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
 
@@ -135,7 +144,8 @@ describe('Airport Component', () => {
   });
 
   it('displays appropriate error message when weather turns stormy during landing', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
 
     // Start landing process
@@ -150,7 +160,8 @@ describe('Airport Component', () => {
   });
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
 
@@ -166,7 +177,8 @@ describe('Airport Component', () => {
   });
 
   it('ensures state persistence across different actions', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
 
@@ -184,7 +196,8 @@ describe('Airport Component', () => {
   });
 
   it('verifies that isStormy mock function is called', async () => {
-    render(<Airport />);
+    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    render(<Airport generateUniqueId={generateUniqueId} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
 
     // Land a plane
