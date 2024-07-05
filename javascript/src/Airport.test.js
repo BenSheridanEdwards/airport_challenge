@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport/Airport';
 
-let mockIdCounter;
+let mockIdCounter = 0; // Initialize the counter before the test suite
 
 jest.mock('./Airport/Airport', () => {
   const originalModule = jest.requireActual('./Airport/Airport');
