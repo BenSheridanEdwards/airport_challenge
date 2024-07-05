@@ -19,8 +19,7 @@ jest.mock('./Airport/Airport', () => {
 });
 
 beforeEach(() => {
-  mockIdCounter = 0; // Reset the counter before each test
-  jest.clearAllMocks(); // Clear all mocks before each test
+  mockIdCounter = 0; // Initialize the counter before the test suite
   jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
 });
 
@@ -43,8 +42,8 @@ describe('Airport', () => {
     await userEvent.click(landButton);
     const message = await screen.findByText(/Plane landed successfully\./);
     expect(message).toBeInTheDocument();
-    await waitFor(async () => {
-      const hangerCount = await screen.findByTestId('hanger-count');
+    await waitFor(() => {
+      const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 10000 });
   });
@@ -72,8 +71,8 @@ describe('Airport', () => {
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     for (let i = 0; i < 5; i++) {
       await userEvent.click(landButton);
-      await waitFor(async () => {
-        const hangerCount = await screen.findByTestId('hanger-count');
+      await waitFor(() => {
+        const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 10000 });
     }
