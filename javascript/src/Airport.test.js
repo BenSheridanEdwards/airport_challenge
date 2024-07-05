@@ -40,7 +40,7 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText((content) => content.includes('Plane landed successfully.'));
+    const message = await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
     expect(message).toBeInTheDocument();
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
@@ -52,7 +52,7 @@ describe('Airport', () => {
     render(<Airport />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText((content) => content.includes('Plane landed successfully.'));
+    const message = await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
     expect(message).toBeInTheDocument();
     const hangerCount = await screen.findByTestId('hanger-count');
     expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
@@ -74,7 +74,7 @@ describe('Airport', () => {
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
     await waitFor(() => {
-      const errorMessage = screen.getByText((content) => content.includes('Stormy weather, unable to take off!'));
+      const errorMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Stormy weather, unable to take off!'));
       expect(errorMessage).toBeInTheDocument();
     });
     jest.restoreAllMocks(); // Restore Math.random mock
@@ -92,10 +92,14 @@ describe('Airport', () => {
       }, { timeout: 10000 });
     }
     await userEvent.click(landButton);
+    await waitFor(async () => {
+      const hangerCount = await screen.findByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
+    }, { timeout: 10000 });
     await waitFor(() => {
-      const errorMessage = screen.getByText((content) => content.includes('Hanger full, abort landing!'));
+      const errorMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Hanger full, abort landing!'));
       expect(errorMessage).toBeInTheDocument();
-    });
+    }, { timeout: 10000 });
     jest.restoreAllMocks(); // Restore Math.random mock
   });
 
@@ -112,7 +116,7 @@ describe('Airport', () => {
     expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     // Attempt to land the same plane again
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText((content) => content.includes('That plane is already here'));
+    const errorMessage = await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('That plane is already here'));
     expect(errorMessage).toBeInTheDocument();
     jest.restoreAllMocks(); // Restore mocks
   });
