@@ -91,24 +91,18 @@ describe('Airport Component', () => {
   it('prevents landing when plane is already in hanger', async () => {
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     await userEvent.click(landButton);
     const hangerContainer = screen.getByTestId('hanger-container');
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
-      console.log('Hanger state after first landing:', hangerCount.textContent);
       expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
     });
-    console.log('Plane ID after first landing:', instances[0].id);
     await userEvent.click(landButton);
     await waitFor(() => {
       const messageElement = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('That plane is already here'));
-      console.log('Message element:', messageElement);
       expect(messageElement).toBeInTheDocument();
     });
-    console.log('Hanger state after second landing attempt:', screen.getByTestId('hanger-count').textContent);
-    console.log('Plane ID after second landing attempt:', instances[0].id);
   });
 
   it('takes off a plane successfully', async () => {
