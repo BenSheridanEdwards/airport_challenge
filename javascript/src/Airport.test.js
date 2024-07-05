@@ -19,7 +19,7 @@ jest.mock('./Airport/Airport', () => {
 });
 
 beforeEach(() => {
-  mockIdCounter = 0; // Initialize the counter before the test suite
+  mockIdCounter = 0; // Reset the counter before each test
   jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
 });
 
