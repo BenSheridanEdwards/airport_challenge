@@ -158,8 +158,8 @@ describe('Airport Component', () => {
     (isStormy as jest.Mock).mockReturnValue(true);
 
     // Attempt to land another plane
+    await userEvent.click(landButton);
     await waitFor(async () => {
-      await userEvent.click(landButton);
       const errorMessage = await screen.findByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/);
       expect(errorMessage).toBeInTheDocument();
     });
