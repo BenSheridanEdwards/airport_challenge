@@ -1,7 +1,7 @@
 import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
-import Airport from './Airport/Airport'; // Move the import statement to the top
+import Airport from './Airport/Airport';
 
 let mockIdCounter = 0;
 
@@ -18,19 +18,21 @@ jest.mock('./Airport/Airport', () => {
   };
 });
 
+beforeAll(() => {
+  mockIdCounter = 0; // Reset the counter before all tests
+});
+
+beforeEach(() => {
+  jest.clearAllMocks(); // Clear all mocks before each test
+  jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
+});
+
+afterEach(() => {
+  cleanup();
+  jest.clearAllMocks(); // Clear all mocks after each test
+});
+
 describe('Airport', () => {
-  beforeEach(() => {
-    mockIdCounter = 0; // Reset the counter before each test
-    jest.clearAllMocks(); // Clear all mocks before each test
-    jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
-  });
-
-  afterEach(() => {
-    mockIdCounter = 0; // Reset the counter after each test
-    cleanup();
-    jest.clearAllMocks(); // Clear all mocks after each test
-  });
-
   it('should display the correct initial capacity and planes in hanger', async () => {
     render(<Airport />);
     expect(await screen.findByText('Capacity: 5')).toBeInTheDocument();
