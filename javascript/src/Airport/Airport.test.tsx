@@ -5,16 +5,28 @@ import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
 
+interface MockPlaneInstance {
+  id: string;
+  airborn: boolean;
+  landed: jest.Mock;
+  inTheAir: jest.Mock;
+}
+
+const instances: MockPlaneInstance[] = [];
+
 jest.mock('../Plane/Plane', () => {
+  const mockPlane = jest.fn().mockImplementation(function (this: MockPlaneInstance, id: string) {
+    this.id = id || '_' + Math.random().toString(36).substr(2, 9);
+    this.airborn = false;
+    this.landed = jest.fn().mockReturnThis();
+    this.inTheAir = jest.fn().mockReturnThis();
+    instances.push(this);
+    return this;
+  });
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(function (this: any, id: string) {
-      this.id = id || '_' + Math.random().toString(36).substr(2, 9);
-      this.airborn = false;
-      this.landed = jest.fn().mockReturnThis();
-      this.inTheAir = jest.fn().mockReturnThis();
-      return this;
-    }),
+    default: mockPlane,
+    instances,
   };
 });
 
@@ -26,7 +38,6 @@ describe('Airport Component', () => {
   const MockPlane = jest.requireActual('../Plane/Plane').default;
 
   beforeEach(() => {
-    jest.resetModules();
     jest.resetAllMocks();
     jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
@@ -85,14 +96,19 @@ describe('Airport Component', () => {
     await userEvent.click(landButton);
     const hangerContainer = screen.getByTestId('hanger-container');
     await waitFor(() => {
+      const hangerCount = screen.getByTestId('hanger-count');
+      console.log('Hanger state after first landing:', hangerCount.textContent);
       expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
     });
-    console.log('Hanger state after first landing:', screen.getByTestId('hanger-count').textContent);
+    console.log('Plane ID after first landing:', instances[0].id);
     await userEvent.click(landButton);
     await waitFor(() => {
       const messageElement = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('That plane is already here'));
+      console.log('Message element:', messageElement);
       expect(messageElement).toBeInTheDocument();
     });
+    console.log('Hanger state after second landing attempt:', screen.getByTestId('hanger-count').textContent);
+    console.log('Plane ID after second landing attempt:', instances[0].id);
   });
 
   it('takes off a plane successfully', async () => {
