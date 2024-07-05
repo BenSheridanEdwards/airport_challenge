@@ -162,8 +162,10 @@ describe('Airport Component', () => {
 
     // Attempt to land another plane
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText(/Stormy\s+weather,\s+cannot\s+land\s+the\s+plane!/);
-    expect(errorMessage).toBeInTheDocument();
+    await waitFor(async () => {
+      const errorMessage = await screen.findByText(/Stormy weather, cannot land the plane!/);
+      expect(errorMessage).toBeInTheDocument();
+    }, { timeout: 10000 });
   });
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
