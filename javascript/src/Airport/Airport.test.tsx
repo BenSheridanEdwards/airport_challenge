@@ -11,9 +11,13 @@ jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
 }));
 
-jest.mock('./generateUniqueId', () => ({
-  generateUniqueId: jest.fn().mockReturnValue('mocked-plane-id'),
-}));
+jest.mock('./Airport', () => {
+  const originalModule = jest.requireActual('./Airport');
+  return {
+    ...originalModule,
+    generateUniqueId: jest.fn().mockReturnValue('mocked-plane-id'),
+  };
+});
 
 describe('Airport Component', () => {
   beforeEach(() => {
