@@ -91,11 +91,11 @@ describe('Airport', () => {
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 10000 });
     }
-    await userEvent.click(landButton);
     await waitFor(async () => {
       const hangerCount = await screen.findByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
     }, { timeout: 10000 });
+    await userEvent.click(landButton);
     await waitFor(() => {
       const errorMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Hanger full, abort landing!'));
       expect(errorMessage).toBeInTheDocument();
