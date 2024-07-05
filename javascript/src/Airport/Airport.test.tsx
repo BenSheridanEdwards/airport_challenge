@@ -11,6 +11,10 @@ jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
 }));
 
+jest.mock('./generateUniqueId', () => ({
+  generateUniqueId: jest.fn().mockReturnValue('mocked-plane-id'),
+}));
+
 describe('Airport Component', () => {
   beforeEach(() => {
     (isStormy as jest.Mock).mockReturnValue(false);
