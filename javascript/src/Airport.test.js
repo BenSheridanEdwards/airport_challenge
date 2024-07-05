@@ -26,7 +26,9 @@ describe('Airport', () => {
   });
 
   afterEach(() => {
+    mockIdCounter = 0; // Reset the counter after each test
     cleanup();
+    jest.clearAllMocks(); // Clear all mocks after each test
   });
 
   it('should display the correct initial capacity and planes in hanger', async () => {
