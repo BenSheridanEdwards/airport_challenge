@@ -43,12 +43,8 @@ describe('Airport Component', () => {
     render(<Airport PlaneClass={MockPlane} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     await userEvent.click(landButton);
-    const hangerContainer = screen.getByTestId('hanger-container');
-    await waitFor(() => {
-      console.log('Planes in hanger:', hangerContainer.textContent);
-      console.log('Plane instance:', MockPlane);
-      expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
-    });
+    const hangerCount = await screen.findByTestId('hanger-count');
+    expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
   });
 
   it('prevents landing when hanger is full', async () => {

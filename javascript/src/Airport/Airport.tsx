@@ -112,7 +112,6 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     return new PlaneClass(id);
   };
 
-
   return (
     <Box p={4} data-testid="hanger-container">
       <Text fontSize="2xl">Airport</Text>
