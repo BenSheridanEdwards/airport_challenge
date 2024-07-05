@@ -5,11 +5,15 @@ import { Button, Box, Text } from '@chakra-ui/react';
 
 const DEFAULT_CAPACITY = 5;
 
-const generateUniqueId = (): string => {
+const defaultGenerateUniqueId = (): string => {
   return '_' + Math.random().toString(36).substr(2, 9);
 };
 
-const Airport: React.FC = () => {
+interface AirportProps {
+  generateUniqueId?: () => string;
+}
+
+const Airport: React.FC<AirportProps> = ({ generateUniqueId = defaultGenerateUniqueId }) => {
   const [hanger, setHanger] = useState<Plane[]>([]);
   const [capacity] = useState<number>(DEFAULT_CAPACITY);
   const [message, setMessage] = useState<string>('');
@@ -110,4 +114,3 @@ const Airport: React.FC = () => {
 };
 
 export default Airport;
-export { generateUniqueId };
