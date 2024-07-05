@@ -17,8 +17,6 @@ jest.mock('./Airport/Airport', () => {
   };
 });
 
-const { generateUniqueId } = require('./Airport/Airport');
-
 describe('Airport', () => {
   beforeEach(() => {
     mockIdCounter = 0; // Reset the counter before each test
