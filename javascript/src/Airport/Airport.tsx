@@ -37,8 +37,11 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       }
       setHanger(prevHanger => [...prevHanger, plane]);
       setMessage('Plane landed successfully.');
+      console.log('Plane landed:', plane);
+      console.log('Updated hanger:', hanger);
     } catch (error) {
       setMessage((error as Error).message);
+      console.log('Error landing plane:', (error as Error).message);
     }
   };
 
@@ -57,8 +60,11 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       }
       setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
       setMessage('Plane took off successfully.');
+      console.log('Plane took off:', plane);
+      console.log('Updated hanger:', hanger);
     } catch (error) {
       setMessage((error as Error).message);
+      console.log('Error taking off plane:', (error as Error).message);
     }
   };
 

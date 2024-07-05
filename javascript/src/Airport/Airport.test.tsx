@@ -52,14 +52,14 @@ describe('Airport Component', () => {
     console.log('Plane instance:', MockPlane);
     for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-      const hangerContainer = screen.getByTestId('hanger-container');
       await waitFor(() => {
+        const hangerContainer = screen.getByTestId('hanger-container');
         expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes(`Planes in hanger: ${i + 1}`))).toBeInTheDocument();
       });
     }
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    const hangerContainer = screen.getByTestId('hanger-container');
     await waitFor(() => {
+      const hangerContainer = screen.getByTestId('hanger-container');
       expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Hanger full, abort landing!'))).toBeInTheDocument();
     });
   });
@@ -70,7 +70,9 @@ describe('Airport Component', () => {
     render(<Airport PlaneClass={MockPlane} />);
     console.log('Plane instance:', MockPlane);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-    expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Stormy weather, cannot land the plane!'))).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Stormy weather, cannot land the plane!'))).toBeInTheDocument();
+    });
   });
 
   // Test to prevent landing when plane is already in hanger
@@ -96,8 +98,10 @@ describe('Airport Component', () => {
     console.log('Plane instance:', MockPlane);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
-    const hangerContainer = screen.getByTestId('hanger-container');
-    expect(await within(hangerContainer).findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 0'))).toBeInTheDocument();
+    await waitFor(() => {
+      const hangerContainer = screen.getByTestId('hanger-container');
+      expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 0'))).toBeInTheDocument();
+    });
   });
 
   it('prevents takeoff when weather is stormy', async () => {
@@ -192,6 +196,7 @@ describe('Airport Component', () => {
     (isStormy as jest.Mock).mockReturnValue(true);
 
     // Attempt to take off the plane
+    await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
     await waitFor(async () => {
       expect(await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Stormy weather, unable to take off!'))).toBeInTheDocument();
     });
