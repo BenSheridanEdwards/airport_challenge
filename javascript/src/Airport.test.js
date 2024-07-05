@@ -5,9 +5,11 @@ import Airport from './Airport/Airport';
 
 let mockIdCounter = 0; // Initialize the counter before the test suite
 
-jest.mock('./Airport/generateUniqueId', () => {
+jest.mock('./Airport/Airport', () => {
+  const originalModule = jest.requireActual('./Airport/Airport');
   return {
     __esModule: true,
+    ...originalModule,
     generateUniqueId: jest.fn(() => {
       console.log(`mockIdCounter before increment: ${mockIdCounter}`);
       const id = `test-plane-id-${mockIdCounter++}`;
@@ -18,7 +20,7 @@ jest.mock('./Airport/generateUniqueId', () => {
   };
 });
 
-beforeEach(() => {
+beforeAll(() => {
   jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
 });
 
