@@ -26,6 +26,8 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const land = (plane: InstanceType<typeof PlaneClass>): Promise<void> => {
     return new Promise((resolve) => {
       try {
+        console.log('Attempting to land plane:', plane);
+        console.log('Current hanger state:', hanger);
         if (hangerFull()) {
           throw new Error('Hanger full, abort landing!');
         }
@@ -40,13 +42,19 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         } else {
           throw new Error('Plane does not have a landed method');
         }
-        setHanger(prevHanger => [...prevHanger, plane]);
+        setHanger(prevHanger => {
+          const updatedHanger = [...prevHanger, plane];
+          console.log('Plane landed:', plane);
+          console.log('Updated hanger state:', updatedHanger);
+          resolve();
+          return updatedHanger;
+        });
         setMessage('Plane landed successfully.');
-        console.log('Plane landed:', plane);
+        console.log('Message set to: Plane landed successfully.');
       } catch (error) {
-        setMessage((error as Error).message);
-        console.log('Error landing plane:', (error as Error).message);
-      } finally {
+        const errorMessage = (error as Error).message;
+        setMessage(errorMessage);
+        console.log('Error landing plane:', errorMessage);
         resolve();
       }
     });
