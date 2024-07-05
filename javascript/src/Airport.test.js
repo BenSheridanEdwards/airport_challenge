@@ -5,7 +5,7 @@ import Airport from './Airport/Airport';
 
 let mockIdCounter = 0; // Initialize the counter before the test suite
 
-jest.mock('./Airport/Airport', () => {
+jest.mock('./Airport/generateUniqueId', () => {
   return {
     __esModule: true,
     generateUniqueId: jest.fn(() => {
