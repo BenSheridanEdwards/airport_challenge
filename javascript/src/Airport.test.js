@@ -7,7 +7,6 @@ let mockIdCounter = 0; // Initialize the counter before the test suite
 
 jest.mock('./Airport/Airport', () => {
   const originalModule = jest.requireActual('./Airport/Airport');
-  mockIdCounter = 0; // Initialize the counter within the mock scope
   return {
     __esModule: true,
     ...originalModule,
