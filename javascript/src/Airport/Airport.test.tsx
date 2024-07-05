@@ -156,6 +156,8 @@ describe('Airport Component', () => {
 
     // Start landing process
     await userEvent.click(landButton);
+
+    // Simulate weather turning stormy
     (isStormy as jest.Mock).mockReturnValue(true);
 
     // Attempt to land another plane
