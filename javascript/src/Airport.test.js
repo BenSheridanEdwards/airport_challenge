@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport/Airport';
 
+let mockIdCounter = 0; // Initialize the counter before the test suite
+
 jest.mock('./Airport/Airport', () => {
-  const originalModule = jest.requireActual('./Airport/Airport');
   return {
     __esModule: true,
-    ...originalModule,
     generateUniqueId: jest.fn(() => {
       console.log(`mockIdCounter before increment: ${mockIdCounter}`);
       const id = `test-plane-id-${mockIdCounter++}`;
@@ -17,8 +17,6 @@ jest.mock('./Airport/Airport', () => {
     }),
   };
 });
-
-let mockIdCounter = 0; // Initialize the counter before the test suite
 
 beforeEach(() => {
   jest.spyOn(Math, 'random').mockReturnValue(0.5); // Mock Math.random to return 0.5 (sunny)
@@ -56,7 +54,6 @@ describe('Airport', () => {
     expect(message).toBeInTheDocument();
     const hangerCount = await screen.findByTestId('hanger-count');
     expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    jest.spyOn(Math, 'random').mockReturnValue(0.5); // Ensure sunny weather for takeoff
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
     const takeOffMessage = await screen.findByText(/Plane took off successfully\./);
