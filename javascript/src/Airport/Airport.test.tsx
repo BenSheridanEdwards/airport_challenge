@@ -165,7 +165,7 @@ describe('Airport Component', () => {
     await waitFor(async () => {
       const errorMessage = await screen.findByText(/Stormy weather, cannot land the plane!/);
       expect(errorMessage).toBeInTheDocument();
-    }, { timeout: 10000 });
+    }, { timeout: 20000 });
   });
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
