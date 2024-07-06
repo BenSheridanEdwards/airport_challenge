@@ -93,15 +93,21 @@ describe('Airport Component', () => {
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
+    const planeIdInput = screen.getByTestId('plane-id-input');
+
+    // Enter the planeId and land the plane
+    const planeId = 'test-plane-id';
+    await userEvent.type(planeIdInput, planeId);
     await userEvent.click(landButton);
+
     const hangerContainer = screen.getByTestId('hanger-container');
     await waitFor(() => {
       expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
     });
-    const firstPlaneId = instances.length > 0 ? instances[0].id : null; // Capture the ID of the first plane if it exists
-    console.log('First plane ID:', firstPlaneId);
-    console.log('Instances array:', instances);
-    await userEvent.click(landButton); // Simulate clicking the land button again
+
+    // Attempt to land the same plane again
+    await userEvent.type(planeIdInput, planeId);
+    await userEvent.click(landButton);
     await waitFor(() => {
       const messageElement = screen.getByTestId('message');
       expect(messageElement).toHaveTextContent('That plane is already here');

@@ -16,6 +16,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [hanger, setHanger] = useState<InstanceType<typeof PlaneClass>[]>([]);
   const [capacity] = useState<number>(DEFAULT_CAPACITY);
   const [message, setMessage] = useState<string>('');
+  const [planeId, setPlaneId] = useState<string>('');
 
   useEffect(() => {
     console.log('Updated hanger:', hanger);
@@ -104,6 +105,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       const newPlane = createPlane(generateUniqueId());
       land(newPlane);
     }
+    setPlaneId(''); // Clear the input field after landing
   };
 
   const handleTakeOff = (planeId?: string) => {
@@ -133,7 +135,14 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       <Text fontSize="2xl">Airport</Text>
       <Text>Capacity: {capacity}</Text>
       <Text role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</Text>
-      <Button colorScheme="teal" onClick={() => handleLand()} m={2}>Land Plane</Button>
+      <input
+        type="text"
+        value={planeId}
+        onChange={(e) => setPlaneId(e.target.value)}
+        placeholder="Enter plane ID"
+        data-testid="plane-id-input"
+      />
+      <Button colorScheme="teal" onClick={() => handleLand(planeId)} m={2}>Land Plane</Button>
       <Button colorScheme="red" onClick={() => handleTakeOff()} m={2} data-testid="takeoff-container">Take Off Plane</Button>
       {message && <Text role="status" mt={4} data-testid="message">{message}</Text>}
     </Box>
