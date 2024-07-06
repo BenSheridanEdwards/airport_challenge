@@ -5,16 +5,28 @@ import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
 
+interface MockPlaneInstance {
+  id: string;
+  airborn: boolean;
+  landed: jest.Mock;
+  inTheAir: jest.Mock;
+}
+
+const instances: MockPlaneInstance[] = [];
+
 jest.mock('../Plane/Plane', () => {
+  const mockPlane = jest.fn().mockImplementation(function (this: MockPlaneInstance, id: string) {
+    this.id = id || '_' + Math.random().toString(36).substr(2, 9);
+    this.airborn = false;
+    this.landed = jest.fn().mockReturnThis();
+    this.inTheAir = jest.fn().mockReturnThis();
+    instances.push(this);
+    return this;
+  });
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(function (this: any, id: string) {
-      this.id = id || '_' + Math.random().toString(36).substr(2, 9);
-      this.airborn = false;
-      this.landed = jest.fn().mockReturnThis();
-      this.inTheAir = jest.fn().mockReturnThis();
-      return this;
-    }),
+    default: mockPlane,
+    instances,
   };
 });
 
@@ -26,10 +38,10 @@ describe('Airport Component', () => {
   const MockPlane = jest.requireActual('../Plane/Plane').default;
 
   beforeEach(() => {
-    jest.resetModules();
     jest.resetAllMocks();
     jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
+    instances.length = 0; // Clear the instances array before each test
     console.log = jest.fn(); // Mock console.log to track logs
   });
 
@@ -66,7 +78,7 @@ describe('Airport Component', () => {
   });
 
   it('prevents landing when weather is stormy', async () => {
-    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    // Removed unused generateUniqueId mock function
     (isStormy as jest.Mock).mockReturnValue(true);
     render(<Airport PlaneClass={MockPlane} />);
     console.log('Plane instance:', MockPlane);
@@ -78,20 +90,28 @@ describe('Airport Component', () => {
 
   // Test to prevent landing when plane is already in hanger
   it('prevents landing when plane is already in hanger', async () => {
-    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     const landButton = screen.getByRole('button', { name: /land plane/i });
+    const planeIdInput = screen.getByTestId('plane-id-input');
+
+    // Enter the planeId and land the plane
+    const planeId = 'test-plane-id';
+    await userEvent.type(planeIdInput, planeId);
     await userEvent.click(landButton);
+
     const hangerContainer = screen.getByTestId('hanger-container');
     await waitFor(() => {
       expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
     });
+
+    // Attempt to land the same plane again
+    await userEvent.type(planeIdInput, planeId);
     await userEvent.click(landButton);
     await waitFor(() => {
-      expect(screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('That plane is already here'))).toBeInTheDocument();
-    });
+      const messageElement = screen.getByTestId('message');
+      expect(messageElement).toHaveTextContent('That plane is already here');
+    }, { timeout: 5000 });
   });
 
   it('takes off a plane successfully', async () => {
@@ -124,7 +144,7 @@ describe('Airport Component', () => {
   });
 
   it('prevents takeoff when plane is not in hanger', async () => {
-    const generateUniqueId = jest.fn().mockReturnValue('mocked-plane-id');
+    // Removed unused generateUniqueId mock function
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
     console.log('Plane instance:', MockPlane);
