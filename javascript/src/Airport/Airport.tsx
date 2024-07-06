@@ -102,7 +102,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       const plane = createPlane(planeId);
       land(plane);
     } else {
-      const newPlane = createPlane(generateUniqueId());
+      const newPlaneId = generateUniqueId();
+      console.log('Generated unique ID for new plane:', newPlaneId);
+      const newPlane = createPlane(newPlaneId);
       land(newPlane);
     }
     setPlaneId(''); // Clear the input field after landing
@@ -127,6 +129,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const createPlane = (id: string): InstanceType<typeof PlaneClass> => {
+    console.log('Creating plane with ID:', id);
     return new PlaneClass(id);
   };
 
