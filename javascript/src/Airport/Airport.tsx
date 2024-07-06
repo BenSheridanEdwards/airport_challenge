@@ -10,9 +10,7 @@ interface AirportProps {
   generateUniqueId?: () => string;
 }
 
-const defaultGenerateUniqueId = (): string => {
-  return '_' + Math.random().toString(36).substr(2, 9);
-};
+const defaultGenerateUniqueId = (): string => '_' + Math.random().toString(36).substr(2, 9);
 
 const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
   const [hanger, setHanger] = useState<InstanceType<typeof PlaneClass>[]>([]);

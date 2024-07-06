@@ -99,11 +99,9 @@ describe('Airport Component', () => {
       expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
     });
     const firstPlaneId = instances.length > 0 ? instances[0].id : null; // Capture the ID of the first plane if it exists
-    if (firstPlaneId) {
-      await userEvent.click(landButton); // Simulate clicking the land button again
-    } else {
-      console.error('No plane instances found');
-    }
+    console.log('First plane ID:', firstPlaneId);
+    console.log('Instances array:', instances);
+    await userEvent.click(landButton); // Simulate clicking the land button again
     await waitFor(() => {
       const messageElement = screen.getByTestId('message');
       expect(messageElement).toHaveTextContent('That plane is already here');
