@@ -152,6 +152,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     console.log('Creating plane with ID:', id);
     if (!id) {
       console.error('createPlane received undefined ID');
+      throw new Error('Cannot create plane with undefined ID');
     }
     return new PlaneClass(id);
   };
