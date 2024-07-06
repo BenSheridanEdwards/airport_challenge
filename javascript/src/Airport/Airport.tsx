@@ -46,6 +46,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
           throw new Error('Plane does not have a landed method');
         }
         setHanger(prevHanger => {
+          console.log('Previous hanger state:', prevHanger);
           const updatedHanger = [...prevHanger, plane];
           console.log('Plane landed:', plane);
           console.log('Updated hanger state:', updatedHanger);
@@ -113,7 +114,10 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     if (planeId) {
       console.log('Using provided planeId:', planeId);
       const plane = createPlane(planeId);
-      land(plane);
+      console.log('Plane created with provided planeId:', plane);
+      land(plane).then(() => {
+        console.log('Plane landed with provided planeId:', plane);
+      });
     } else {
       const newPlaneId = generateUniqueId();
       console.log('Generated unique ID for new plane:', newPlaneId);
@@ -125,7 +129,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       console.log('Creating new plane with ID:', newPlaneId);
       const newPlane = createPlane(newPlaneId);
       console.log('New plane created:', newPlane);
-      land(newPlane);
+      land(newPlane).then(() => {
+        console.log('New plane landed:', newPlane);
+      });
     }
     setPlaneId(''); // Clear the input field after landing
   };
