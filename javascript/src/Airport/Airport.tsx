@@ -10,7 +10,11 @@ interface AirportProps {
   generateUniqueId?: () => string;
 }
 
-const defaultGenerateUniqueId = (): string => '_' + Math.random().toString(36).substr(2, 9);
+const defaultGenerateUniqueId = (): string => {
+  const id = '_' + Math.random().toString(36).substr(2, 9);
+  console.log('Generated unique ID:', id);
+  return id;
+};
 
 const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
   const [hanger, setHanger] = useState<InstanceType<typeof PlaneClass>[]>([]);
@@ -62,6 +66,8 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const takeOff = (plane: InstanceType<typeof PlaneClass>): Promise<void> => {
     return new Promise((resolve) => {
       try {
+        console.log('Attempting to take off plane:', plane);
+        console.log('Current hanger state:', hanger);
         if (!landed(plane)) {
           throw new Error("No planes available for takeoff");
         }
@@ -73,9 +79,14 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         } else {
           throw new Error('Plane does not have an inTheAir method');
         }
-        setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
+        setHanger(prevHanger => {
+          const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
+          console.log('Plane took off:', plane);
+          console.log('Updated hanger state:', updatedHanger);
+          return updatedHanger;
+        });
         setMessage('Plane took off successfully.');
-        console.log('Plane took off:', plane);
+        console.log('Message set to: Plane took off successfully.');
       } catch (error) {
         setMessage((error as Error).message);
         console.log('Error taking off plane:', (error as Error).message);
@@ -94,20 +105,26 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const handleLand = (planeId?: string) => {
+    console.log('handleLand called with planeId:', planeId);
     if (hangerFull()) {
       setMessage('Hanger full, abort landing!');
       return;
     }
     if (planeId) {
+      console.log('Using provided planeId:', planeId);
       const plane = createPlane(planeId);
       land(plane);
     } else {
       const newPlaneId = generateUniqueId();
       console.log('Generated unique ID for new plane:', newPlaneId);
       if (!newPlaneId) {
-        console.error('generateUniqueId returned undefined');
+        console.error('generateUniqueId returned undefined, aborting landing process');
+        setMessage('Error generating unique ID, aborting landing process');
+        return;
       }
+      console.log('Creating new plane with ID:', newPlaneId);
       const newPlane = createPlane(newPlaneId);
+      console.log('New plane created:', newPlane);
       land(newPlane);
     }
     setPlaneId(''); // Clear the input field after landing
