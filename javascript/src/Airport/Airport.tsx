@@ -104,6 +104,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     } else {
       const newPlaneId = generateUniqueId();
       console.log('Generated unique ID for new plane:', newPlaneId);
+      if (!newPlaneId) {
+        console.error('generateUniqueId returned undefined');
+      }
       const newPlane = createPlane(newPlaneId);
       land(newPlane);
     }
@@ -130,6 +133,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   const createPlane = (id: string): InstanceType<typeof PlaneClass> => {
     console.log('Creating plane with ID:', id);
+    if (!id) {
+      console.error('createPlane received undefined ID');
+    }
     return new PlaneClass(id);
   };
 
