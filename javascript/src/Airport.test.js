@@ -90,16 +90,19 @@ describe('Airport', () => {
       await userEvent.click(landButton);
       await waitFor(() => {
         const hangerCount = screen.getByTestId('hanger-count');
+        console.log(`Hanger count after landing plane ${i + 1}: ${hangerCount.textContent}`);
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 10000 });
     }
     await waitFor(async () => {
       const hangerCount = await screen.findByTestId('hanger-count');
+      console.log(`Final hanger count before attempting to land another plane: ${hangerCount.textContent}`);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
     }, { timeout: 10000 });
     await userEvent.click(landButton);
     await waitFor(() => {
       const errorMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Hanger full, abort landing!'));
+      console.log(`Error message displayed: ${errorMessage.textContent}`);
       expect(errorMessage).toBeInTheDocument();
     }, { timeout: 10000 });
   });
