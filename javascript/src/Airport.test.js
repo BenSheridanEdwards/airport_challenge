@@ -59,7 +59,7 @@ describe('Airport', () => {
     }, { timeout: 10000 });
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    const takeOffMessage = await screen.findByText(/Plane took off successfully\./);
+    const takeOffMessage = await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane took off successfully.'));
     expect(takeOffMessage).toBeInTheDocument();
     await waitFor(() => {
       const updatedHangerCount = screen.getByTestId('hanger-count');
