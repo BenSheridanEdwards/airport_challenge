@@ -180,7 +180,6 @@ Determining test suites to run...
       const hangerCount = await screen.findByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     });
-    // Attempt to land the same plane again
     await userEvent.click(landButton);
 
       at src/Airport.test.js:89:27
@@ -189,8 +188,6 @@ Determining test suites to run...
  RUNS  src/Airport.test.js
 
  RUNS  src/Airport.test.js
-
- RUNS  src/Airport/Airport.test.tsx
 
  RUNS  src/Airport/Airport.test.tsx
 

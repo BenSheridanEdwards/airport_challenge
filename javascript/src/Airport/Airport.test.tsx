@@ -42,7 +42,6 @@ describe('Airport Component', () => {
     jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
     instances.length = 0; // Clear the instances array before each test
-    console.log = jest.fn(); // Mock console.log to track logs
   });
 
   it('renders Airport component', () => {
@@ -77,7 +76,6 @@ describe('Airport Component', () => {
   });
 
   it('prevents landing when weather is stormy', async () => {
-    // Removed unused generateUniqueId mock function
     (isStormy as jest.Mock).mockReturnValue(true);
     render(<Airport PlaneClass={MockPlane} />);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
@@ -86,7 +84,6 @@ describe('Airport Component', () => {
     });
   });
 
-  // Test to prevent landing when plane is already in hanger
   it('prevents landing when plane is already in hanger', async () => {
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
@@ -139,7 +136,6 @@ describe('Airport Component', () => {
   });
 
   it('prevents takeoff when plane is not in hanger', async () => {
-    // Removed unused generateUniqueId mock function
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
