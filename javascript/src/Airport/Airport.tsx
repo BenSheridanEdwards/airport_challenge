@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
 import { Button, Box, Text } from '@chakra-ui/react';
@@ -20,8 +20,6 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [capacity] = useState<number>(DEFAULT_CAPACITY);
   const [message, setMessage] = useState<string>('');
   const [planeId, setPlaneId] = useState<string>('');
-
-  useEffect(() => {}, [hanger]);
 
   const land = (plane: InstanceType<typeof PlaneClass>): Promise<void> => {
     return new Promise((resolve) => {
