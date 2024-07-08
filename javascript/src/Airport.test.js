@@ -23,6 +23,7 @@ beforeAll(() => {
 
 afterEach(() => {
   cleanup();
+  jest.restoreAllMocks(); // Restore all mocks after each test
 });
 
 describe('Airport', () => {
@@ -79,7 +80,6 @@ describe('Airport', () => {
       const errorMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Stormy weather, unable to take off!'));
       expect(errorMessage).toBeInTheDocument();
     });
-    jest.restoreAllMocks(); // Restore Math.random mock
   });
 
   // Test case for landing a plane in a full hanger
@@ -92,6 +92,7 @@ describe('Airport', () => {
         const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 10000 });
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Add a small delay between landing attempts
     }
     await waitFor(async () => {
       const hangerCount = await screen.findByTestId('hanger-count');
@@ -102,6 +103,8 @@ describe('Airport', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
+      const landButton = screen.getByRole('button', { name: /Land Plane/i });
+      expect(landButton).toBeDisabled(); // Check if the "Land Plane" button is disabled
     }, { timeout: 10000 });
 
     await waitFor(() => {
