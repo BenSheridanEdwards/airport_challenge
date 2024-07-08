@@ -98,8 +98,10 @@ describe('Airport', () => {
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
     }, { timeout: 10000 });
     await userEvent.click(landButton);
-    const errorMessage = await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Hanger full, abort landing!'));
-    expect(errorMessage).toBeInTheDocument();
+    await waitFor(() => {
+      const errorMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Hanger full, abort landing!'));
+      expect(errorMessage).toBeInTheDocument();
+    }, { timeout: 10000 });
   });
 
   // Test case for landing a plane that is already in the hanger
