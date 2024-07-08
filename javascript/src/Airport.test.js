@@ -11,10 +11,7 @@ jest.mock('./Airport/Airport', () => {
     __esModule: true,
     ...originalModule,
     generateUniqueId: jest.fn(() => {
-      console.log(`mockIdCounter before increment: ${mockIdCounter}`);
       const id = `test-plane-id-${mockIdCounter++}`;
-      console.log(`Mocked generateUniqueId called. Generated unique ID: ${id}`);
-      console.log(`mockIdCounter after increment: ${mockIdCounter}`);
       return id;
     }),
   };
@@ -39,14 +36,11 @@ describe('Airport', () => {
   it('should land a plane and update the hanger', async () => {
     render(<Airport generateUniqueId={() => `test-plane-id-${mockIdCounter++}`} />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
-    console.log('Clicking the Land Plane button');
     await userEvent.click(landButton);
-    console.log('Clicked the Land Plane button');
     const message = await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
     expect(message).toBeInTheDocument();
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
-      console.log('Hanger count after landing:', hangerCount.textContent);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 10000 });
   });
@@ -96,10 +90,8 @@ describe('Airport', () => {
       await userEvent.click(landButton);
       await waitFor(() => {
         const hangerCount = screen.getByTestId('hanger-count');
-        console.log(`Hanger count after landing ${i + 1} plane(s):`, hangerCount.textContent);
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 10000 });
-      console.log(`Completed landing ${i + 1} plane(s)`);
     }
     await waitFor(async () => {
       const hangerCount = await screen.findByTestId('hanger-count');
