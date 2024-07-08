@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
-import { Button, Box, Text } from '@chakra-ui/react';
+
+type PlaneInstance = InstanceType<typeof Plane>;
 
 const DEFAULT_CAPACITY = 5;
 
@@ -16,74 +17,50 @@ const defaultGenerateUniqueId = (): string => {
 };
 
 const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
-  const [hanger, setHanger] = useState<InstanceType<typeof PlaneClass>[]>([]);
-  const [capacity] = useState<number>(DEFAULT_CAPACITY);
+  const [hanger, setHanger] = useState<PlaneInstance[]>([]);
   const [message, setMessage] = useState<string>('');
   const [planeId, setPlaneId] = useState<string>('');
 
-  const land = (plane: InstanceType<typeof PlaneClass>): Promise<void> => {
-    return new Promise((resolve) => {
-      try {
-        if (hangerFull()) {
-          throw new Error('Hanger full, abort landing!');
-        }
-        if (landed(plane)) {
-          throw new Error('That plane is already here');
-        }
-        if (isStormy()) {
-          throw new Error('Stormy weather, cannot land the plane!');
-        }
-        if (typeof plane.landed === 'function') {
-          plane.landed();
-        } else {
-          throw new Error('Plane does not have a landed method');
-        }
-        setHanger(prevHanger => {
-          const updatedHanger = [...prevHanger, plane];
-          return updatedHanger;
-        });
-        resolve();
-        setMessage('Plane landed successfully.');
-      } catch (error) {
-        const errorMessage = (error as Error).message;
-        setMessage(errorMessage);
-        resolve();
+  const land = (plane: PlaneInstance): void => {
+    try {
+      if (hangerFull()) {
+        throw new Error('Hanger full, abort landing!');
       }
-    });
+      if (landed(plane)) {
+        throw new Error('That plane is already here');
+      }
+      if (isStormy()) {
+        throw new Error('Stormy weather, cannot land the plane!');
+      }
+      plane.landed();
+      setHanger(prevHanger => [...prevHanger, plane]);
+      setMessage('Plane landed successfully.');
+    } catch (error) {
+      setMessage((error as Error).message);
+    }
   };
 
-  const takeOff = (plane: InstanceType<typeof PlaneClass>): Promise<void> => {
-    return new Promise((resolve) => {
-      try {
-        if (!landed(plane)) {
-          throw new Error("No planes available for takeoff");
-        }
-        if (isStormy()) {
-          throw new Error('Stormy weather, unable to take off!');
-        }
-        if (typeof plane.inTheAir === 'function') {
-          plane.inTheAir();
-        } else {
-          throw new Error('Plane does not have an inTheAir method');
-        }
-        setHanger(prevHanger => {
-          const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
-          return updatedHanger;
-        });
-        setMessage('Plane took off successfully.');
-      } catch (error) {
-        setMessage((error as Error).message);
-      } finally {
-        resolve();
+  const takeOff = (plane: PlaneInstance): void => {
+    try {
+      if (!landed(plane)) {
+        throw new Error("No planes available for takeoff");
       }
-    });
+      if (isStormy()) {
+        throw new Error('Stormy weather, unable to take off!');
+      }
+      plane.inTheAir();
+      setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
+      setMessage('Plane took off successfully.');
+    } catch (error) {
+      setMessage((error as Error).message);
+    }
   };
 
   const hangerFull = (): boolean => {
-    return hanger.length >= capacity;
+    return hanger.length >= DEFAULT_CAPACITY;
   };
 
-  const landed = (plane: InstanceType<typeof PlaneClass>): boolean => {
+  const landed = (plane: PlaneInstance): boolean => {
     return hanger.some(p => p.id === plane.id);
   };
 
@@ -94,7 +71,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     }
     if (planeId) {
       const plane = createPlane(planeId);
-      land(plane).then(() => {});
+      land(plane);
     } else {
       const newPlaneId = generateUniqueId();
       if (!newPlaneId) {
@@ -102,7 +79,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         return;
       }
       const newPlane = createPlane(newPlaneId);
-      land(newPlane).then(() => {});
+      land(newPlane);
     }
     setPlaneId(''); // Clear the input field after landing
   };
@@ -125,7 +102,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     }
   };
 
-  const createPlane = (id: string): InstanceType<typeof PlaneClass> => {
+  const createPlane = (id: string): PlaneInstance => {
     if (!id) {
       throw new Error('Cannot create plane with undefined ID');
     }
@@ -133,21 +110,22 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   return (
-    <Box p={4} data-testid="hanger-container">
-      <Text fontSize="2xl">Airport</Text>
-      <Text>Capacity: {capacity}</Text>
-      <Text role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</Text>
+    <div className="p-4" data-testid="hanger-container">
+      <h2 className="text-2xl">Airport</h2>
+      <p>Capacity: {DEFAULT_CAPACITY}</p>
+      <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
       <input
         type="text"
         value={planeId}
         onChange={(e) => setPlaneId(e.target.value)}
         placeholder="Enter plane ID"
+        className="border p-2"
         data-testid="plane-id-input"
       />
-      <Button colorScheme="teal" onClick={() => handleLand(planeId)} m={2}>Land Plane</Button>
-      <Button colorScheme="red" onClick={() => handleTakeOff()} m={2} data-testid="takeoff-container">Take Off Plane</Button>
-      {message && <Text role="status" mt={4} data-testid="message">{message}</Text>}
-    </Box>
+      <button className="bg-teal-500 text-white p-2 m-2" onClick={() => handleLand(planeId)}>Land Plane</button>
+      <button className="bg-red-500 text-white p-2 m-2" onClick={() => handleTakeOff()} data-testid="takeoff-container">Take Off Plane</button>
+      {message && <p role="status" className="mt-4" data-testid="message">{message}</p>}
+    </div>
   );
 };
 
