@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 type PlaneInstance = InstanceType<typeof Plane>;
 
@@ -18,7 +20,6 @@ const defaultGenerateUniqueId = (): string => {
 
 const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
   const [hanger, setHanger] = useState<PlaneInstance[]>([]);
-  const [message, setMessage] = useState<string>('');
   const [planeId, setPlaneId] = useState<string>('');
 
   const land = (plane: PlaneInstance): void => {
@@ -34,9 +35,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       }
       plane.landed();
       setHanger(prevHanger => [...prevHanger, plane]);
-      setMessage('Plane landed successfully.');
+      toast.success('Plane landed successfully.');
     } catch (error) {
-      setMessage((error as Error).message);
+      toast.error((error as Error).message);
     }
   };
 
@@ -50,9 +51,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       }
       plane.inTheAir();
       setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
-      setMessage('Plane took off successfully.');
+      toast.success('Plane took off successfully.');
     } catch (error) {
-      setMessage((error as Error).message);
+      toast.error((error as Error).message);
     }
   };
 
@@ -66,7 +67,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   const handleLand = (planeId?: string) => {
     if (hangerFull()) {
-      setMessage('Hanger full, abort landing!');
+      toast.error('Hanger full, abort landing!');
       return;
     }
     if (planeId) {
@@ -75,7 +76,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     } else {
       const newPlaneId = generateUniqueId();
       if (!newPlaneId) {
-        setMessage('Error generating unique ID, aborting landing process');
+        toast.error('Error generating unique ID, aborting landing process');
         return;
       }
       const newPlane = createPlane(newPlaneId);
@@ -90,14 +91,14 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       if (plane) {
         takeOff(plane);
       } else {
-        setMessage("No planes available for takeoff");
+        toast.error("No planes available for takeoff");
       }
     } else {
       if (hanger.length > 0) {
         const plane = hanger[0];
         takeOff(plane);
       } else {
-        setMessage('No planes available for takeoff.');
+        toast.error('No planes available for takeoff.');
       }
     }
   };
@@ -124,7 +125,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       />
       <button className="bg-teal-500 text-white p-2 m-2" onClick={() => handleLand(planeId)}>Land Plane</button>
       <button className="bg-red-500 text-white p-2 m-2" onClick={() => handleTakeOff()} data-testid="takeoff-container">Take Off Plane</button>
-      {message && <p role="status" className="mt-4" data-testid="message">{message}</p>}
+      <ToastContainer />
     </div>
   );
 };
