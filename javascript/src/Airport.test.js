@@ -74,6 +74,10 @@ describe('Airport', () => {
     render(<Airport generateUniqueId={() => `test-plane-id-${mockIdCounter++}`} />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
+    await waitFor(() => {
+      const message = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
+      expect(message).toBeInTheDocument();
+    }, { timeout: 10000 });
     const hangerCount = await screen.findByTestId('hanger-count');
     await waitFor(() => expect(hangerCount).toHaveTextContent('Planes in hanger: 1'), { timeout: 5000 });
     jest.spyOn(Math, 'random').mockReturnValue(0); // Mock Math.random to return 0 (stormy)
