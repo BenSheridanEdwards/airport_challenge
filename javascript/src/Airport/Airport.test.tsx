@@ -62,7 +62,6 @@ describe('Airport Component', () => {
 
   it('prevents landing when hanger is full', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     for (let i = 0; i < 5; i++) {
       await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
       await waitFor(() => {
@@ -81,7 +80,6 @@ describe('Airport Component', () => {
     // Removed unused generateUniqueId mock function
     (isStormy as jest.Mock).mockReturnValue(true);
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     await waitFor(() => {
       expect(screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Stormy weather, cannot land the plane!'))).toBeInTheDocument();
@@ -116,7 +114,6 @@ describe('Airport Component', () => {
 
   it('takes off a plane successfully', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
     await waitFor(() => {
@@ -127,7 +124,6 @@ describe('Airport Component', () => {
 
   it('prevents takeoff when weather is stormy', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     (isStormy as jest.Mock).mockReturnValue(true);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
@@ -137,7 +133,6 @@ describe('Airport Component', () => {
 
   it('prevents takeoff when no planes are available', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     await userEvent.click(screen.getByRole('button', { name: /take off plane/i }));
     const hangerContainer = screen.getByTestId('hanger-container');
     expect(await within(hangerContainer).findByText((content) => content.replace(/\s+/g, ' ').trim().includes('No planes available for takeoff'))).toBeInTheDocument();
@@ -147,7 +142,6 @@ describe('Airport Component', () => {
     // Removed unused generateUniqueId mock function
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
     await userEvent.click(landButton);
@@ -162,7 +156,6 @@ describe('Airport Component', () => {
 
   it('handles multiple planes landing and taking off in sequence', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
 
@@ -191,7 +184,6 @@ describe('Airport Component', () => {
   // Test case to display appropriate error message when weather turns stormy during landing
   it('displays appropriate error message when weather turns stormy during landing', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     const landButton = screen.getByRole('button', { name: /land plane/i });
 
     // Start landing process
@@ -209,7 +201,6 @@ describe('Airport Component', () => {
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     const landButton = screen.getByRole('button', { name: /land plane/i });
 
     // Land a plane
@@ -225,7 +216,6 @@ describe('Airport Component', () => {
 
   it('ensures state persistence across different actions', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
 
@@ -244,7 +234,6 @@ describe('Airport Component', () => {
 
   it('verifies that isStormy mock function is called', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    console.log('Plane instance:', MockPlane);
     const landButton = screen.getByRole('button', { name: /land plane/i });
 
     // Land a plane
