@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
 import { Button, Box, Text } from '@chakra-ui/react';
@@ -12,7 +12,6 @@ interface AirportProps {
 
 const defaultGenerateUniqueId = (): string => {
   const id = '_' + Math.random().toString(36).substr(2, 9);
-  console.log('Generated unique ID:', id);
   return id;
 };
 
@@ -22,15 +21,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [message, setMessage] = useState<string>('');
   const [planeId, setPlaneId] = useState<string>('');
 
-  useEffect(() => {
-    console.log('Updated hanger:', hanger);
-  }, [hanger]);
-
   const land = (plane: InstanceType<typeof PlaneClass>): Promise<void> => {
     return new Promise((resolve) => {
       try {
-        console.log('Attempting to land plane:', plane);
-        console.log('Current hanger state:', hanger);
         if (hangerFull()) {
           throw new Error('Hanger full, abort landing!');
         }
@@ -46,19 +39,14 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
           throw new Error('Plane does not have a landed method');
         }
         setHanger(prevHanger => {
-          console.log('Previous hanger state:', prevHanger);
           const updatedHanger = [...prevHanger, plane];
-          console.log('Plane landed:', plane);
-          console.log('Updated hanger state:', updatedHanger);
-          resolve();
           return updatedHanger;
         });
+        resolve();
         setMessage('Plane landed successfully.');
-        console.log('Message set to: Plane landed successfully.');
       } catch (error) {
         const errorMessage = (error as Error).message;
         setMessage(errorMessage);
-        console.log('Error landing plane:', errorMessage);
         resolve();
       }
     });
@@ -67,8 +55,6 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const takeOff = (plane: InstanceType<typeof PlaneClass>): Promise<void> => {
     return new Promise((resolve) => {
       try {
-        console.log('Attempting to take off plane:', plane);
-        console.log('Current hanger state:', hanger);
         if (!landed(plane)) {
           throw new Error("No planes available for takeoff");
         }
@@ -82,15 +68,11 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         }
         setHanger(prevHanger => {
           const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
-          console.log('Plane took off:', plane);
-          console.log('Updated hanger state:', updatedHanger);
           return updatedHanger;
         });
         setMessage('Plane took off successfully.');
-        console.log('Message set to: Plane took off successfully.');
       } catch (error) {
         setMessage((error as Error).message);
-        console.log('Error taking off plane:', (error as Error).message);
       } finally {
         resolve();
       }
@@ -106,32 +88,21 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const handleLand = (planeId?: string) => {
-    console.log('handleLand called with planeId:', planeId);
     if (hangerFull()) {
       setMessage('Hanger full, abort landing!');
       return;
     }
     if (planeId) {
-      console.log('Using provided planeId:', planeId);
       const plane = createPlane(planeId);
-      console.log('Plane created with provided planeId:', plane);
-      land(plane).then(() => {
-        console.log('Plane landed with provided planeId:', plane);
-      });
+      land(plane).then(() => {});
     } else {
       const newPlaneId = generateUniqueId();
-      console.log('Generated unique ID for new plane:', newPlaneId);
       if (!newPlaneId) {
-        console.error('generateUniqueId returned undefined, aborting landing process');
         setMessage('Error generating unique ID, aborting landing process');
         return;
       }
-      console.log('Creating new plane with ID:', newPlaneId);
       const newPlane = createPlane(newPlaneId);
-      console.log('New plane created:', newPlane);
-      land(newPlane).then(() => {
-        console.log('New plane landed:', newPlane);
-      });
+      land(newPlane).then(() => {});
     }
     setPlaneId(''); // Clear the input field after landing
   };
@@ -155,9 +126,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const createPlane = (id: string): InstanceType<typeof PlaneClass> => {
-    console.log('Creating plane with ID:', id);
     if (!id) {
-      console.error('createPlane received undefined ID');
       throw new Error('Cannot create plane with undefined ID');
     }
     return new PlaneClass(id);
