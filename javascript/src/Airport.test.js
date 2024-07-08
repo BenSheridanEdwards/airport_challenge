@@ -35,6 +35,7 @@ describe('Airport', () => {
 
   // Test case for landing a plane and updating the hanger
   it('should land a plane and update the hanger', async () => {
+    jest.spyOn(Math, 'random').mockReturnValue(0.5); // Ensure sunny weather for this test case
     render(<Airport generateUniqueId={() => `test-plane-id-${mockIdCounter++}`} />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
