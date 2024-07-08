@@ -21,62 +21,47 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [message, setMessage] = useState<string>('');
   const [planeId, setPlaneId] = useState<string>('');
 
-  const land = (plane: InstanceType<typeof PlaneClass>): Promise<void> => {
-    return new Promise((resolve) => {
-      try {
-        if (hangerFull()) {
-          throw new Error('Hanger full, abort landing!');
-        }
-        if (landed(plane)) {
-          throw new Error('That plane is already here');
-        }
-        if (isStormy()) {
-          throw new Error('Stormy weather, cannot land the plane!');
-        }
-        if (typeof plane.landed === 'function') {
-          plane.landed();
-        } else {
-          throw new Error('Plane does not have a landed method');
-        }
-        setHanger(prevHanger => {
-          const updatedHanger = [...prevHanger, plane];
-          return updatedHanger;
-        });
-        resolve();
-        setMessage('Plane landed successfully.');
-      } catch (error) {
-        const errorMessage = (error as Error).message;
-        setMessage(errorMessage);
-        resolve();
+  const land = (plane: InstanceType<typeof PlaneClass>): void => {
+    try {
+      if (hangerFull()) {
+        throw new Error('Hanger full, abort landing!');
       }
-    });
+      if (landed(plane)) {
+        throw new Error('That plane is already here');
+      }
+      if (isStormy()) {
+        throw new Error('Stormy weather, cannot land the plane!');
+      }
+      if (typeof plane.landed === 'function') {
+        plane.landed();
+      } else {
+        throw new Error('Plane does not have a landed method');
+      }
+      setHanger(prevHanger => [...prevHanger, plane]);
+      setMessage('Plane landed successfully.');
+    } catch (error) {
+      setMessage((error as Error).message);
+    }
   };
 
-  const takeOff = (plane: InstanceType<typeof PlaneClass>): Promise<void> => {
-    return new Promise((resolve) => {
-      try {
-        if (!landed(plane)) {
-          throw new Error("No planes available for takeoff");
-        }
-        if (isStormy()) {
-          throw new Error('Stormy weather, unable to take off!');
-        }
-        if (typeof plane.inTheAir === 'function') {
-          plane.inTheAir();
-        } else {
-          throw new Error('Plane does not have an inTheAir method');
-        }
-        setHanger(prevHanger => {
-          const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
-          return updatedHanger;
-        });
-        setMessage('Plane took off successfully.');
-      } catch (error) {
-        setMessage((error as Error).message);
-      } finally {
-        resolve();
+  const takeOff = (plane: InstanceType<typeof PlaneClass>): void => {
+    try {
+      if (!landed(plane)) {
+        throw new Error("No planes available for takeoff");
       }
-    });
+      if (isStormy()) {
+        throw new Error('Stormy weather, unable to take off!');
+      }
+      if (typeof plane.inTheAir === 'function') {
+        plane.inTheAir();
+      } else {
+        throw new Error('Plane does not have an inTheAir method');
+      }
+      setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
+      setMessage('Plane took off successfully.');
+    } catch (error) {
+      setMessage((error as Error).message);
+    }
   };
 
   const hangerFull = (): boolean => {
@@ -94,7 +79,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     }
     if (planeId) {
       const plane = createPlane(planeId);
-      land(plane).then(() => {});
+      land(plane);
     } else {
       const newPlaneId = generateUniqueId();
       if (!newPlaneId) {
@@ -102,7 +87,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         return;
       }
       const newPlane = createPlane(newPlaneId);
-      land(newPlane).then(() => {});
+      land(newPlane);
     }
     setPlaneId(''); // Clear the input field after landing
   };
