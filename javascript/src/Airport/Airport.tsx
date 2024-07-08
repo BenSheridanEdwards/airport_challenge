@@ -129,7 +129,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         placeholder="Enter plane ID"
         data-testid="plane-id-input"
       />
-      <Button colorScheme="teal" onClick={() => handleLand(planeId)} m={2}>Land Plane</Button>
+      <Button colorScheme="teal" onClick={() => handleLand(planeId)} m={2} disabled={hangerFull()}>Land Plane</Button>
       <Button colorScheme="red" onClick={() => handleTakeOff()} m={2} data-testid="takeoff-container">Take Off Plane</Button>
       {message && <Text role="status" mt={4} data-testid="message">{message}</Text>}
     </Box>
