@@ -40,9 +40,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         }
         setHanger(prevHanger => {
           const updatedHanger = [...prevHanger, plane];
-          resolve();
           return updatedHanger;
         });
+        resolve();
         setMessage('Plane landed successfully.');
       } catch (error) {
         const errorMessage = (error as Error).message;
