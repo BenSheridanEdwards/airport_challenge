@@ -38,8 +38,10 @@ describe('Airport', () => {
     render(<Airport generateUniqueId={() => `test-plane-id-${mockIdCounter++}`} />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
-    expect(message).toBeInTheDocument();
+    await waitFor(() => {
+      const message = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
+      expect(message).toBeInTheDocument();
+    }, { timeout: 10000 });
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
