@@ -97,6 +97,7 @@ describe('Airport', () => {
       const hangerCount = await screen.findByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
     }, { timeout: 10000 });
+    jest.spyOn(Math, 'random').mockReturnValue(0.5); // Ensure sunny weather
     await userEvent.click(landButton);
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
