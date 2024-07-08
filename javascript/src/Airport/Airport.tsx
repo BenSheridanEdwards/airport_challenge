@@ -70,15 +70,11 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         }
         setHanger(prevHanger => {
           const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
-          console.log('Plane took off:', plane);
-          console.log('Updated hanger state:', updatedHanger);
           return updatedHanger;
         });
         setMessage('Plane took off successfully.');
-        console.log('Message set to: Plane took off successfully.');
       } catch (error) {
         setMessage((error as Error).message);
-        console.log('Error taking off plane:', (error as Error).message);
       } finally {
         resolve();
       }
