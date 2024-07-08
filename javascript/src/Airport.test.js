@@ -88,6 +88,7 @@ describe('Airport', () => {
   it('should display an error message when trying to land a plane in a full hanger', async () => {
     render(<Airport generateUniqueId={() => `test-plane-id-${mockIdCounter++}`} />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
+    jest.spyOn(Math, 'random').mockReturnValue(0.5); // Ensure sunny weather for all landing attempts
     for (let i = 0; i < 5; i++) {
       await userEvent.click(landButton);
       await waitFor(() => {
@@ -99,7 +100,6 @@ describe('Airport', () => {
       const hangerCount = await screen.findByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
     }, { timeout: 10000 });
-    jest.spyOn(Math, 'random').mockReturnValue(0.5); // Ensure sunny weather
     await userEvent.click(landButton);
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
