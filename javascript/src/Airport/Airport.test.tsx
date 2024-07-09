@@ -186,6 +186,10 @@ describe('Airport Component', () => {
         const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 5000 });
+      await waitFor(() => {
+        const successMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
+        expect(successMessage).toBeInTheDocument();
+      }, { timeout: 5000 });
     }
 
     // Take off 2 planes
@@ -195,6 +199,10 @@ describe('Airport Component', () => {
         const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${2 - i}`);
       }, { timeout: 5000 });
+      await waitFor(() => {
+        const successMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane took off successfully.'));
+        expect(successMessage).toBeInTheDocument();
+      }, { timeout: 5000 });
     }
 
     // Land 2 more planes
@@ -203,6 +211,10 @@ describe('Airport Component', () => {
       await waitFor(() => {
         const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${1 + i}`);
+      }, { timeout: 5000 });
+      await waitFor(() => {
+        const successMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
+        expect(successMessage).toBeInTheDocument();
       }, { timeout: 5000 });
     }
   });
