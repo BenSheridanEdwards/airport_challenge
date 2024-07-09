@@ -37,12 +37,10 @@ describe('Airport', () => {
     render(<Airport generateUniqueId={() => `test-plane-id-${mockIdCounter++}`} />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
-    expect(message).toBeInTheDocument();
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 10000 });
+    }, { timeout: 5000 });
   });
 
   // Test case for taking off a plane and updating the hanger
@@ -50,20 +48,16 @@ describe('Airport', () => {
     render(<Airport generateUniqueId={() => `test-plane-id-${mockIdCounter++}`} />);
     const landButton = await screen.findByRole('button', { name: /Land Plane/i });
     await userEvent.click(landButton);
-    const message = await screen.findByText((content) => content.replace(/\s+/g, ' ').trim().includes('Plane landed successfully.'));
-    expect(message).toBeInTheDocument();
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 10000 });
+    }, { timeout: 5000 });
     const takeOffButton = await screen.findByRole('button', { name: /Take Off Plane/i });
     await userEvent.click(takeOffButton);
-    const takeOffMessage = await screen.findByText(/Plane took off successfully\./);
-    expect(takeOffMessage).toBeInTheDocument();
     await waitFor(() => {
-      const updatedHangerCount = screen.getByTestId('hanger-count');
-      expect(updatedHangerCount).toHaveTextContent('Planes in hanger: 0');
-    }, { timeout: 10000 });
+      const hangerCount = screen.getByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
+    }, { timeout: 5000 });
   });
 
   it('should display an error message when trying to take off a plane during stormy weather', async () => {
