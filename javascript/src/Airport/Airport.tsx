@@ -22,39 +22,37 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [hanger, setHanger] = useState<PlaneInstance[]>([]);
   const [planeId, setPlaneId] = useState<string>('');
 
-  const land = (plane: PlaneInstance): void => {
-    try {
+  const land = (plane: PlaneInstance): Promise<void> => {
+    return new Promise((resolve, reject) => {
       if (hangerFull()) {
-        throw new Error('Hanger full, abort landing!');
+        reject(new Error('Hanger full, abort landing!'));
+      } else if (landed(plane)) {
+        reject(new Error('That plane is already here'));
+      } else if (isStormy()) {
+        reject(new Error('Stormy weather, cannot land the plane!'));
+      } else {
+        plane.landed();
+        setHanger(prevHanger => [...prevHanger, plane]);
+        resolve();
       }
-      if (landed(plane)) {
-        throw new Error('That plane is already here');
-      }
-      if (isStormy()) {
-        throw new Error('Stormy weather, cannot land the plane!');
-      }
-      plane.landed();
-      setHanger(prevHanger => [...prevHanger, plane]);
-      toast.success('Plane landed successfully.');
-    } catch (error) {
-      toast.error((error as Error).message);
-    }
+    });
   };
 
-  const takeOff = (plane: PlaneInstance): void => {
-    try {
+  const takeOff = (plane: PlaneInstance): Promise<void> => {
+    return new Promise((resolve, reject) => {
       if (!landed(plane)) {
-        throw new Error("No planes available for takeoff");
+        reject(new Error("No planes available for takeoff"));
+      } else if (isStormy()) {
+        reject(new Error('Stormy weather, unable to take off!'));
+      } else {
+        plane.inTheAir();
+        setHanger(prevHanger => {
+          const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
+          return updatedHanger;
+        });
+        resolve();
       }
-      if (isStormy()) {
-        throw new Error('Stormy weather, unable to take off!');
-      }
-      plane.inTheAir();
-      setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
-      toast.success('Plane took off successfully.');
-    } catch (error) {
-      toast.error((error as Error).message);
-    }
+    });
   };
 
   const hangerFull = (): boolean => {
@@ -65,41 +63,49 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     return hanger.some(p => p.id === plane.id);
   };
 
-  const handleLand = (planeId?: string) => {
+  const handleLand = async (planeId?: string) => {
     if (hangerFull()) {
       toast.error('Hanger full, abort landing!');
       return;
     }
-    if (planeId) {
-      const plane = createPlane(planeId);
-      land(plane);
-    } else {
-      const newPlaneId = generateUniqueId();
-      if (!newPlaneId) {
-        toast.error('Error generating unique ID, aborting landing process');
-        return;
+    try {
+      if (planeId) {
+        const plane = createPlane(planeId);
+        await land(plane);
+      } else {
+        const newPlaneId = generateUniqueId();
+        if (!newPlaneId) {
+          toast.error('Error generating unique ID, aborting landing process');
+          return;
+        }
+        const newPlane = createPlane(newPlaneId);
+        await land(newPlane);
       }
-      const newPlane = createPlane(newPlaneId);
-      land(newPlane);
+      setPlaneId(''); // Clear the input field after landing
+    } catch (error) {
+      toast.error((error as Error).message);
     }
-    setPlaneId(''); // Clear the input field after landing
   };
 
-  const handleTakeOff = (planeId?: string) => {
-    if (planeId) {
-      const plane = hanger.find(p => p.id === planeId);
-      if (plane) {
-        takeOff(plane);
+  const handleTakeOff = async (planeId?: string) => {
+    try {
+      if (planeId) {
+        const plane = hanger.find(p => p.id === planeId);
+        if (plane) {
+          await takeOff(plane);
+        } else {
+          toast.error("No planes available for takeoff");
+        }
       } else {
-        toast.error("No planes available for takeoff");
+        if (hanger.length > 0) {
+          const plane = hanger[0];
+          await takeOff(plane);
+        } else {
+          toast.error('No planes available for takeoff.');
+        }
       }
-    } else {
-      if (hanger.length > 0) {
-        const plane = hanger[0];
-        takeOff(plane);
-      } else {
-        toast.error('No planes available for takeoff.');
-      }
+    } catch (error) {
+      toast.error((error as Error).message);
     }
   };
 
@@ -123,8 +129,19 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         className="border p-2"
         data-testid="plane-id-input"
       />
-      <button className="bg-teal-500 text-white p-2 m-2" onClick={() => handleLand(planeId)}>Land Plane</button>
-      <button className="bg-red-500 text-white p-2 m-2" onClick={() => handleTakeOff()} data-testid="takeoff-container">Take Off Plane</button>
+      <button
+        className="bg-teal-500 text-white p-2 m-2"
+        onClick={() => handleLand(planeId).catch(error => toast.error(error.message))}
+      >
+        Land Plane
+      </button>
+      <button
+        className="bg-red-500 text-white p-2 m-2"
+        onClick={() => handleTakeOff().catch(error => toast.error(error.message))}
+        data-testid="takeoff-container"
+      >
+        Take Off Plane
+      </button>
       <ToastContainer />
     </div>
   );
