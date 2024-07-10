@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
 import { toast, ToastContainer } from 'react-toastify';
@@ -21,41 +21,38 @@ const defaultGenerateUniqueId = (): string => {
 const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
   const [hanger, setHanger] = useState<PlaneInstance[]>([]);
   const [planeId, setPlaneId] = useState<string>('');
+  const [pendingOperations, setPendingOperations] = useState<number>(0);
 
-  const land = (plane: PlaneInstance): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (hangerFull()) {
-        reject(new Error('Hanger full, abort landing!'));
-      } else if (landed(plane)) {
-        reject(new Error('That plane is already here'));
-      } else if (isStormy()) {
-        reject(new Error('Stormy weather, cannot land the plane!'));
-      } else {
-        plane.landed();
-        setHanger(prevHanger => {
-          const updatedHanger = [...prevHanger, plane];
-          resolve();
-          return updatedHanger;
-        });
-      }
-    });
+  const land = async (plane: PlaneInstance): Promise<void> => {
+    if (hangerFull()) {
+      throw new Error('Hanger full, abort landing!');
+    } else if (landed(plane)) {
+      throw new Error('That plane is already here');
+    } else if (isStormy()) {
+      throw new Error('Stormy weather, cannot land the plane!');
+    } else {
+      plane.landed();
+      setPendingOperations(prev => prev + 1);
+      setHanger(prevHanger => {
+        const updatedHanger = [...prevHanger, plane];
+        return updatedHanger;
+      });
+    }
   };
 
-  const takeOff = (plane: PlaneInstance): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (!landed(plane)) {
-        reject(new Error("No planes available for takeoff"));
-      } else if (isStormy()) {
-        reject(new Error('Stormy weather, unable to take off!'));
-      } else {
-        plane.inTheAir();
-        setHanger(prevHanger => {
-          const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
-          resolve();
-          return updatedHanger;
-        });
-      }
-    });
+  const takeOff = async (plane: PlaneInstance): Promise<void> => {
+    if (!landed(plane)) {
+      throw new Error("No planes available for takeoff");
+    } else if (isStormy()) {
+      throw new Error('Stormy weather, unable to take off!');
+    } else {
+      plane.inTheAir();
+      setPendingOperations(prev => prev + 1);
+      setHanger(prevHanger => {
+        const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
+        return updatedHanger;
+      });
+    }
   };
 
   const hangerFull = (): boolean => {
@@ -118,6 +115,15 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     }
     return new PlaneClass(id);
   };
+
+  useEffect(() => {
+    if (pendingOperations > 0) {
+      setPendingOperations(prev => prev - 1);
+    } else if (pendingOperations === 0) {
+      // Perform actions that depend on state updates being complete
+      // For example, enable UI interactions or trigger final state updates
+    }
+  }, [hanger, pendingOperations]);
 
   return (
     <div className="p-4" data-testid="hanger-container">
