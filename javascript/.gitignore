@@ -1,0 +1,25 @@
+# Node.js dependencies
+node_modules/
+
+# Lock files
+package-lock.json
+
+# Local environment files
+.env
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+*.tmp
+
+# Build output
+dist/
+build/
+
+# IDE specific files
+.vscode/
+.idea/
+.DS_Store
