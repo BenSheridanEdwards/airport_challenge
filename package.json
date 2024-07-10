@@ -22,7 +22,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
-    "prepare": "husky install"
+    "prepare": "npx husky-init"
   },
   "eslintConfig": {
     "extends": [
@@ -47,7 +47,7 @@
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/jest": "^29.5.12",
-    "husky": "^9.0.11",
+    "husky": "^8.0.0",
     "typescript": "4.9.5"
   }
 }
