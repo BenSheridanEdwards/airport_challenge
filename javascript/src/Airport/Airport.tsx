@@ -69,18 +69,13 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       return;
     }
     try {
-      if (planeId) {
-        const plane = createPlane(planeId);
-        await land(plane);
-      } else {
-        const newPlaneId = generateUniqueId();
-        if (!newPlaneId) {
-          toast.error('Error generating unique ID, aborting landing process');
-          return;
-        }
-        const newPlane = createPlane(newPlaneId);
-        await land(newPlane);
+      const id = planeId || generateUniqueId();
+      if (!id) {
+        toast.error('Error generating unique ID, aborting landing process');
+        return;
       }
+      const plane = createPlane(id);
+      await land(plane);
       setPlaneId(''); // Clear the input field after landing
     } catch (error) {
       toast.error((error as Error).message);
@@ -89,20 +84,11 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   const handleTakeOff = async (planeId?: string) => {
     try {
-      if (planeId) {
-        const plane = hanger.find(p => p.id === planeId);
-        if (plane) {
-          await takeOff(plane);
-        } else {
-          toast.error("No planes available for takeoff");
-        }
+      const plane = planeId ? hanger.find(p => p.id === planeId) : hanger[0];
+      if (plane) {
+        await takeOff(plane);
       } else {
-        if (hanger.length > 0) {
-          const plane = hanger[0];
-          await takeOff(plane);
-        } else {
-          toast.error('No planes available for takeoff.');
-        }
+        toast.error('No planes available for takeoff.');
       }
     } catch (error) {
       toast.error((error as Error).message);
