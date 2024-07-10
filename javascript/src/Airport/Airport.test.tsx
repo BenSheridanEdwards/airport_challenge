@@ -205,6 +205,11 @@ describe('Airport Component', () => {
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${1 + i}`);
       }, { timeout: 5000 });
     }
+
+    await waitFor(() => {
+      const hangerCount = screen.getByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 3');
+    }, { timeout: 5000 });
   });
 
   // Test case to display appropriate error message when weather turns stormy during landing
