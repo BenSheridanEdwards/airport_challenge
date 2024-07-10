@@ -1,0 +1,334 @@
+> airport_challenge_react@0.1.0 test
+> react-scripts test --watchAll=false
+
+Determining test suites to run...
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+ FAIL  src/Airport.test.js (5.689 s)
+
+ RUNS  src/Airport.test.js
+  ● Airport › should take off a plane and update the hanger
+
+    Timed out in waitFor.
+
+      const landButton = await screen.findByRole('button', { name: /Land Plane/i });
+      await userEvent.click(landButton);
+    await waitFor(async () => {
+      const message = await screen.findByText('Plane landed successfully.');
+      expect(message).toBeInTheDocument();
+    }, { timeout: 15000 });
+
+      at waitForWrapper (node_modules/@testing-library/dom/dist/wait-for.js:163:27)
+      at Object.<anonymous> (src/Airport.test.js:43:18)
+
+  ● Airport › should display an error message when trying to land a plane in a full hanger
+
+    expect(element).toHaveTextContent()
+
+    Expected element to have text content:
+      Planes in hanger: 2
+    Received:
+      Planes in hanger: 1
+
+    Ignored nodes: comments, script, style
+    <html>
+      <head />
+      <body>
+        <div>
+          <div
+            class="css-2rlxtj"
+            data-testid="hanger-container"
+          >
+            <p
+              class="chakra-text css-1n49pl7"
+            >
+              Airport
+            </p>
+            <p
+              class="chakra-text css-0"
+            >
+              Capacity:
+              5
+            </p>
+            <p
+              class="chakra-text css-0"
+              data-testid="hanger-count"
+              role="status"
+            >
+              Planes in hanger:
+              1
+            </p>
+            <button
+              class="chakra-button css-6b9bn0"
+              type="button"
+            >
+              Land Plane
+            </button>
+            <button
+              class="chakra-button css-6b9bn0"
+              data-testid="takeoff-container"
+              type="button"
+            >
+              Take Off Plane
+            </button>
+            <p
+              class="chakra-text css-1fhgjcy"
+              data-testid="hanger-1"
+              role="status"
+            >
+              That plane is already here
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+
+      await waitFor(async () => {
+        const hangerCount = await screen.findByTestId('hanger-count');
+        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
+      });
+
+  ● Airport › should display an error message when trying to land a plane that is already in the hanger
+
+    expect(element).toHaveTextContent()
+
+    Expected element to have text content:
+      Planes in hanger: 1
+    Received:
+      Planes in hanger: 0
+
+    Ignored nodes: comments, script, style
+    <html>
+      <head />
+      <body>
+        <div>
+          <div
+            class="css-2rlxtj"
+            data-testid="hanger-container"
+          >
+            <p
+              class="chakra-text css-1n49pl7"
+            >
+              Airport
+            </p>
+            <p
+              class="chakra-text css-0"
+            >
+              Capacity:
+              5
+            </p>
+            <p
+              class="chakra-text css-0"
+              data-testid="hanger-count"
+              role="status"
+            >
+              Planes in hanger:
+              0
+            </p>
+            <button
+              class="chakra-button css-6b9bn0"
+              type="button"
+            >
+              Land Plane
+            </button>
+            <button
+              class="chakra-button css-6b9bn0"
+              data-testid="takeoff-container"
+              type="button"
+            >
+              Take Off Plane
+            </button>
+            <p
+              class="chakra-text css-1fhgjcy"
+              data-testid="hanger-1"
+              role="status"
+            >
+              Stormy weather, cannot land the plane!
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+
+    await waitFor(async () => {
+      const hangerCount = await screen.findByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+    });
+    await userEvent.click(landButton);
+
+      at src/Airport.test.js:89:27
+
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport.test.js
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+ FAIL  src/Airport/Airport.test.tsx
+
+ RUNS  src/Airport/Airport.test.tsx
+  ● Airport Component › prevents landing when plane is already in hanger
+
+    Unable to find an element with the text: /That\s+plane\s+is\s+already\s+here/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+    Ignored nodes: comments, script, style
+    <body>
+      <div>
+        <div
+          class="css-2rlxtj"
+          data-testid="hanger-container"
+        >
+          <p
+            class="chakra-text css-1n49pl7"
+          >
+            Airport
+          </p>
+          <p
+            class="chakra-text css-0"
+          >
+            Capacity:
+            5
+          </p>
+          <p
+            class="chakra-text css-0"
+            data-testid="hanger-count"
+            role="status"
+          >
+            Planes in hanger:
+            2
+          </p>
+          <button
+            class="chakra-button css-6b9bn0"
+            type="button"
+          >
+            Land Plane
+          </button>
+          <button
+            class="chakra-button css-6b9bn0"
+            data-testid="takeoff-container"
+            type="button"
+          >
+            Take Off Plane
+          </button>
+          <p
+            class="chakra-text css-1fhgjcy"
+            data-testid="hanger-1"
+            role="status"
+          >
+            Plane landed successfully.
+          </p>
+        </div>
+      </div>
+    </body>
+
+    await userEvent.click(landButton);
+    await waitFor(() => {
+      expect(screen.getByText(/That\s+plane\s+is\s+already\s+here/)).toBeInTheDocument();
+    });
+
+      at waitForWrapper (node_modules/@testing-library/dom/dist/wait-for.js:163:27)
+      at Object.<anonymous> (src/Airport/Airport.test.tsx:67:18)
+
+
+ RUNS  src/Airport/Airport.test.tsx
+
+ RUNS  src/Plane.test.js
+
+ RUNS  src/Plane.test.js
+
+ RUNS  src/Plane.test.js
+
+ RUNS  src/Plane.test.js
+ PASS  src/Plane.test.js
+
+ RUNS  src/Plane.test.js
+
+ RUNS  src/Weather/Weather.test.tsx
+
+ RUNS  src/Weather/Weather.test.tsx
+
+ RUNS  src/Weather/Weather.test.tsx
+
+ RUNS  src/Weather/Weather.test.tsx
+
+ RUNS  src/Weather/Weather.test.tsx
+ PASS  src/Weather/Weather.test.tsx
+
+ RUNS  src/Weather/Weather.test.tsx
+
+ RUNS  src/Weather.test.js
+
+ RUNS  src/Weather.test.js
+
+ RUNS  src/Weather.test.js
+
+ RUNS  src/Weather.test.js
+ PASS  src/Weather.test.js
+
+ RUNS  src/Weather.test.js
+
+Test Suites: 2 failed, 3 passed, 5 total
+Tests:       4 failed, 25 passed, 29 total
+Snapshots:   0 total
+Time:        9.927 s, estimated 10 s
+Ran all test suites.
