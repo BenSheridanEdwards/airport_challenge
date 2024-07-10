@@ -32,8 +32,11 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         reject(new Error('Stormy weather, cannot land the plane!'));
       } else {
         plane.landed();
-        setHanger(prevHanger => [...prevHanger, plane]);
-        resolve();
+        setHanger(prevHanger => {
+          const updatedHanger = [...prevHanger, plane];
+          resolve();
+          return updatedHanger;
+        });
       }
     });
   };
@@ -48,9 +51,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         plane.inTheAir();
         setHanger(prevHanger => {
           const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
+          resolve();
           return updatedHanger;
         });
-        resolve();
       }
     });
   };
