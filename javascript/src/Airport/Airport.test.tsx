@@ -184,7 +184,6 @@ describe('Airport Component', () => {
       await userEvent.click(landButton);
       await waitFor(() => {
         const hangerCount = screen.getByTestId('hanger-count');
-        console.log(`After landing plane ${i + 1}: ${hangerCount.textContent}`);
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 5000 });
     }
