@@ -189,7 +189,7 @@ describe('Airport Component', () => {
     }
 
     // Take off 2 planes
-    for (let i = 2; i >= 1; i--) {
+    for (let i = 0; i < 2; i++) {
       await userEvent.click(takeOffButton);
       await waitFor(() => {
         const hangerCount = screen.getByTestId('hanger-count');
@@ -198,13 +198,18 @@ describe('Airport Component', () => {
     }
 
     // Land 2 more planes
-    for (let i = 1; i <= 2; i++) {
+    for (let i = 0; i < 2; i++) {
       await userEvent.click(landButton);
       await waitFor(() => {
         const hangerCount = screen.getByTestId('hanger-count');
-        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${1 + i}`);
+        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${2 + i}`);
       }, { timeout: 5000 });
     }
+
+    await waitFor(() => {
+      const hangerCount = screen.getByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 3');
+    }, { timeout: 5000 });
   });
 
   // Test case to display appropriate error message when weather turns stormy during landing
