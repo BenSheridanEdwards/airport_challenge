@@ -13,7 +13,7 @@
 
 ## Introduction
 
-This project is a challenge from Makers Academy to write software that controls the flow of planes at an airport. The planes can land and take off provided that the weather is sunny. Occasionally it may be stormy, in which case no planes can land or take off. The project includes both a Ruby version and a JavaScript version, each with a full test suite.
+This project is a challenge from Makers Academy to write software that controls the flow of planes at an airport. The planes can land and take off provided that the weather is sunny. Occasionally it may be stormy, in which case no planes can land or take off. The project includes both a Ruby version and a JavaScript version, each with a full test suite. To ensure code quality and maintain high test coverage, a Husky pre-push hook has been implemented in the JavaScript version of the project. This hook runs all unit tests before each push to the repository, preventing any code that fails tests from being pushed.
 
 ## What I Did
 
@@ -31,9 +31,17 @@ I (Ben) have made the project my own by implementing the following features and 
 1. Fork this repo, and clone to your local machine.
 2. Navigate to the `/javascript` folder.
 3. Run the command `npm install` to install all dependencies.
-4. Run the command `npm start` to start the development server.
-5. Open your browser and navigate to `http://localhost:3000` to view the app.
-6. Run the command `npm test` to execute the test suite.
+4. Run the command `npm run prepare` to install Husky and set up the pre-push hook.
+5. Run the command `npm start` to start the development server.
+6. Open your browser and navigate to `http://localhost:3000` to view the app.
+7. Run the command `npm test` to execute the test suite.
+
+### Troubleshooting
+
+If you encounter any issues during the Husky installation, consider the following steps:
+- Ensure that you have the latest version of Node.js and npm installed.
+- Verify that the `.husky` directory and `pre-push` file have the correct permissions (e.g., `chmod +x .husky/pre-push`).
+- Check the Husky documentation for additional troubleshooting tips: https://typicode.github.io/husky/#/
 
 ### Ruby Version
 
@@ -42,10 +50,31 @@ I (Ben) have made the project my own by implementing the following features and 
 3. When the installation completes, run `bundle install`.
 4. Run the command `rspec` to execute the test suite.
 
+## Husky Pre-Push Hook
+
+To ensure code quality and maintain high test coverage, a Husky pre-push hook has been implemented in the JavaScript version of the project. This hook runs all unit tests before each push to the repository, preventing any code that fails tests from being pushed.
+
+### Setup
+
+The Husky pre-push hook is set up as follows:
+1. Husky is installed in the JavaScript directory of the project.
+2. A `pre-push` file is added to the `.husky` directory with the command to run tests before each push.
+3. The `package.json` file includes a "prepare" script for Husky installation.
+
+### Verification
+
+To verify that the Husky pre-push hook is working correctly:
+1. Make a change to the code in the JavaScript directory.
+2. Attempt to push the changes to the repository.
+3. The pre-push hook will automatically run `npm test` to execute the test suite.
+4. If all tests pass, the changes will be pushed successfully. If any tests fail, the push will be aborted, and the test failures will be displayed.
+
+This setup ensures that only code that passes all unit tests can be pushed to the repository, maintaining code quality and reliability.
 ## Additional Details
 
 - The JavaScript version of the project uses React and TypeScript.
 - The JavaScript version has a full test suite with 80% test coverage for statements and lines, and 63.63% for branches. The Ruby version has over 95% test coverage.
+- To ensure code quality and maintain high test coverage, a Husky pre-push hook has been implemented in the JavaScript version of the project. This hook runs all unit tests before each push to the repository, preventing any code that fails tests from being pushed.
 - The project includes user stories that were worked out in collaboration with the client to ensure the software meets their requirements.
 
 ## User Stories
