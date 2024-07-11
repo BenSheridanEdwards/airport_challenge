@@ -22,7 +22,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
-    "prepare": "npx husky-init"
+    "prepare": "npx husky-init && husky install"
   },
   "eslintConfig": {
     "extends": [
