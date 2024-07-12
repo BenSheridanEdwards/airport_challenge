@@ -1,6 +1,6 @@
 class Plane
 
-  attr_reader :airborne?
+  attr_reader :airborne
 
   def initialize(airborne = false)
     @airborne = airborne
