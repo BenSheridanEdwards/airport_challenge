@@ -354,8 +354,8 @@ describe('Airport Component', () => {
     const landButton = screen.getByRole('button', { name: /land plane/i });
     const planeIdInput = screen.getByTestId('plane-id-input');
 
-    // Attempt to land a plane with an undefined ID
-    await userEvent.type(planeIdInput, '');
+    // Attempt to land a plane without typing anything into the input
+    await userEvent.clear(planeIdInput);
     await userEvent.click(landButton);
 
     await waitFor(() => {
