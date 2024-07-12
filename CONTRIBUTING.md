@@ -13,6 +13,7 @@ Requirements
 * Ensure all your tests are passing.
 * Check your code conforms to the [Rubocop](https://github.com/bbatsov/rubocop) style guide. Run `rubocop`, read and digest what it says, fix the violations and then run `rubocop` again to check. When you're done, commit and push.
   * Advanced mode: run `rubocop` before every commit you make and fix mistakes before you even commit!
+* Ensure the Husky pre-push hook is properly installed and functioning before submitting your code. Run the command `npm run prepare` after cloning the repository to set up the pre-push hook. This hook will automatically run all unit tests before each push to the repository, preventing any code that fails tests from being pushed.
 
 Guidelines
 -------
