@@ -62,6 +62,7 @@ The project is a challenge from Makers Academy to write software that controls t
 - The `Airport` class was updated to use the new `take_off` method from the `Plane` class. All instances of "hanger" were corrected to "hangar" for consistency and accuracy.
 - The test suite for the `Plane` class was updated to reflect the changes made to the `Plane` class.
 - The test suite for the `Airport` class was updated to use the correct spelling "hangar" and to match the updated error messages.
+- The `Plane` class attribute `airborne?` was renamed to `airborne` to follow Ruby conventions, and the tests were reviewed to ensure they use the `airborne?` method instead of directly accessing the attribute.
 
 ### Comparison Between JavaScript and Ruby Versions
 - The JavaScript version uses modern web development technologies such as React and TypeScript, providing a rich user interface and type safety.
