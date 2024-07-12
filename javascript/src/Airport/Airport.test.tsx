@@ -308,9 +308,16 @@ describe('Airport Component', () => {
     }, { timeout: 5000 });
   });
 
-  it('handles errors in handleLand function', async () => {
+  it('handles errors in handleLand function when hanger is full', async () => {
     render(<Airport PlaneClass={MockPlane} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
+
+    // Fill the hanger
+    for (let i = 0; i < 5; i++) {
+      await userEvent.click(landButton);
+    }
+
+    // Attempt to land another plane
     await userEvent.click(landButton);
     await waitFor(() => {
       const errorMessage = screen.getByText('Hanger full, abort landing!');
