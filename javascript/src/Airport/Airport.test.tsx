@@ -285,4 +285,75 @@ describe('Airport Component', () => {
     await userEvent.click(landButton);
     await waitFor(() => expect(isStormy).toHaveBeenCalled());
   });
+
+  it('throws an error if generateUniqueId returns an empty string', async () => {
+    const MockGenerateUniqueId = jest.fn().mockReturnValue('');
+    render(<Airport PlaneClass={MockPlane} generateUniqueId={MockGenerateUniqueId} />);
+    const landButton = screen.getByRole('button', { name: /land plane/i });
+    await userEvent.click(landButton);
+    await waitFor(() => {
+      const errorMessage = screen.getByText('Error generating unique ID, aborting landing process');
+      expect(errorMessage).toBeInTheDocument();
+    }, { timeout: 5000 });
+  });
+
+  it('throws an error if generateUniqueId returns null', async () => {
+    const MockGenerateUniqueId = jest.fn().mockReturnValue(null);
+    render(<Airport PlaneClass={MockPlane} generateUniqueId={MockGenerateUniqueId} />);
+    const landButton = screen.getByRole('button', { name: /land plane/i });
+    await userEvent.click(landButton);
+    await waitFor(() => {
+      const errorMessage = screen.getByText('Error generating unique ID, aborting landing process');
+      expect(errorMessage).toBeInTheDocument();
+    }, { timeout: 5000 });
+  });
+
+  it('handles errors in handleLand function', async () => {
+    render(<Airport PlaneClass={MockPlane} />);
+    const landButton = screen.getByRole('button', { name: /land plane/i });
+    await userEvent.click(landButton);
+    await waitFor(() => {
+      const errorMessage = screen.getByText('Hanger full, abort landing!');
+      expect(errorMessage).toBeInTheDocument();
+    }, { timeout: 5000 });
+  });
+
+  it('handles errors in handleTakeOff function', async () => {
+    render(<Airport PlaneClass={MockPlane} />);
+    const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
+    await userEvent.click(takeOffButton);
+    await waitFor(() => {
+      const errorMessage = screen.getByText('No planes available for takeoff.');
+      expect(errorMessage).toBeInTheDocument();
+    }, { timeout: 5000 });
+  });
+
+  it('verifies useEffect hook for pendingOperations state management', async () => {
+    render(<Airport PlaneClass={MockPlane} />);
+    const landButton = screen.getByRole('button', { name: /land plane/i });
+    await userEvent.click(landButton);
+    await waitFor(() => {
+      const hangerCount = screen.getByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+    }, { timeout: 5000 });
+    await waitFor(() => {
+      const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
+      expect(takeOffButton).not.toBeDisabled();
+    }, { timeout: 5000 });
+  });
+
+  it('throws an error if createPlane is called with undefined ID', async () => {
+    render(<Airport PlaneClass={MockPlane} />);
+    const landButton = screen.getByRole('button', { name: /land plane/i });
+    const planeIdInput = screen.getByTestId('plane-id-input');
+
+    // Attempt to land a plane with an undefined ID
+    await userEvent.type(planeIdInput, '');
+    await userEvent.click(landButton);
+
+    await waitFor(() => {
+      const errorMessage = screen.getByText('Error generating unique ID, aborting landing process');
+      expect(errorMessage).toBeInTheDocument();
+    }, { timeout: 5000 });
+  });
 });
