@@ -359,8 +359,8 @@ describe('Airport Component', () => {
     await userEvent.click(landButton);
 
     await waitFor(() => {
-      const errorMessage = screen.getByText('Error generating unique ID, aborting landing process');
-      expect(errorMessage).toBeInTheDocument();
+      const toastMessage = screen.getByText((content) => content.includes('Error generating unique ID, aborting landing process'));
+      expect(toastMessage).toBeInTheDocument();
     }, { timeout: 5000 });
   });
 });
