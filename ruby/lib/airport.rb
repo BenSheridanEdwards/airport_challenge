@@ -31,11 +31,11 @@ class Airport
 
     raise "Stormy weather, cannot take off" if stormy?
 
-    plane.in_the_air
+    plane.take_off
     hanger.delete(plane)
-  end 
+  end
 
- private 
+ private
 
   def hanger_full?
     @hanger.count >= @capacity
@@ -47,6 +47,6 @@ class Airport
 
   def stormy?
     @weather.stormy?
-  end 
+  end
 
 end
