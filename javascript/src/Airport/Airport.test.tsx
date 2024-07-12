@@ -358,9 +358,11 @@ describe('Airport Component', () => {
     await userEvent.clear(planeIdInput);
     await userEvent.click(landButton);
 
-    await waitFor(() => {
-      const toastMessage = screen.getByText((content) => content.includes('Error generating unique ID, aborting landing process'));
-      expect(toastMessage).toBeInTheDocument();
-    }, { timeout: 5000 });
+    const toastContainer = screen.getByTestId('toast-container');
+    if (!toastContainer) {
+      throw new Error('Toast container not found');
+    }
+    const toastMessage = await within(toastContainer).findByText(/Error generating unique ID, aborting landing process/, {}, { timeout: 5000 });
+    expect(toastMessage).toBeInTheDocument();
   });
 });
