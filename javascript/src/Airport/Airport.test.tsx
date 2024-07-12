@@ -7,7 +7,7 @@ import { isStormy } from '../Weather/Weather';
 
 interface MockPlaneInstance {
   id: string;
-  airborn: boolean;
+  airborne: boolean;
   landed: jest.Mock;
   inTheAir: jest.Mock;
 }
@@ -17,7 +17,7 @@ const instances: MockPlaneInstance[] = [];
 jest.mock('../Plane/Plane', () => {
   const mockPlane = jest.fn().mockImplementation(function (this: MockPlaneInstance, id: string) {
     this.id = id || '_' + Math.random().toString(36).substr(2, 9);
-    this.airborn = false;
+    this.airborne = false;
     this.landed = jest.fn().mockReturnThis();
     this.inTheAir = jest.fn().mockReturnThis();
     instances.push(this);
