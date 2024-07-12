@@ -5,17 +5,17 @@ require 'weather_spec'
 describe Airport do
 
   let(:airport) { Airport.new }
-  let(:airport_with_plane) { Airport.new(hanger: [plane]) }
+  let(:airport_with_plane) { Airport.new(hangar: [plane]) }
   let(:plane) { Plane.new }
   let(:weather) { Weather.new }
 
   describe '#initialize' do
 
-    it "uses a given capacity and so returns a hanger count over the default capacity of 5" do
+    it "uses a given capacity and so returns a hangar count over the default capacity of 5" do
       airport10 = Airport.new(Weather.new, 10)
       allow(airport10).to receive(:stormy?).and_return(false)
       6.times { airport10.land(Plane.new) }
-      expect(airport10.hanger.count).to eq(6)
+      expect(airport10.hangar.count).to eq(6)
     end
 
     it 'uses a default capacity when no input is given' do
@@ -37,17 +37,17 @@ describe Airport do
       expect { airport.land(plane) }.to raise_error message
     end
 
-    it "should not land a plane if the hanger is full" do
+    it "should not land a plane if the hangar is full" do
       allow(airport).to receive(:stormy?).and_return(false)
       airport.capacity.times { airport.land(Plane.new) }
-      message = 'Hanger full, abort landing!'
+      message = 'Hangar full, abort landing!'
       expect { airport.land(Plane.new) }.to raise_error message
     end
   end
 
   describe '#take_off' do
 
-    it "should release a plane currently in the hanger" do
+    it "should release a plane currently in the hangar" do
       allow(airport).to receive(:stormy?).and_return(false)
       airport.land(plane)
       expect(airport.take_off(plane)).to eq(plane)

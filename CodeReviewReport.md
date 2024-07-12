@@ -57,6 +57,12 @@ The project is a challenge from Makers Academy to write software that controls t
 ### Effectiveness of Husky Pre-Push Hook
 - The Husky pre-push hook is effective in maintaining code quality and high test coverage by preventing code with failing tests or linting errors from being pushed to the repository.
 
+## Changes to the Ruby Version
+- The `Plane` class was refactored to correct the spelling of the `airborn` attribute to `airborne` and to rename the `in_the_air` method to `take_off`. A new method `airborne?` was added to check the plane's status.
+- The `Airport` class was updated to use the new `take_off` method from the `Plane` class. All instances of "hanger" were corrected to "hangar" for consistency and accuracy.
+- The test suite for the `Plane` class was updated to reflect the changes made to the `Plane` class.
+- The test suite for the `Airport` class was updated to use the correct spelling "hangar" and to match the updated error messages.
+
 ### Comparison Between JavaScript and Ruby Versions
 - The JavaScript version uses modern web development technologies such as React and TypeScript, providing a rich user interface and type safety.
 - The Ruby version focuses on backend logic and may not have the same level of interactivity as the JavaScript version.
