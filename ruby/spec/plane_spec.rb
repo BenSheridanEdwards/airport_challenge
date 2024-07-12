@@ -2,42 +2,42 @@ require 'plane'
 require 'airport'
 require 'weather_spec'
 
-describe Plane do 
+describe Plane do
 
   let(:plane) { Plane.new }
   let(:airport) { Airport.new }
 
-  it "should initialize with the plane not being airborn" do
-    expect(plane.airborn).to eq(false)
+  it "should initialize with the plane not being airborne" do
+    expect(plane.airborne?).to eq(false)
   end
 
-  it "shouldn't be airborn when in the hanger" do
+  it "shouldn't be airborne when in the hangar" do
     allow(airport).to receive(:stormy?).and_return(false)
-    airport.hanger = [plane]
-    expect(plane.airborn).to be_falsey
+    airport.hangar = [plane]
+    expect(plane.airborne?).to be_falsey
   end
 
-  it "should be airborn if it takes off successfully from the airport" do
+  it "should be airborne if it takes off successfully from the airport" do
     allow(airport).to receive(:stormy?).and_return(false)
     airport.land(plane)
     airport.take_off(plane)
-    expect(plane.airborn).to be_truthy
+    expect(plane.airborne?).to be_truthy
   end
 
-  describe '#in_the_air' do
+  describe '#take_off' do
 
-    it "should be airborn when in the air is called" do 
-      plane.in_the_air
-      expect(plane.airborn).to be_truthy
+    it "should be airborne when take_off is called" do
+      plane.take_off
+      expect(plane.airborne?).to be_truthy
     end
 
-  end 
+  end
 
   describe '#landed' do
 
-    it "should not be airborn when landed is called" do 
+    it "should not be airborne when landed is called" do
       plane.landed
-      expect(plane.airborn).to be_falsey
+      expect(plane.airborne?).to be_falsey
     end
 
   end

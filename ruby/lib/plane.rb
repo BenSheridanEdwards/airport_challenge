@@ -1,16 +1,20 @@
 class Plane
 
-  attr_reader :airborn
+  attr_reader :airborne?
 
-  def initialize(airborn = false)
-    @airborn = airborn
+  def initialize(airborne = false)
+    @airborne = airborne
   end
 
-  def in_the_air
-    @airborn = true
+  def take_off
+    @airborne = true
   end
 
   def landed
-    @airborn = false
-  end 
+    @airborne = false
+  end
+
+  def airborne?
+    @airborne
+  end
 end
