@@ -19,13 +19,13 @@ const defaultGenerateUniqueId = (): string => {
 };
 
 const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
-  const [hanger, setHanger] = useState<PlaneInstance[]>([]);
+  const [hangar, setHangar] = useState<PlaneInstance[]>([]);
   const [planeId, setPlaneId] = useState<string>('');
   const [pendingOperations, setPendingOperations] = useState<number>(0);
 
   const land = async (plane: PlaneInstance): Promise<void> => {
-    if (hangerFull()) {
-      throw new Error('Hanger full, abort landing!');
+    if (hangarFull()) {
+      throw new Error('Hangar full, abort landing!');
     } else if (landed(plane)) {
       throw new Error('That plane is already here');
     } else if (isStormy()) {
@@ -33,9 +33,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     } else {
       plane.landed();
       setPendingOperations(prev => prev + 1);
-      setHanger(prevHanger => {
-        const updatedHanger = [...prevHanger, plane];
-        return updatedHanger;
+      setHangar(prevHangar => {
+        const updatedHangar = [...prevHangar, plane];
+        return updatedHangar;
       });
     }
   };
@@ -48,24 +48,24 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     } else {
       plane.inTheAir();
       setPendingOperations(prev => prev + 1);
-      setHanger(prevHanger => {
-        const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
-        return updatedHanger;
+      setHangar(prevHangar => {
+        const updatedHangar = prevHangar.filter(p => p.id !== plane.id);
+        return updatedHangar;
       });
     }
   };
 
-  const hangerFull = (): boolean => {
-    return hanger.length >= DEFAULT_CAPACITY;
+  const hangarFull = (): boolean => {
+    return hangar.length >= DEFAULT_CAPACITY;
   };
 
   const landed = (plane: PlaneInstance): boolean => {
-    return hanger.some(p => p.id === plane.id);
+    return hangar.some(p => p.id === plane.id);
   };
 
   const handleLand = async (planeId?: string) => {
-    if (hangerFull()) {
-      toast.error('Hanger full, abort landing!');
+    if (hangarFull()) {
+      toast.error('Hangar full, abort landing!');
       return;
     }
     try {
@@ -84,7 +84,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   const handleTakeOff = async (planeId?: string) => {
     try {
-      const plane = planeId ? hanger.find(p => p.id === planeId) : hanger[0];
+      const plane = planeId ? hangar.find(p => p.id === planeId) : hangar[0];
       if (plane) {
         await takeOff(plane);
       } else {
@@ -109,13 +109,13 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       // Perform actions that depend on state updates being complete
       // For example, enable UI interactions or trigger final state updates
     }
-  }, [hanger, pendingOperations]);
+  }, [hangar, pendingOperations]);
 
   return (
-    <div className="p-4" data-testid="hanger-container">
+    <div className="p-4" data-testid="hangar-container">
       <h2 className="text-2xl">Airport</h2>
       <p>Capacity: {DEFAULT_CAPACITY}</p>
-      <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
+      <p role="status" data-testid="hangar-count">Planes in hangar: {hangar.length}</p>
       <input
         type="text"
         value={planeId}
