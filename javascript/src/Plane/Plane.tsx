@@ -1,18 +1,18 @@
 class Plane {
   id: string;
-  airborn: boolean;
+  airborne: boolean;
 
-  constructor(id: string, airborn: boolean = false) {
+  constructor(id: string, airborne: boolean = false) {
     this.id = id;
-    this.airborn = airborn;
+    this.airborne = airborne;
   }
 
   inTheAir() {
-    this.airborn = true;
+    this.airborne = true;
   }
 
   landed() {
-    this.airborn = false;
+    this.airborne = false;
   }
 }
 

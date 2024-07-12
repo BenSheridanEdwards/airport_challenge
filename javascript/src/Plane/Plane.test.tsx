@@ -4,12 +4,12 @@ describe('Plane', () => {
   it('should be in the air after calling inTheAir', () => {
     const plane = new Plane('0');
     plane.inTheAir();
-    expect(plane.airborn).toBe(true);
+    expect(plane.airborne).toBe(true);
   });
 
   it('should be landed after calling landed', () => {
     const plane = new Plane('0', true);
     plane.landed();
-    expect(plane.airborn).toBe(false);
+    expect(plane.airborne).toBe(false);
   });
 });
