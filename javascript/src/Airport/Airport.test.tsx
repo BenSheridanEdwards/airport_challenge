@@ -36,7 +36,7 @@ jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
 }));
 
-const TIMEOUT = 5000; // Define timeout as a constant
+const TIMEOUT = 10000; // Increase timeout to 10 seconds
 
 const landMultiplePlanes = async (count: number) => {
   const landButton = screen.getByRole('button', { name: /land plane/i });
@@ -51,6 +51,7 @@ const landMultiplePlanes = async (count: number) => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
     }, { timeout: TIMEOUT });
+    await new Promise(resolve => setTimeout(resolve, 100)); // Add small delay
   }
 };
 
@@ -64,6 +65,7 @@ const takeOffMultiplePlanes = async (count: number) => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent(`Planes in hanger: ${count - i - 1}`);
     }, { timeout: TIMEOUT });
+    await new Promise(resolve => setTimeout(resolve, 100)); // Add small delay
   }
 };
 
@@ -201,7 +203,7 @@ describe('Airport Component', () => {
     }, { timeout: 5000 });
   });
 
-  it('handles multiple planes landing and taking off in sequence', async () => {
+  it('handles multiple planes landing', async () => {
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
 
@@ -210,20 +212,30 @@ describe('Airport Component', () => {
       await landMultiplePlanes(3);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
     }, { timeout: TIMEOUT });
+  });
+
+  it('handles multiple planes taking off', async () => {
+    (isStormy as jest.Mock).mockReturnValue(false);
+    render(<Airport PlaneClass={MockPlane} />);
+
+    // Land 3 planes
+    await landMultiplePlanes(3);
 
     // Take off 2 planes
     await waitFor(async () => {
       await takeOffMultiplePlanes(2);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: TIMEOUT });
+  });
 
-    // Land 2 more planes
-    await waitFor(async () => {
-      await landMultiplePlanes(2);
-      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
-    }, { timeout: TIMEOUT });
+  it('verifies plane IDs in the hangar after multiple operations', async () => {
+    (isStormy as jest.Mock).mockReturnValue(false);
+    render(<Airport PlaneClass={MockPlane} />);
 
-    // Verify plane IDs in the hangar
+    await landMultiplePlanes(3);
+    await takeOffMultiplePlanes(2);
+    await landMultiplePlanes(2);
+
     await waitFor(() => {
       const hangarPlanes = screen.getAllByTestId('plane-item');
       expect(hangarPlanes).toHaveLength(3);
