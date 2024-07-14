@@ -1,4 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-cd /home/ubuntu/airport_challenge/javascript && npm test
+# Run tests after successful push
+git push "$@"
+exit_code=$?
+[ $exit_code -eq 0 ] && cd /home/ubuntu/airport_challenge/javascript && npm test
