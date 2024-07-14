@@ -34,6 +34,19 @@ jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
 }));
 
+const TIMEOUT = 5000; // Define timeout as a constant
+
+const landMultiplePlanes = async (count: number) => {
+  const landButton = screen.getByRole('button', { name: /land plane/i });
+  for (let i = 0; i < count; i++) {
+    await userEvent.click(landButton);
+    await waitFor(() => {
+      const hangerCount = screen.getByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
+    }, { timeout: TIMEOUT });
+  }
+};
+
 describe('Airport Component', () => {
   const MockPlane = jest.requireActual('../Plane/Plane').default;
 
@@ -59,27 +72,21 @@ describe('Airport Component', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 5000 });
+    }, { timeout: TIMEOUT });
   });
 
   it('prevents landing when hanger is full', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    for (let i = 0; i < 5; i++) {
-      await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
-      await waitFor(() => {
-        const hangerCount = screen.getByTestId('hanger-count');
-        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-      }, { timeout: 5000 });
-    }
+    await landMultiplePlanes(5);
     await userEvent.click(screen.getByRole('button', { name: /land plane/i }));
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
-    }, { timeout: 5000 });
+    }, { timeout: TIMEOUT });
     await waitFor(() => {
       const errorMessage = screen.getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Hanger full, abort landing!'));
       expect(errorMessage).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: TIMEOUT });
   });
 
   it('prevents landing when weather is stormy', async () => {
@@ -90,7 +97,7 @@ describe('Airport Component', () => {
       return screen.findByText('Stormy weather, cannot land the plane!').then((element) => {
         expect(element).toBeInTheDocument();
       });
-    }, { timeout: 5000 });
+    }, { timeout: TIMEOUT });
   });
 
   it('prevents landing when plane is already in hanger', async () => {
@@ -107,7 +114,7 @@ describe('Airport Component', () => {
     const hangerContainer = screen.getByTestId('hanger-container');
     await waitFor(() => {
       expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 1'))).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: TIMEOUT });
 
     // Attempt to land the same plane again
     await userEvent.type(planeIdInput, planeId);
@@ -116,7 +123,7 @@ describe('Airport Component', () => {
       return screen.findByText('That plane is already here').then((element) => {
         expect(element).toBeInTheDocument();
       });
-    }, { timeout: 5000 });
+    }, { timeout: TIMEOUT });
   });
 
   it('takes off a plane successfully', async () => {
@@ -126,7 +133,7 @@ describe('Airport Component', () => {
     await waitFor(() => {
       const hangerContainer = screen.getByTestId('hanger-container');
       expect(within(hangerContainer).getByText((content) => content.replace(/\s+/g, ' ').trim().includes('Planes in hanger: 0'))).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: TIMEOUT });
   });
 
   it('prevents takeoff when weather is stormy', async () => {
@@ -138,7 +145,7 @@ describe('Airport Component', () => {
       return screen.findByText('Stormy weather, unable to take off!').then((element) => {
         expect(element).toBeInTheDocument();
       });
-    }, { timeout: 5000 });
+    }, { timeout: TIMEOUT });
   });
 
   it('prevents takeoff when no planes are available', async () => {
@@ -176,17 +183,10 @@ describe('Airport Component', () => {
 
   it('handles multiple planes landing and taking off in sequence', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    const landButton = screen.getByRole('button', { name: /land plane/i });
     const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
 
     // Land 3 planes
-    for (let i = 0; i < 3; i++) {
-      await userEvent.click(landButton);
-      await waitFor(() => {
-        const hangerCount = screen.getByTestId('hanger-count');
-        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-      }, { timeout: 5000 });
-    }
+    await landMultiplePlanes(3);
 
     // Take off 2 planes
     for (let i = 0; i < 2; i++) {
@@ -194,22 +194,16 @@ describe('Airport Component', () => {
       await waitFor(() => {
         const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${2 - i}`);
-      }, { timeout: 5000 });
+      }, { timeout: TIMEOUT });
     }
 
     // Land 2 more planes
-    for (let i = 0; i < 2; i++) {
-      await userEvent.click(landButton);
-      await waitFor(() => {
-        const hangerCount = screen.getByTestId('hanger-count');
-        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${2 + i}`);
-      }, { timeout: 5000 });
-    }
+    await landMultiplePlanes(2);
 
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 3');
-    }, { timeout: 5000 });
+    }, { timeout: TIMEOUT });
   });
 
   // Test case to display appropriate error message when weather turns stormy during landing
