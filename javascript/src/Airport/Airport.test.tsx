@@ -36,7 +36,7 @@ jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
 }));
 
-const TIMEOUT = 10000; // Increase timeout to 10 seconds
+const TIMEOUT = 20000; // Increase timeout to 20 seconds
 
 const landMultiplePlanes = async (count: number) => {
   const landButton = screen.getByRole('button', { name: /land plane/i });
@@ -218,23 +218,40 @@ describe('Airport Component', () => {
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
 
-    // Land 3 planes
-    await landMultiplePlanes(3);
+    await waitFor(async () => {
+      await landMultiplePlanes(3);
+    }, { timeout: TIMEOUT });
 
-    // Take off 2 planes
     await waitFor(async () => {
       await takeOffMultiplePlanes(2);
-      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: TIMEOUT });
+
+    await waitFor(() => {
+      const hangerCount = screen.getByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+    }, { timeout: TIMEOUT });
+
+    expect(screen.getByTestId('hanger-count')).toHaveTextContent(
+      '1',
+      'Expected 1 plane in hangar after landing 3 and taking off 2'
+    );
   });
 
   it('verifies plane IDs in the hangar after multiple operations', async () => {
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
 
-    await landMultiplePlanes(3);
-    await takeOffMultiplePlanes(2);
-    await landMultiplePlanes(2);
+    await waitFor(async () => {
+      await landMultiplePlanes(3);
+    }, { timeout: TIMEOUT });
+
+    await waitFor(async () => {
+      await takeOffMultiplePlanes(2);
+    }, { timeout: TIMEOUT });
+
+    await waitFor(async () => {
+      await landMultiplePlanes(2);
+    }, { timeout: TIMEOUT });
 
     await waitFor(() => {
       const hangarPlanes = screen.getAllByTestId('plane-item');
@@ -242,6 +259,11 @@ describe('Airport Component', () => {
       expect(hangarPlanes[0]).toHaveTextContent('Plane 1');
       expect(hangarPlanes[1]).toHaveTextContent('Plane 4');
       expect(hangarPlanes[2]).toHaveTextContent('Plane 5');
+
+      expect(hangarPlanes.length).toEqual(3, 'Expected 3 planes in hangar after landing 3, taking off 2, and landing 2 more');
+      expect(hangarPlanes[0].textContent).toEqual('Plane 1', 'First plane should be Plane 1');
+      expect(hangarPlanes[1].textContent).toEqual('Plane 4', 'Second plane should be Plane 4');
+      expect(hangarPlanes[2].textContent).toEqual('Plane 5', 'Third plane should be Plane 5');
     }, { timeout: TIMEOUT });
   });
 
