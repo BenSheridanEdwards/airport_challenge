@@ -203,32 +203,34 @@ describe('Airport Component', () => {
 
   it('handles multiple planes landing and taking off in sequence', async () => {
     (isStormy as jest.Mock).mockReturnValue(false);
-    const { rerender } = render(<Airport PlaneClass={MockPlane} />);
+    render(<Airport PlaneClass={MockPlane} />);
 
     // Land 3 planes
-    await act(async () => {
+    await waitFor(async () => {
       await landMultiplePlanes(3);
-    });
-    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
+      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
+    }, { timeout: TIMEOUT });
 
     // Take off 2 planes
-    await act(async () => {
+    await waitFor(async () => {
       await takeOffMultiplePlanes(2);
-    });
-    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
+      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
+    }, { timeout: TIMEOUT });
 
     // Land 2 more planes
-    await act(async () => {
+    await waitFor(async () => {
       await landMultiplePlanes(2);
-    });
-    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
+      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
+    }, { timeout: TIMEOUT });
 
     // Verify plane IDs in the hangar
-    const hangarPlanes = screen.getAllByTestId('plane-item');
-    expect(hangarPlanes).toHaveLength(3);
-    expect(hangarPlanes[0]).toHaveTextContent('Plane 1');
-    expect(hangarPlanes[1]).toHaveTextContent('Plane 4');
-    expect(hangarPlanes[2]).toHaveTextContent('Plane 5');
+    await waitFor(() => {
+      const hangarPlanes = screen.getAllByTestId('plane-item');
+      expect(hangarPlanes).toHaveLength(3);
+      expect(hangarPlanes[0]).toHaveTextContent('Plane 1');
+      expect(hangarPlanes[1]).toHaveTextContent('Plane 4');
+      expect(hangarPlanes[2]).toHaveTextContent('Plane 5');
+    }, { timeout: TIMEOUT });
   });
 
   // Test case to display appropriate error message when weather turns stormy during landing
