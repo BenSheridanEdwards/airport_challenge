@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HUSKY_GIT_DIR: ${{ github.workspace }}/.git
 
     steps:
     - name: Checkout repository
@@ -24,7 +26,6 @@ jobs:
     - name: Install dependencies
       run: |
         cd javascript
-        export HUSKY_GIT_DIR=${{ github.workspace }}/.git
         npm install --legacy-peer-deps
 
     - name: Run tests
