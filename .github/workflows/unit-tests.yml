@@ -21,7 +21,12 @@ jobs:
       with:
         node-version: '20'  # Latest LTS version as of now
 
+    - name: Set Husky Git directory
+      run: echo "HUSKY_GIT_DIR=$(pwd)/.git" >> $GITHUB_ENV
+
     - name: Install dependencies
+      env:
+        HUSKY_GIT_DIR: ${{ env.HUSKY_GIT_DIR }}
       run: |
         cd javascript
         npm install --legacy-peer-deps
