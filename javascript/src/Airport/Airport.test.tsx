@@ -14,21 +14,20 @@ interface MockPlaneInstance {
   inTheAir: jest.Mock;
 }
 
-const instances: MockPlaneInstance[] = [];
-
 jest.mock('../Plane/Plane', () => {
+  const mockInstances: MockPlaneInstance[] = [];
   const mockPlane = jest.fn().mockImplementation(function (this: MockPlaneInstance, id: string) {
     this.id = id || '_' + Math.random().toString(36).substr(2, 9);
     this.airborn = false;
     this.landed = jest.fn().mockReturnThis();
     this.inTheAir = jest.fn().mockReturnThis();
-    instances.push(this);
+    mockInstances.push(this);
     return this;
   });
   return {
     __esModule: true,
     default: mockPlane,
-    instances,
+    get instances() { return mockInstances; },
   };
 });
 
@@ -87,7 +86,7 @@ describe('Airport Component', () => {
     jest.resetAllMocks();
     jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
-    instances.length = 0; // Clear the instances array before each test
+    jest.requireMock('../Plane/Plane').instances.length = 0; // Clear the instances array before each test
     document.body.innerHTML = ''; // Clear toast notifications
   });
 
