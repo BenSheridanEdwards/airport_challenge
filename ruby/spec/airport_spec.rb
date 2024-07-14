@@ -22,6 +22,12 @@ describe Airport do
       expect(subject.capacity).to eq(Airport::DEFAULT_CAPACITY)
     end
 
+    it 'sets the weather attribute when provided' do
+      custom_weather = double('Weather')
+      airport = Airport.new(custom_weather)
+      expect(airport.weather).to eq(custom_weather)
+    end
+
   end
 
   describe '#land' do
