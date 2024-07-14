@@ -15,19 +15,16 @@ interface MockPlaneInstance {
 }
 
 jest.mock('../Plane/Plane', () => {
-  const mockInstances: MockPlaneInstance[] = [];
-  const mockPlane = jest.fn().mockImplementation(function (this: MockPlaneInstance, id: string) {
-    this.id = id || '_' + Math.random().toString(36).substr(2, 9);
-    this.airborn = false;
-    this.landed = jest.fn().mockReturnThis();
-    this.inTheAir = jest.fn().mockReturnThis();
-    mockInstances.push(this);
-    return this;
-  });
   return {
     __esModule: true,
-    default: mockPlane,
-    get instances() { return mockInstances; },
+    default: jest.fn().mockImplementation(function (this: MockPlaneInstance, id: string) {
+      this.id = id || '_' + Math.random().toString(36).substr(2, 9);
+      this.airborn = false;
+      this.landed = jest.fn().mockReturnThis();
+      this.inTheAir = jest.fn().mockReturnThis();
+      return this;
+    }),
+    instances: [] as MockPlaneInstance[],
   };
 });
 
