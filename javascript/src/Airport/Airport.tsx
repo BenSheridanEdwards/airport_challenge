@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
 import { toast, ToastContainer } from 'react-toastify';
@@ -21,9 +21,8 @@ const defaultGenerateUniqueId = (): string => {
 const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
   const [hanger, setHanger] = useState<PlaneInstance[]>([]);
   const [planeId, setPlaneId] = useState<string>('');
-  const [pendingOperations, setPendingOperations] = useState<number>(0);
 
-  const land = async (plane: PlaneInstance): Promise<void> => {
+  const land = (plane: PlaneInstance): void => {
     if (hangerFull()) {
       throw new Error('Hanger full, abort landing!');
     } else if (landed(plane)) {
@@ -32,26 +31,18 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       throw new Error('Stormy weather, cannot land the plane!');
     } else {
       plane.landed();
-      setPendingOperations(prev => prev + 1);
-      setHanger(prevHanger => {
-        const updatedHanger = [...prevHanger, plane];
-        return updatedHanger;
-      });
+      setHanger(prevHanger => [...prevHanger, plane]);
     }
   };
 
-  const takeOff = async (plane: PlaneInstance): Promise<void> => {
+  const takeOff = (plane: PlaneInstance): void => {
     if (!landed(plane)) {
       throw new Error("No planes available for takeoff");
     } else if (isStormy()) {
       throw new Error('Stormy weather, unable to take off!');
     } else {
       plane.inTheAir();
-      setPendingOperations(prev => prev + 1);
-      setHanger(prevHanger => {
-        const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
-        return updatedHanger;
-      });
+      setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
     }
   };
 
@@ -63,7 +54,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     return hanger.some(p => p.id === plane.id);
   };
 
-  const handleLand = async (planeId?: string) => {
+  const handleLand = (planeId?: string) => {
     if (hangerFull()) {
       toast.error('Hanger full, abort landing!');
       return;
@@ -75,18 +66,18 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         return;
       }
       const plane = createPlane(id);
-      await land(plane);
+      land(plane);
       setPlaneId(''); // Clear the input field after landing
     } catch (error) {
       toast.error((error as Error).message);
     }
   };
 
-  const handleTakeOff = async (planeId?: string) => {
+  const handleTakeOff = (planeId?: string) => {
     try {
       const plane = planeId ? hanger.find(p => p.id === planeId) : hanger[0];
       if (plane) {
-        await takeOff(plane);
+        takeOff(plane);
       } else {
         toast.error('No planes available for takeoff.');
       }
@@ -102,14 +93,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     return new PlaneClass(id);
   };
 
-  useEffect(() => {
-    if (pendingOperations > 0) {
-      setPendingOperations(prev => prev - 1);
-    } else if (pendingOperations === 0) {
-      // Perform actions that depend on state updates being complete
-      // For example, enable UI interactions or trigger final state updates
-    }
-  }, [hanger, pendingOperations]);
+
 
   return (
     <div className="p-4" data-testid="hanger-container">
@@ -126,13 +110,13 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       />
       <button
         className="bg-teal-500 text-white p-2 m-2"
-        onClick={() => handleLand(planeId).catch(error => toast.error(error.message))}
+        onClick={() => handleLand(planeId)}
       >
         Land Plane
       </button>
       <button
         className="bg-red-500 text-white p-2 m-2"
-        onClick={() => handleTakeOff().catch(error => toast.error(error.message))}
+        onClick={() => handleTakeOff()}
         data-testid="takeoff-container"
       >
         Take Off Plane
