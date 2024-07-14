@@ -23,7 +23,7 @@
     "test": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
     "prepare": "husky install",
-    "postinstall": "cd .. && HUSKY_GIT_DIR=.git npx husky install javascript/.husky"
+    "postinstall": "export HUSKY_GIT_DIR=../.git && npx husky install .husky"
   },
   "eslintConfig": {
     "extends": [
