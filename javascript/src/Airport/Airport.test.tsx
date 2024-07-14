@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport';
@@ -40,11 +40,29 @@ const TIMEOUT = 5000; // Define timeout as a constant
 
 const landMultiplePlanes = async (count: number) => {
   const landButton = screen.getByRole('button', { name: /land plane/i });
+  const planeIdInput = screen.getByTestId('plane-id-input');
   for (let i = 0; i < count; i++) {
-    await userEvent.click(landButton);
+    const planeId = `plane-${i + 1}`;
+    await act(async () => {
+      await userEvent.type(planeIdInput, planeId);
+      await userEvent.click(landButton);
+    });
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
+    }, { timeout: TIMEOUT });
+  }
+};
+
+const takeOffMultiplePlanes = async (count: number) => {
+  const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
+  for (let i = 0; i < count; i++) {
+    await act(async () => {
+      await userEvent.click(takeOffButton);
+    });
+    await waitFor(() => {
+      const hangerCount = screen.getByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent(`Planes in hanger: ${count - i - 1}`);
     }, { timeout: TIMEOUT });
   }
 };
@@ -184,28 +202,33 @@ describe('Airport Component', () => {
   });
 
   it('handles multiple planes landing and taking off in sequence', async () => {
-    render(<Airport PlaneClass={MockPlane} />);
-    const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
+    (isStormy as jest.Mock).mockReturnValue(false);
+    const { rerender } = render(<Airport PlaneClass={MockPlane} />);
 
     // Land 3 planes
-    await landMultiplePlanes(3);
+    await act(async () => {
+      await landMultiplePlanes(3);
+    });
+    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
 
     // Take off 2 planes
-    for (let i = 0; i < 2; i++) {
-      await userEvent.click(takeOffButton);
-      await waitFor(() => {
-        const hangerCount = screen.getByTestId('hanger-count');
-        expect(hangerCount).toHaveTextContent(`Planes in hanger: ${2 - i}`);
-      }, { timeout: TIMEOUT });
-    }
+    await act(async () => {
+      await takeOffMultiplePlanes(2);
+    });
+    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
 
     // Land 2 more planes
-    await landMultiplePlanes(2);
+    await act(async () => {
+      await landMultiplePlanes(2);
+    });
+    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
 
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
-      expect(hangerCount).toHaveTextContent('Planes in hanger: 3');
-    }, { timeout: TIMEOUT });
+    // Verify plane IDs in the hangar
+    const hangarPlanes = screen.getAllByTestId('plane-item');
+    expect(hangarPlanes).toHaveLength(3);
+    expect(hangarPlanes[0]).toHaveTextContent('Plane 1');
+    expect(hangarPlanes[1]).toHaveTextContent('Plane 4');
+    expect(hangarPlanes[2]).toHaveTextContent('Plane 5');
   });
 
   // Test case to display appropriate error message when weather turns stormy during landing
