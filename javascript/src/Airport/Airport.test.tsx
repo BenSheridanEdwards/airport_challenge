@@ -222,19 +222,22 @@ describe('Airport Component', () => {
       await landMultiplePlanes(3);
     }, { timeout: TIMEOUT });
 
+    console.log('After landing 3 planes');
+
     await waitFor(async () => {
       await takeOffMultiplePlanes(2);
     }, { timeout: TIMEOUT });
+
+    console.log('After taking off 2 planes');
 
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: TIMEOUT });
 
-    expect(screen.getByTestId('hanger-count')).toHaveTextContent(
-      '1',
-      'Expected 1 plane in hangar after landing 3 and taking off 2'
-    );
+    console.log('Final hanger count:', screen.getByTestId('hanger-count').textContent);
+
+    expect(screen.getByTestId('hanger-count')).toHaveTextContent('1');
   });
 
   it('verifies plane IDs in the hangar after multiple operations', async () => {
@@ -253,6 +256,8 @@ describe('Airport Component', () => {
       await landMultiplePlanes(2);
     }, { timeout: TIMEOUT });
 
+    console.log('After landing 2 more planes');
+
     await waitFor(() => {
       const hangarPlanes = screen.getAllByTestId('plane-item');
       expect(hangarPlanes).toHaveLength(3);
@@ -260,10 +265,12 @@ describe('Airport Component', () => {
       expect(hangarPlanes[1]).toHaveTextContent('Plane 4');
       expect(hangarPlanes[2]).toHaveTextContent('Plane 5');
 
-      expect(hangarPlanes.length).toEqual(3, 'Expected 3 planes in hangar after landing 3, taking off 2, and landing 2 more');
-      expect(hangarPlanes[0].textContent).toEqual('Plane 1', 'First plane should be Plane 1');
-      expect(hangarPlanes[1].textContent).toEqual('Plane 4', 'Second plane should be Plane 4');
-      expect(hangarPlanes[2].textContent).toEqual('Plane 5', 'Third plane should be Plane 5');
+      console.log('Final hangar planes:', hangarPlanes.map(plane => plane.textContent));
+
+      expect(hangarPlanes.length).toEqual(3);
+      expect(hangarPlanes[0].textContent).toEqual('Plane 1');
+      expect(hangarPlanes[1].textContent).toEqual('Plane 4');
+      expect(hangarPlanes[2].textContent).toEqual('Plane 5');
     }, { timeout: TIMEOUT });
   });
 
