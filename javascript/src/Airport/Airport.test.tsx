@@ -47,7 +47,10 @@ const landMultiplePlanes = async (count: number) => {
     console.log(`Attempting to land plane ${planeId}`);
     try {
       await act(async () => {
+        console.log(`Land button disabled state before typing: ${(landButton as HTMLButtonElement).disabled}`);
         await userEvent.type(planeIdInput, planeId);
+        console.log(`Land button disabled state after typing: ${(landButton as HTMLButtonElement).disabled}`);
+        console.log(`Plane ID input value: ${(planeIdInput as HTMLInputElement).value}`);
         await userEvent.click(landButton);
       });
       await waitFor(() => {
@@ -117,6 +120,9 @@ describe('Airport Component', () => {
     }
     document.body.innerHTML = '';
     console.log('Cleared toast notifications');
+    render(<Airport PlaneClass={MockPlane} />);
+    const landButton = screen.getByRole('button', { name: /land plane/i }) as HTMLButtonElement;
+    console.log('Initial render - Land button disabled state:', landButton.disabled);
     console.log('Test environment setup complete');
   });
 
@@ -138,10 +144,17 @@ describe('Airport Component', () => {
     console.log('Starting land plane test');
     render(<Airport PlaneClass={MockPlane} />);
     console.log('Airport component rendered');
-    const landButton = screen.getByRole('button', { name: /land plane/i });
+    const landButton = screen.getByRole('button', { name: /land plane/i }) as HTMLButtonElement;
     console.log('Land button found:', landButton);
+    console.log('Land button disabled state before click:', landButton.disabled);
     await userEvent.click(landButton);
     console.log('Land button clicked');
+
+    const planeIdInput = screen.getByTestId('plane-id-input') as HTMLInputElement;
+    const planeId = 'test-plane-1';
+    await userEvent.type(planeIdInput, planeId);
+    console.log('Plane ID input value:', planeIdInput.value);
+    console.log('Land button disabled state after setting planeId:', landButton.disabled);
 
     try {
       await waitFor(() => {
@@ -272,7 +285,21 @@ describe('Airport Component', () => {
     (isStormy as jest.Mock).mockReturnValue(false);
     render(<Airport PlaneClass={MockPlane} />);
 
-    await landMultiplePlanes(3);
+    const landButton = screen.getByRole('button', { name: /land plane/i }) as HTMLButtonElement;
+    const planeIdInput = screen.getByTestId('plane-id-input') as HTMLInputElement;
+
+    for (let i = 0; i < 3; i++) {
+      const planeId = `plane-${i + 1}`;
+      console.log(`Attempting to land plane ${planeId}`);
+      console.log('Plane ID input value:', planeIdInput.value);
+      console.log('Land button disabled state before setting planeId:', landButton.disabled);
+
+      await userEvent.type(planeIdInput, planeId);
+      console.log('Land button disabled state after setting planeId:', landButton.disabled);
+
+      await landMultiplePlanes(1);
+    }
+
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
     }, { timeout: TIMEOUT });
