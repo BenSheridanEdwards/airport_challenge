@@ -23,18 +23,15 @@ jobs:
       with:
         node-version: '20'  # Latest LTS version as of now
 
-    - name: Set Husky git directory
-      run: echo "HUSKY_GIT_DIR=$(pwd)/.git" >> $GITHUB_ENV
+    - name: Install Husky
+      run: npx husky install --ci
+      working-directory: ${{ github.workspace }}
 
     - name: Install dependencies
       run: |
         echo "HUSKY_GIT_DIR=$HUSKY_GIT_DIR"
         npm install --legacy-peer-deps
       working-directory: ${{ github.workspace }}/javascript
-
-    - name: Install Husky
-      run: npx husky install
-      working-directory: ${{ github.workspace }}
 
     - name: Run tests
       run: npm test
