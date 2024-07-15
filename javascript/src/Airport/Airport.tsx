@@ -69,6 +69,11 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     }
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleLand(planeId);
+  };
+
   const handleLand = (planeId?: string) => {
     console.log('handleLand called. Current state:', { hanger, capacity });
     if (hangerFull()) {
@@ -77,20 +82,25 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       return;
     }
     try {
-      const id = planeId || generateUniqueId();
-      if (!id) {
-        console.log('Error generating unique ID');
-        toast.error('Error generating unique ID, aborting landing process');
+      const id = planeId?.trim() || generateUniqueId();
+      if (!isValidPlaneId(id)) {
+        console.log('Invalid plane ID');
+        toast.error('Invalid plane ID, please enter a valid ID');
         return;
       }
       const plane = createPlane(id);
       land(plane);
-      console.log('Plane landed successfully. New hanger state:', hanger);
-      setPlaneId(''); // Clear the input field after landing
+      setPlaneId(''); // Clear the input after successful landing
+      toast.success(`Plane ${plane.id} has landed`);
     } catch (error) {
       console.error('Error during landing:', error);
       toast.error((error as Error).message);
     }
+  };
+
+  const isValidPlaneId = (id: string): boolean => {
+    // Check if the ID is non-empty, alphanumeric, and between 3 and 10 characters
+    return /^[a-zA-Z0-9]{3,10}$/.test(id);
   };
 
   const handleTakeOff = (planeId?: string) => {
@@ -122,20 +132,23 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       <h2 className="text-2xl">Airport</h2>
       <p>Airport Capacity: {capacity} planes</p>
       <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
-      <input
-        type="text"
-        value={planeId}
-        onChange={(e) => setPlaneId(e.target.value)}
-        placeholder="Enter plane ID"
-        className="border p-2"
-        data-testid="plane-id-input"
-      />
-      <button
-        className="bg-teal-500 text-white p-2 m-2"
-        onClick={() => handleLand(planeId)}
-      >
-        Land Plane
-      </button>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={planeId}
+          onChange={(e) => setPlaneId(e.target.value.trim())}
+          placeholder="Enter plane ID"
+          className="border p-2"
+          data-testid="plane-id-input"
+        />
+        <button
+          type="submit"
+          className="bg-teal-500 text-white p-2 m-2"
+          disabled={!isValidPlaneId(planeId)}
+        >
+          Land Plane
+        </button>
+      </form>
       <button
         className="bg-red-500 text-white p-2 m-2"
         onClick={() => handleTakeOff()}
