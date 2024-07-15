@@ -7,7 +7,8 @@ import { isStormy } from '../Weather/Weather';
 import { toast, ToastContainer } from 'react-toastify';
 
 jest.mock('react-toastify', () => ({
-  toast: { error: jest.fn() }
+  toast: { error: jest.fn() },
+  ToastContainer: () => null
 }));
 
 // Set global timeout for all tests
