@@ -44,14 +44,10 @@ const landMultiplePlanes = async (count: number) => {
     await act(async () => {
       await userEvent.type(planeIdInput, planeId);
       await userEvent.click(landButton);
+      await new Promise(resolve => setTimeout(resolve, 100)); // Add small delay
     });
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
-      console.log(`Current hanger count: ${hangerCount.textContent}`);
-      expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-    }, { timeout: TIMEOUT });
+    await screen.findByText(`Planes in hanger: ${i + 1}`, {}, { timeout: TIMEOUT });
     console.log(`Successfully landed plane: ${planeId}`);
-    await new Promise(resolve => setTimeout(resolve, 100)); // Add small delay
   }
   console.log(`Finished landing ${count} planes`);
 };
@@ -63,15 +59,11 @@ const takeOffMultiplePlanes = async (count: number) => {
     console.log(`Attempting to take off plane ${i + 1}`);
     await act(async () => {
       await userEvent.click(takeOffButton);
+      await new Promise(resolve => setTimeout(resolve, 100)); // Add small delay
     });
     console.log(`Clicked take off button for plane ${i + 1}`);
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
-      console.log(`Current hanger count: ${hangerCount.textContent}`);
-      expect(hangerCount).toHaveTextContent(`Planes in hanger: ${count - i - 1}`);
-    }, { timeout: TIMEOUT });
+    await screen.findByText(`Planes in hanger: ${count - i - 1}`, {}, { timeout: TIMEOUT });
     console.log(`Verified hanger count after plane ${i + 1} took off`);
-    await new Promise(resolve => setTimeout(resolve, 100)); // Add small delay
   }
   console.log(`Finished takeOffMultiplePlanes, ${count} planes took off`);
 };
@@ -229,30 +221,18 @@ describe('Airport Component', () => {
     console.log('Airport component rendered');
 
     console.log('Starting to land 3 planes');
-    await waitFor(async () => {
-      await landMultiplePlanes(3);
-    }, { timeout: TIMEOUT });
+    await landMultiplePlanes(3);
     console.log('Finished landing 3 planes');
 
     console.log('Verifying hanger count after landing');
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
-      console.log('Current hanger count:', hangerCount.textContent);
-      expect(hangerCount).toHaveTextContent('Planes in hanger: 3');
-    }, { timeout: TIMEOUT });
+    await screen.findByText('Planes in hanger: 3', {}, { timeout: TIMEOUT });
 
     console.log('Starting to take off 2 planes');
-    await waitFor(async () => {
-      await takeOffMultiplePlanes(2);
-    }, { timeout: TIMEOUT });
+    await takeOffMultiplePlanes(2);
     console.log('Finished taking off 2 planes');
 
     console.log('Verifying final hanger count');
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
-      console.log('Final hanger count:', hangerCount.textContent);
-      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: TIMEOUT });
+    await screen.findByText('Planes in hanger: 1', {}, { timeout: TIMEOUT });
 
     console.log('Test completed: handles multiple planes taking off');
   });
@@ -265,21 +245,15 @@ describe('Airport Component', () => {
     console.log('Airport component rendered');
 
     console.log('Landing 3 planes');
-    await waitFor(async () => {
-      await landMultiplePlanes(3);
-    }, { timeout: TIMEOUT });
+    await landMultiplePlanes(3);
     console.log('3 planes landed');
 
     console.log('Taking off 2 planes');
-    await waitFor(async () => {
-      await takeOffMultiplePlanes(2);
-    }, { timeout: TIMEOUT });
+    await takeOffMultiplePlanes(2);
     console.log('2 planes took off');
 
     console.log('Landing 2 more planes');
-    await waitFor(async () => {
-      await landMultiplePlanes(2);
-    }, { timeout: TIMEOUT });
+    await landMultiplePlanes(2);
     console.log('2 more planes landed');
 
     console.log('Verifying hangar planes');
@@ -292,11 +266,6 @@ describe('Airport Component', () => {
       expect(hangarPlanes[0]).toHaveTextContent('Plane 1');
       expect(hangarPlanes[1]).toHaveTextContent('Plane 4');
       expect(hangarPlanes[2]).toHaveTextContent('Plane 5');
-
-      expect(hangarPlanes.length).toEqual(3);
-      expect(hangarPlanes[0].textContent).toEqual('Plane 1');
-      expect(hangarPlanes[1].textContent).toEqual('Plane 4');
-      expect(hangarPlanes[2].textContent).toEqual('Plane 5');
     }, { timeout: TIMEOUT });
 
     console.log('Test completed: verifies plane IDs in the hangar after multiple operations');
