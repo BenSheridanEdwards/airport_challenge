@@ -28,17 +28,17 @@ jobs:
       with:
         node-version: '20'  # Latest LTS version as of now
 
-    - name: Install dependencies
-      run: |
-        cd javascript
-        npm install --legacy-peer-deps
+    - name: Install Husky
+      run: npm install husky --save-dev
       working-directory: ${{ github.workspace }}
 
-    - name: Install and setup Husky
-      run: |
-        npm install husky --save-dev
-        npx husky install
+    - name: Setup Husky
+      run: npx husky install
       working-directory: ${{ github.workspace }}
+
+    - name: Install JavaScript dependencies
+      run: npm install --legacy-peer-deps
+      working-directory: ${{ github.workspace }}/javascript
 
     - name: Run tests
       run: npm test
