@@ -28,11 +28,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd javascript
         echo "HUSKY_GIT_DIR=$HUSKY_GIT_DIR"
         npm install --legacy-peer-deps
+      working-directory: ${{ github.workspace }}/javascript
+
+    - name: Install Husky
+      run: npx husky install
+      working-directory: ${{ github.workspace }}
 
     - name: Run tests
-      run: |
-        cd javascript
-        npm test
+      run: npm test
+      working-directory: ${{ github.workspace }}/javascript
