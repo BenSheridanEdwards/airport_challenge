@@ -20,6 +20,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [hanger, setHanger] = useState<PlaneInstance[]>([]);
   const [planeId, setPlaneId] = useState<string>('');
   const [capacity, setCapacity] = useState(5);
+  const [newCapacity, setNewCapacity] = useState<string>('');
 
   useEffect(() => {
     console.log('State updated:', { hanger, capacity });
@@ -55,6 +56,17 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   const landed = (plane: PlaneInstance): boolean => {
     return hanger.some(p => p.id === plane.id);
+  };
+
+  const handleCapacityChange = () => {
+    const capacityValue = parseInt(newCapacity, 10);
+    if (!isNaN(capacityValue) && capacityValue > 0) {
+      setCapacity(capacityValue);
+      setNewCapacity('');
+      toast.success(`Airport capacity updated to ${capacityValue}`);
+    } else {
+      toast.error('Please enter a valid positive number for capacity');
+    }
   };
 
   const handleLand = (planeId?: string) => {
@@ -108,7 +120,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   return (
     <div className="p-4" data-testid="hanger-container">
       <h2 className="text-2xl">Airport</h2>
-      <p>Capacity: {capacity}</p>
+      <p>Airport Capacity: {capacity} planes</p>
       <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
       <input
         type="text"
@@ -131,6 +143,21 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       >
         Take Off Plane
       </button>
+      <div className="mt-4">
+        <input
+          type="number"
+          value={newCapacity}
+          onChange={(e) => setNewCapacity(e.target.value)}
+          placeholder="New Capacity"
+          className="border p-2 mr-2"
+        />
+        <button
+          onClick={handleCapacityChange}
+          className="bg-blue-500 text-white p-2 rounded"
+        >
+          Update Capacity
+        </button>
+      </div>
       <ToastContainer />
     </div>
   );
