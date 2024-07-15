@@ -16,6 +16,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: List repository contents
+      run: |
+        echo "Repository root contents:"
+        ls -la ${{ github.workspace }}
+        echo "Git directory contents:"
+        ls -la ${{ github.workspace }}/.git
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
