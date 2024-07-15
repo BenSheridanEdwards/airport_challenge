@@ -22,7 +22,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --watchAll=false --runInBand",
     "eject": "react-scripts eject",
-    "prepare": "cd .. && husky install javascript/.husky"
+    "prepare": "cd .. && HUSKY_GIT_DIR=.git husky install javascript/.husky"
   },
   "eslintConfig": {
     "extends": [
