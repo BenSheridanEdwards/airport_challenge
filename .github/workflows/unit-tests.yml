@@ -28,18 +28,20 @@ jobs:
       with:
         node-version: '20'  # Latest LTS version as of now
 
-    - name: Install and setup Husky
-      env:
-        HUSKY_GIT_DIR: ${{ github.workspace }}/.git
-      run: |
-        npm install husky --save-dev
-        npx husky install
-      working-directory: ${{ github.workspace }}
+    - name: Clear npm cache
+      run: npm cache clean --force
+      working-directory: ${{ github.workspace }}/javascript
 
     - name: Install JavaScript dependencies
-      run: npm install --legacy-peer-deps
+      run: npm ci
+      working-directory: ${{ github.workspace }}/javascript
+
+    - name: List installed packages
+      run: npm list --depth=0
       working-directory: ${{ github.workspace }}/javascript
 
     - name: Run tests
+      env:
+        NODE_ENV: test
       run: npm test
       working-directory: ${{ github.workspace }}/javascript
