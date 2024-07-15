@@ -36,7 +36,7 @@ const TIMEOUT = 10000; // Reduced timeout to 10 seconds
 
 const landMultiplePlanes = async (count: number) => {
   const landButton = screen.getByTestId('land-plane-button');
-  const planeIdInput = screen.getByTestId('plane-id-input');
+  const planeIdInput = screen.getByTestId('land-plane-input');
 
   for (let i = 0; i < count; i++) {
     const planeId = `plane-${i + 1}`;
@@ -87,7 +87,7 @@ describe('Airport Component', () => {
     screen.debug(); // Add debug output to see the rendered component
 
     const landButton = screen.getByTestId('land-plane-button');
-    const planeIdInput = screen.getByTestId('plane-id-input');
+    const planeIdInput = screen.getByTestId('land-plane-input');
     const planeId = 'test-plane-1';
 
     await userEvent.type(planeIdInput, planeId);
@@ -119,7 +119,7 @@ describe('Airport Component', () => {
 
   it('prevents landing when plane is already in hanger', async () => {
     const landButton = screen.getByTestId('land-plane-button');
-    const planeIdInput = screen.getByTestId('plane-id-input');
+    const planeIdInput = screen.getByTestId('land-plane-input');
     const planeId = 'test-plane-id';
 
     await userEvent.type(planeIdInput, planeId);
@@ -186,7 +186,7 @@ describe('Airport Component', () => {
 
   it('handles multiple planes landing', async () => {
     const landButton = screen.getByTestId('land-plane-button');
-    const planeIdInput = screen.getByTestId('plane-id-input');
+    const planeIdInput = screen.getByTestId('land-plane-input');
 
     for (let i = 0; i < 3; i++) {
       const planeId = `plane-${i + 1}`;
