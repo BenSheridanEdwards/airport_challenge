@@ -147,6 +147,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       <h2 className="text-2xl" data-testid="airport-heading">Airport</h2>
       <p data-testid="airport-capacity">Airport Capacity: {capacity} planes</p>
       <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
+      <p data-testid="error-message"></p>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -160,7 +161,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
           type="submit"
           className="bg-teal-500 text-white p-2 m-2"
           disabled={!isValidPlaneId(planeId)}
-          data-testid="land-button"
+          data-testid="land-plane-button"
           role="button"
           aria-label="Land Plane"
         >

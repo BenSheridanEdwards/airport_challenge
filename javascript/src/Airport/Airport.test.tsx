@@ -4,6 +4,14 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
+import { toast } from 'react-toastify';
+
+jest.mock('react-toastify', () => ({
+  toast: {
+    error: jest.fn(),
+    success: jest.fn(),
+  },
+}));
 
 // Set global timeout for all tests
 jest.setTimeout(30000); // 30 seconds
@@ -76,6 +84,10 @@ describe('Airport Component', () => {
     render(<Airport PlaneClass={MockPlane} />);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders Airport component', () => {
     expect(screen.getByTestId('airport-heading')).toBeInTheDocument();
     expect(screen.getByTestId('airport-capacity')).toBeInTheDocument();
@@ -102,17 +114,17 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 5');
-      expect(screen.getByTestId('error-message')).toHaveTextContent('Hanger full, abort landing!');
+      expect(toast.error).toHaveBeenCalledWith('Hanger full, abort landing!');
     }, { timeout: TIMEOUT });
   });
 
   it('prevents landing when weather is stormy', async () => {
     (isStormy as jest.Mock).mockReturnValue(true);
-    const landButton = screen.getByTestId('land-button');
+    const landButton = screen.getByTestId('land-plane-button');
     await userEvent.click(landButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId('error-message')).toHaveTextContent('Stormy weather, cannot land the plane!');
+      expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!');
     }, { timeout: TIMEOUT });
   });
 
@@ -136,7 +148,7 @@ describe('Airport Component', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('error-message')).toHaveTextContent('That plane is already here');
+      expect(toast.error).toHaveBeenCalledWith('That plane is already here');
     }, { timeout: TIMEOUT });
   });
 
@@ -157,7 +169,7 @@ describe('Airport Component', () => {
     await userEvent.click(screen.getByTestId('takeoff-container'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('error-message')).toHaveTextContent('Stormy weather, unable to take off!');
+      expect(toast.error).toHaveBeenCalledWith('Stormy weather, unable to take off!');
     }, { timeout: TIMEOUT });
   });
 
@@ -165,7 +177,7 @@ describe('Airport Component', () => {
     await userEvent.click(screen.getByTestId('takeoff-container'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('error-message')).toHaveTextContent('No planes available for takeoff.');
+      expect(toast.error).toHaveBeenCalledWith('No planes available for takeoff.');
     }, { timeout: TIMEOUT });
   });
 
@@ -185,7 +197,7 @@ describe('Airport Component', () => {
 
     await userEvent.click(takeOffButton);
     await waitFor(() => {
-      expect(screen.getByTestId('error-message')).toHaveTextContent('No planes available for takeoff.');
+      expect(toast.error).toHaveBeenCalledWith('No planes available for takeoff.');
     }, { timeout: TIMEOUT });
   });
 
@@ -236,7 +248,7 @@ describe('Airport Component', () => {
     await userEvent.click(landButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId('error-message')).toHaveTextContent('Stormy weather, cannot land the plane!');
+      expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!');
     }, { timeout: TIMEOUT });
   });
 
@@ -246,7 +258,7 @@ describe('Airport Component', () => {
     await userEvent.click(screen.getByTestId('takeoff-container'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('error-message')).toHaveTextContent('Stormy weather, unable to take off!');
+      expect(toast.error).toHaveBeenCalledWith('Stormy weather, unable to take off!');
     }, { timeout: TIMEOUT });
   });
 
