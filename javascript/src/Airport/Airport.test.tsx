@@ -84,6 +84,8 @@ describe('Airport Component', () => {
   });
 
   it('lands a plane successfully', async () => {
+    screen.debug(); // Add debug output to see the rendered component
+
     const landButton = screen.getByTestId('land-plane-button');
     const planeIdInput = screen.getByTestId('plane-id-input');
     const planeId = 'test-plane-1';
