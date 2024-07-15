@@ -86,7 +86,7 @@ describe('Airport Component', () => {
   it('lands a plane successfully', async () => {
     screen.debug(); // Add debug output to see the rendered component
 
-    const landButton = screen.getByTestId('land-plane-button');
+    const landButton = screen.getByTestId('land-button');
     const planeIdInput = screen.getByTestId('land-plane-input');
     const planeId = 'test-plane-1';
 
@@ -100,7 +100,7 @@ describe('Airport Component', () => {
 
   it('prevents landing when hanger is full', async () => {
     await landMultiplePlanes(5);
-    await userEvent.click(screen.getByTestId('land-plane-button'));
+    await userEvent.click(screen.getByTestId('land-button'));
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 5');
@@ -110,7 +110,7 @@ describe('Airport Component', () => {
 
   it('prevents landing when weather is stormy', async () => {
     (isStormy as jest.Mock).mockReturnValue(true);
-    await userEvent.click(screen.getByTestId('land-plane-button'));
+    await userEvent.click(screen.getByTestId('land-button'));
 
     await waitFor(() => {
       expect(screen.getByTestId('error-message')).toHaveTextContent('Stormy weather, cannot land the plane!');
@@ -138,8 +138,8 @@ describe('Airport Component', () => {
   });
 
   it('takes off a plane successfully', async () => {
-    await userEvent.click(screen.getByTestId('land-plane-button'));
-    await userEvent.click(screen.getByTestId('take-off-button'));
+    await userEvent.click(screen.getByTestId('land-button'));
+    await userEvent.click(screen.getByTestId('takeoff-container'));
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
@@ -147,9 +147,9 @@ describe('Airport Component', () => {
   });
 
   it('prevents takeoff when weather is stormy', async () => {
-    await userEvent.click(screen.getByTestId('land-plane-button'));
+    await userEvent.click(screen.getByTestId('land-button'));
     (isStormy as jest.Mock).mockReturnValue(true);
-    await userEvent.click(screen.getByTestId('take-off-button'));
+    await userEvent.click(screen.getByTestId('takeoff-container'));
 
     await waitFor(() => {
       expect(screen.getByTestId('error-message')).toHaveTextContent('Stormy weather, unable to take off!');
@@ -157,7 +157,7 @@ describe('Airport Component', () => {
   });
 
   it('prevents takeoff when no planes are available', async () => {
-    await userEvent.click(screen.getByTestId('take-off-button'));
+    await userEvent.click(screen.getByTestId('takeoff-container'));
 
     await waitFor(() => {
       expect(screen.getByTestId('error-message')).toHaveTextContent('No planes available for takeoff.');
@@ -165,8 +165,8 @@ describe('Airport Component', () => {
   });
 
   it('prevents takeoff when plane is not in hanger', async () => {
-    const landButton = screen.getByTestId('land-plane-button');
-    const takeOffButton = screen.getByTestId('take-off-button');
+    const landButton = screen.getByTestId('land-button');
+    const takeOffButton = screen.getByTestId('takeoff-container');
 
     await userEvent.click(landButton);
     await waitFor(() => {
@@ -224,7 +224,7 @@ describe('Airport Component', () => {
   });
 
   it('displays appropriate error message when weather turns stormy during landing', async () => {
-    const landButton = screen.getByTestId('land-plane-button');
+    const landButton = screen.getByTestId('land-button');
 
     await userEvent.click(landButton);
     (isStormy as jest.Mock).mockReturnValue(true);
@@ -236,9 +236,9 @@ describe('Airport Component', () => {
   });
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
-    await userEvent.click(screen.getByTestId('land-plane-button'));
+    await userEvent.click(screen.getByTestId('land-button'));
     (isStormy as jest.Mock).mockReturnValue(true);
-    await userEvent.click(screen.getByTestId('take-off-button'));
+    await userEvent.click(screen.getByTestId('takeoff-container'));
 
     await waitFor(() => {
       expect(screen.getByTestId('error-message')).toHaveTextContent('Stormy weather, unable to take off!');
@@ -246,8 +246,8 @@ describe('Airport Component', () => {
   });
 
   it('ensures state persistence across different actions', async () => {
-    const landButton = screen.getByTestId('land-plane-button');
-    const takeOffButton = screen.getByTestId('take-off-button');
+    const landButton = screen.getByTestId('land-button');
+    const takeOffButton = screen.getByTestId('takeoff-container');
 
     await userEvent.click(landButton);
     await waitFor(() => {
@@ -266,8 +266,8 @@ describe('Airport Component', () => {
   });
 
   it('verifies that isStormy mock function is called during landing and takeoff', async () => {
-    const landButton = screen.getByTestId('land-plane-button');
-    const takeOffButton = screen.getByTestId('take-off-button');
+    const landButton = screen.getByTestId('land-button');
+    const takeOffButton = screen.getByTestId('takeoff-container');
 
     await userEvent.click(landButton);
     await waitFor(() => expect(isStormy).toHaveBeenCalled(), { timeout: TIMEOUT });
