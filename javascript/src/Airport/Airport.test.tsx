@@ -73,7 +73,7 @@ describe('Airport Component', () => {
   it('renders Airport component', () => {
     render(<Airport PlaneClass={MockPlane} />);
     expect(screen.getByText('Airport')).toBeInTheDocument();
-    expect(screen.getByText('Capacity: 5')).toBeInTheDocument();
+    expect(screen.getByText('Airport Capacity: 5 planes')).toBeInTheDocument();
     expect(screen.getByText('Planes in hanger: 0')).toBeInTheDocument();
   });
 
@@ -295,13 +295,20 @@ describe('Airport Component', () => {
     }, { timeout: TIMEOUT });
   });
 
-  it('verifies that isStormy mock function is called', async () => {
+  it('verifies that isStormy mock function is called during landing and takeoff', async () => {
     render(<Airport PlaneClass={MockPlane} />);
     const landButton = screen.getByRole('button', { name: /land plane/i });
+    const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
 
     // Land a plane
     await userEvent.click(landButton);
-    await userEvent.click(landButton);
+    await waitFor(() => expect(isStormy).toHaveBeenCalled());
+
+    // Reset the mock
+    (isStormy as jest.Mock).mockClear();
+
+    // Take off a plane
+    await userEvent.click(takeOffButton);
     await waitFor(() => expect(isStormy).toHaveBeenCalled());
   });
 });
