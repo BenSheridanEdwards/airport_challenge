@@ -283,12 +283,19 @@ describe('Airport Component', () => {
     const landButton = await screen.findByTestId('land-plane-button');
     const takeOffButton = screen.getByTestId('takeoff-container');
 
+    console.log('Clicking land button');
     await userEvent.click(landButton);
+    console.log('Waiting for isStormy to be called after landing');
     await waitFor(() => expect(isStormy).toHaveBeenCalled(), { timeout: TIMEOUT });
+    console.log('isStormy called after landing');
 
-    (isStormy as jest.Mock).mockClear();
+    jest.clearAllMocks();
+    console.log('Mocks cleared');
 
+    console.log('Clicking takeoff button');
     await userEvent.click(takeOffButton);
+    console.log('Waiting for isStormy to be called after takeoff');
     await waitFor(() => expect(isStormy).toHaveBeenCalled(), { timeout: TIMEOUT });
+    console.log('isStormy called after takeoff');
   });
 });
