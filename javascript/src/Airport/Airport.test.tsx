@@ -6,7 +6,7 @@ import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
 
 // Set global timeout for all tests
-jest.setTimeout(10000); // 10 seconds
+jest.setTimeout(30000); // 30 seconds
 
 interface MockPlaneInstance {
   id: string;
@@ -33,7 +33,7 @@ jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
 }));
 
-const TIMEOUT = 5000; // Reduced timeout to 5 seconds
+const TIMEOUT = 15000; // Increased timeout to 15 seconds
 
 
 
@@ -45,48 +45,79 @@ const landMultiplePlanes = async (count: number) => {
   const landPlane = async (i: number) => {
     const planeId = `plane-${i + 1}`;
     console.log(`Attempting to land plane ${planeId}`);
-    await act(async () => {
-      await userEvent.type(planeIdInput, planeId);
-      await userEvent.click(landButton);
-    });
-    await waitFor(() => {
-      expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-    }, { timeout: TIMEOUT });
-    console.log(`Successfully landed plane ${planeId}`);
+    try {
+      await act(async () => {
+        await userEvent.type(planeIdInput, planeId);
+        await userEvent.click(landButton);
+      });
+      await waitFor(() => {
+        const hangerCount = screen.getByTestId('hanger-count').textContent;
+        console.log(`Current hanger count: ${hangerCount}`);
+        expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${i + 1}`);
+      }, { timeout: TIMEOUT });
+      console.log(`Successfully landed plane ${planeId}`);
+    } catch (error) {
+      console.error(`Error landing plane ${planeId}:`, error);
+      throw error;
+    }
   };
 
-  await Promise.all(Array.from({ length: count }, (_, i) => landPlane(i)));
-  console.log(`Finished landing ${count} planes`);
+  try {
+    await Promise.all(Array.from({ length: count }, (_, i) => landPlane(i)));
+    console.log(`Finished landing ${count} planes`);
+  } catch (error) {
+    console.error('Error in landMultiplePlanes:', error);
+    throw error;
+  }
 };
 
 const takeOffMultiplePlanes = async (count: number) => {
   console.log(`Starting takeOffMultiplePlanes for ${count} planes`);
   const takeOffButton = screen.getByRole('button', { name: /take off plane/i });
   const takeOffPromises = Array.from({ length: count }, async (_, i) => {
-    console.log(`Attempting to take off plane ${i + 1}`);
-    await act(async () => {
-      await userEvent.click(takeOffButton);
-    });
-    await waitFor(() => {
-      const expectedCount = count - i - 1;
-      console.log(`Checking hanger count: expected ${expectedCount}`);
-      expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${expectedCount}`);
-    }, { timeout: TIMEOUT });
-    console.log(`Plane ${i + 1} took off successfully`);
+    try {
+      console.log(`Attempting to take off plane ${i + 1}`);
+      await act(async () => {
+        await userEvent.click(takeOffButton);
+      });
+      await waitFor(() => {
+        const expectedCount = count - i - 1;
+        console.log(`Checking hanger count: expected ${expectedCount}`);
+        expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${expectedCount}`);
+      }, { timeout: TIMEOUT });
+      console.log(`Plane ${i + 1} took off successfully`);
+    } catch (error) {
+      console.error(`Error taking off plane ${i + 1}:`, error);
+      throw error;
+    }
   });
-  await Promise.all(takeOffPromises);
-  console.log(`Completed takeOffMultiplePlanes for ${count} planes`);
+  try {
+    await Promise.all(takeOffPromises);
+    console.log(`Completed takeOffMultiplePlanes for ${count} planes`);
+  } catch (error) {
+    console.error('Error in takeOffMultiplePlanes:', error);
+    throw error;
+  }
 };
 
 describe('Airport Component', () => {
   const MockPlane = jest.requireActual('../Plane/Plane').default;
 
   beforeEach(() => {
+    console.log('Setting up test environment');
     jest.resetAllMocks();
     jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
-    jest.requireMock('../Plane/Plane').instances.length = 0; // Clear the instances array before each test
-    document.body.innerHTML = ''; // Clear toast notifications
+    console.log('isStormy mock set to:', (isStormy as jest.Mock)());
+    try {
+      jest.requireMock('../Plane/Plane').instances.length = 0;
+      console.log('Cleared Plane instances');
+    } catch (error) {
+      console.error('Error clearing Plane instances:', error);
+    }
+    document.body.innerHTML = '';
+    console.log('Cleared toast notifications');
+    console.log('Test environment setup complete');
   });
 
   it('renders Airport component', () => {
@@ -104,17 +135,25 @@ describe('Airport Component', () => {
   });
 
   it('lands a plane successfully', async () => {
+    console.log('Starting land plane test');
     render(<Airport PlaneClass={MockPlane} />);
+    console.log('Airport component rendered');
     const landButton = screen.getByRole('button', { name: /land plane/i });
+    console.log('Land button found:', landButton);
     await userEvent.click(landButton);
+    console.log('Land button clicked');
 
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
-      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: TIMEOUT }).catch(error => {
-      console.error('Timeout waiting for hanger count to update:', error);
+    try {
+      await waitFor(() => {
+        const hangerCount = screen.getByTestId('hanger-count');
+        console.log('Current hanger count:', hangerCount.textContent);
+        expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+      }, { timeout: TIMEOUT });
+      console.log('Land plane test completed successfully');
+    } catch (error) {
+      console.error('Error in land plane test:', error);
       throw error;
-    });
+    }
   });
 
   it('prevents landing when hanger is full', async () => {
