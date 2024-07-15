@@ -90,7 +90,7 @@ describe('Airport Component', () => {
   });
 
   it('lands a plane successfully', async () => {
-    const landButton = screen.getByTestId('land-button');
+    const landButton = screen.getByTestId('land-plane-button');
     const planeIdInput = screen.getByTestId('land-plane-input');
     const planeId = 'test-plane-1';
 
@@ -149,7 +149,7 @@ describe('Airport Component', () => {
 
   it('takes off a plane successfully', async () => {
     await act(async () => {
-      await userEvent.click(screen.getByTestId('land-button'));
+      await userEvent.click(screen.getByTestId('land-plane-button'));
       await userEvent.click(screen.getByTestId('takeoff-container'));
     });
 
@@ -177,7 +177,7 @@ describe('Airport Component', () => {
   });
 
   it('prevents takeoff when plane is not in hanger', async () => {
-    const landButton = screen.getByTestId('land-button');
+    const landButton = screen.getByTestId('land-plane-button');
     const takeOffButton = screen.getByTestId('takeoff-container');
 
     await userEvent.click(landButton);
@@ -236,7 +236,7 @@ describe('Airport Component', () => {
   });
 
   it('displays appropriate error message when weather turns stormy during landing', async () => {
-    const landButton = screen.getByTestId('land-button');
+    const landButton = screen.getByTestId('land-plane-button');
 
     await userEvent.click(landButton);
     (isStormy as jest.Mock).mockReturnValue(true);
@@ -258,7 +258,7 @@ describe('Airport Component', () => {
   });
 
   it('ensures state persistence across different actions', async () => {
-    const landButton = screen.getByTestId('land-button');
+    const landButton = screen.getByTestId('land-plane-button');
     const takeOffButton = screen.getByTestId('takeoff-container');
 
     await userEvent.click(landButton);
@@ -278,7 +278,7 @@ describe('Airport Component', () => {
   });
 
   it('verifies that isStormy mock function is called during landing and takeoff', async () => {
-    const landButton = screen.getByTestId('land-button');
+    const landButton = screen.getByTestId('land-plane-button');
     const takeOffButton = screen.getByTestId('takeoff-container');
 
     await userEvent.click(landButton);
