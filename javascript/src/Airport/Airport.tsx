@@ -21,6 +21,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [planeId, setPlaneId] = useState<string>('');
   const [capacity, setCapacity] = useState(5);
   const [newCapacity, setNewCapacity] = useState<string>('');
+  const [selectedPlane, setSelectedPlane] = useState<string>('');
 
   useEffect(() => {
     console.log('State updated:', { hanger, capacity });
@@ -103,17 +104,20 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     return /^[a-zA-Z0-9]{3,10}$/.test(id);
   };
 
-  const handleTakeOff = (planeId?: string) => {
-    console.log('handleTakeOff called. Current state:', { hanger, capacity });
+  const handleTakeOff = () => {
+    if (!selectedPlane) {
+      toast.error('Please select a plane for takeoff');
+      return;
+    }
     try {
-      const plane = planeId ? hanger.find(p => p.id === planeId) : hanger[0];
-      if (plane) {
-        takeOff(plane);
-        console.log('Plane took off successfully. New hanger state:', hanger);
-      } else {
-        console.log('No planes available for takeoff.');
-        toast.error('No planes available for takeoff.');
+      const plane = hanger.find(p => p.id === selectedPlane);
+      if (!plane) {
+        toast.error('Selected plane not found in hanger');
+        return;
       }
+      takeOff(plane);
+      setSelectedPlane('');
+      toast.success(`Plane ${plane.id} has taken off`);
     } catch (error) {
       console.error('Error during takeoff:', error);
       toast.error((error as Error).message);
@@ -149,9 +153,20 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
           Land Plane
         </button>
       </form>
+      <select
+        value={selectedPlane}
+        onChange={(e) => setSelectedPlane(e.target.value)}
+        className="border p-2 m-2"
+      >
+        <option value="">Select a plane</option>
+        {hanger.map(plane => (
+          <option key={plane.id} value={plane.id}>{plane.id}</option>
+        ))}
+      </select>
       <button
         className="bg-red-500 text-white p-2 m-2"
-        onClick={() => handleTakeOff()}
+        onClick={handleTakeOff}
+        disabled={!selectedPlane}
         data-testid="takeoff-container"
       >
         Take Off Plane
