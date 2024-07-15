@@ -77,15 +77,12 @@ describe('Airport Component', () => {
   });
 
   it('renders Airport component', () => {
-    render(<Airport PlaneClass={MockPlane} />);
     expect(screen.getByTestId('airport-heading')).toBeInTheDocument();
     expect(screen.getByTestId('airport-capacity')).toBeInTheDocument();
     expect(screen.getByTestId('hanger-count')).toBeInTheDocument();
   });
 
   it('lands a plane successfully', async () => {
-    screen.debug(); // Add debug output to see the rendered component
-
     const landButton = screen.getByTestId('land-button');
     const planeIdInput = screen.getByTestId('land-plane-input');
     const planeId = 'test-plane-1';
@@ -100,7 +97,8 @@ describe('Airport Component', () => {
 
   it('prevents landing when hanger is full', async () => {
     await landMultiplePlanes(5);
-    await userEvent.click(screen.getByTestId('land-button'));
+    const landButton = screen.getByTestId('land-plane-button');
+    await userEvent.click(landButton);
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 5');
@@ -110,7 +108,8 @@ describe('Airport Component', () => {
 
   it('prevents landing when weather is stormy', async () => {
     (isStormy as jest.Mock).mockReturnValue(true);
-    await userEvent.click(screen.getByTestId('land-button'));
+    const landButton = screen.getByTestId('land-button');
+    await userEvent.click(landButton);
 
     await waitFor(() => {
       expect(screen.getByTestId('error-message')).toHaveTextContent('Stormy weather, cannot land the plane!');
@@ -122,15 +121,19 @@ describe('Airport Component', () => {
     const planeIdInput = screen.getByTestId('land-plane-input');
     const planeId = 'test-plane-id';
 
-    await userEvent.type(planeIdInput, planeId);
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.type(planeIdInput, planeId);
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: TIMEOUT });
 
-    await userEvent.type(planeIdInput, planeId);
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.type(planeIdInput, planeId);
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('error-message')).toHaveTextContent('That plane is already here');
@@ -138,8 +141,10 @@ describe('Airport Component', () => {
   });
 
   it('takes off a plane successfully', async () => {
-    await userEvent.click(screen.getByTestId('land-button'));
-    await userEvent.click(screen.getByTestId('takeoff-container'));
+    await act(async () => {
+      await userEvent.click(screen.getByTestId('land-button'));
+      await userEvent.click(screen.getByTestId('takeoff-container'));
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
