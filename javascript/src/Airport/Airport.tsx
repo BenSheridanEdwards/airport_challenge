@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 type PlaneInstance = InstanceType<typeof Plane>;
-
-const DEFAULT_CAPACITY = 5;
 
 interface AirportProps {
   PlaneClass?: typeof Plane;
@@ -21,6 +19,11 @@ const defaultGenerateUniqueId = (): string => {
 const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
   const [hanger, setHanger] = useState<PlaneInstance[]>([]);
   const [planeId, setPlaneId] = useState<string>('');
+  const [capacity, setCapacity] = useState(5);
+
+  useEffect(() => {
+    console.log('State updated:', { hanger, capacity });
+  }, [hanger, capacity]);
 
   const land = (plane: PlaneInstance): void => {
     if (hangerFull()) {
@@ -47,7 +50,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const hangerFull = (): boolean => {
-    return hanger.length >= DEFAULT_CAPACITY;
+    return hanger.length >= capacity;
   };
 
   const landed = (plane: PlaneInstance): boolean => {
@@ -55,33 +58,42 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const handleLand = (planeId?: string) => {
+    console.log('handleLand called. Current state:', { hanger, capacity });
     if (hangerFull()) {
+      console.log('Unable to land plane. Capacity reached.');
       toast.error('Hanger full, abort landing!');
       return;
     }
     try {
       const id = planeId || generateUniqueId();
       if (!id) {
+        console.log('Error generating unique ID');
         toast.error('Error generating unique ID, aborting landing process');
         return;
       }
       const plane = createPlane(id);
       land(plane);
+      console.log('Plane landed successfully. New hanger state:', hanger);
       setPlaneId(''); // Clear the input field after landing
     } catch (error) {
+      console.error('Error during landing:', error);
       toast.error((error as Error).message);
     }
   };
 
   const handleTakeOff = (planeId?: string) => {
+    console.log('handleTakeOff called. Current state:', { hanger, capacity });
     try {
       const plane = planeId ? hanger.find(p => p.id === planeId) : hanger[0];
       if (plane) {
         takeOff(plane);
+        console.log('Plane took off successfully. New hanger state:', hanger);
       } else {
+        console.log('No planes available for takeoff.');
         toast.error('No planes available for takeoff.');
       }
     } catch (error) {
+      console.error('Error during takeoff:', error);
       toast.error((error as Error).message);
     }
   };
@@ -93,12 +105,10 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     return new PlaneClass(id);
   };
 
-
-
   return (
     <div className="p-4" data-testid="hanger-container">
       <h2 className="text-2xl">Airport</h2>
-      <p>Capacity: {DEFAULT_CAPACITY}</p>
+      <p>Capacity: {capacity}</p>
       <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
       <input
         type="text"
