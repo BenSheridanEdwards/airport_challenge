@@ -148,13 +148,13 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
           onChange={(e) => setPlaneId(e.target.value.trim())}
           placeholder="Enter plane ID"
           className="border p-2"
-          data-testid="plane-id-input"
+          data-testid="land-plane-input"
         />
         <button
           type="submit"
           className="bg-teal-500 text-white p-2 m-2"
           disabled={!isValidPlaneId(planeId)}
-          data-testid="land-plane-button"
+          data-testid="land-button"
           aria-label="Land Plane"
         >
           Land Plane
