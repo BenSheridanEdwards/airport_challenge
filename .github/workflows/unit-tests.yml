@@ -37,10 +37,8 @@ jobs:
     - name: Install and setup Husky
       run: |
         npm install husky --save-dev
-        npm run prepare
+        npx husky install
       working-directory: ${{ github.workspace }}
-      env:
-        HUSKY_GIT_DIR: ${{ github.workspace }}/.git
 
     - name: Run tests
       run: npm test
