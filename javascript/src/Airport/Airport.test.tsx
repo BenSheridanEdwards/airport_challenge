@@ -6,7 +6,9 @@ import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
 import { toast, ToastContainer } from 'react-toastify';
 
-// The manual mock for 'react-toastify' has been removed
+jest.mock('react-toastify', () => ({
+  toast: { error: jest.fn() }
+}));
 
 // Set global timeout for all tests
 jest.setTimeout(30000); // 30 seconds
@@ -94,8 +96,10 @@ describe('Airport Component', () => {
     const planeIdInput = await screen.findByTestId('land-plane-input');
     const planeId = 'test-plane-1';
 
-    await userEvent.type(planeIdInput, planeId);
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.type(planeIdInput, planeId);
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
@@ -105,7 +109,9 @@ describe('Airport Component', () => {
   it('prevents landing when hanger is full', async () => {
     await landMultiplePlanes(5);
     const landButton = await screen.findByTestId('land-plane-button');
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 5');
@@ -116,7 +122,9 @@ describe('Airport Component', () => {
   it('prevents landing when weather is stormy', async () => {
     (isStormy as jest.Mock).mockReturnValue(true);
     const landButton = await screen.findByTestId('land-plane-button');
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!');
@@ -160,9 +168,13 @@ describe('Airport Component', () => {
 
   it('prevents takeoff when weather is stormy', async () => {
     const landButton = await screen.findByTestId('land-plane-button');
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
     (isStormy as jest.Mock).mockReturnValue(true);
-    await userEvent.click(screen.getByTestId('takeoff-container'));
+    await act(async () => {
+      await userEvent.click(screen.getByTestId('takeoff-container'));
+    });
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, unable to take off!');
@@ -170,7 +182,9 @@ describe('Airport Component', () => {
   });
 
   it('prevents takeoff when no planes are available', async () => {
-    await userEvent.click(screen.getByTestId('takeoff-container'));
+    await act(async () => {
+      await userEvent.click(screen.getByTestId('takeoff-container'));
+    });
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('No planes available for takeoff.');
@@ -181,17 +195,23 @@ describe('Airport Component', () => {
     const landButton = await screen.findByTestId('land-plane-button');
     const takeOffButton = screen.getByTestId('takeoff-container');
 
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: TIMEOUT });
 
-    await userEvent.click(takeOffButton);
+    await act(async () => {
+      await userEvent.click(takeOffButton);
+    });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
     }, { timeout: TIMEOUT });
 
-    await userEvent.click(takeOffButton);
+    await act(async () => {
+      await userEvent.click(takeOffButton);
+    });
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('No planes available for takeoff.');
     }, { timeout: TIMEOUT });
@@ -203,8 +223,10 @@ describe('Airport Component', () => {
 
     for (let i = 0; i < 3; i++) {
       const planeId = `plane-${i + 1}`;
-      await userEvent.type(planeIdInput, planeId);
-      await userEvent.click(landButton);
+      await act(async () => {
+        await userEvent.type(planeIdInput, planeId);
+        await userEvent.click(landButton);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${i + 1}`);
@@ -239,9 +261,13 @@ describe('Airport Component', () => {
   it('displays appropriate error message when weather turns stormy during landing', async () => {
     const landButton = await screen.findByTestId('land-plane-button');
 
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
     (isStormy as jest.Mock).mockReturnValue(true);
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!');
@@ -250,9 +276,13 @@ describe('Airport Component', () => {
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
     const landButton = await screen.findByTestId('land-plane-button');
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
     (isStormy as jest.Mock).mockReturnValue(true);
-    await userEvent.click(screen.getByTestId('takeoff-container'));
+    await act(async () => {
+      await userEvent.click(screen.getByTestId('takeoff-container'));
+    });
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, unable to take off!');
@@ -263,17 +293,23 @@ describe('Airport Component', () => {
     const landButton = await screen.findByTestId('land-plane-button');
     const takeOffButton = screen.getByTestId('takeoff-container');
 
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: TIMEOUT });
 
-    await userEvent.click(takeOffButton);
+    await act(async () => {
+      await userEvent.click(takeOffButton);
+    });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
     }, { timeout: TIMEOUT });
 
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: TIMEOUT });
@@ -283,19 +319,16 @@ describe('Airport Component', () => {
     const landButton = await screen.findByTestId('land-plane-button');
     const takeOffButton = screen.getByTestId('takeoff-container');
 
-    console.log('Clicking land button');
-    await userEvent.click(landButton);
-    console.log('Waiting for isStormy to be called after landing');
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
     await waitFor(() => expect(isStormy).toHaveBeenCalled(), { timeout: TIMEOUT });
-    console.log('isStormy called after landing');
 
     jest.clearAllMocks();
-    console.log('Mocks cleared');
 
-    console.log('Clicking takeoff button');
-    await userEvent.click(takeOffButton);
-    console.log('Waiting for isStormy to be called after takeoff');
+    await act(async () => {
+      await userEvent.click(takeOffButton);
+    });
     await waitFor(() => expect(isStormy).toHaveBeenCalled(), { timeout: TIMEOUT });
-    console.log('isStormy called after takeoff');
   });
 });
