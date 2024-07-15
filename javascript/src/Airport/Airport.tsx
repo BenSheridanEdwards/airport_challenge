@@ -139,7 +139,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         return null;
       })()}
       <h2 className="text-2xl" data-testid="airport-heading">Airport</h2>
-      <p>Airport Capacity: {capacity} planes</p>
+      <p data-testid="airport-capacity">Airport Capacity: {capacity} planes</p>
       <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
       <form onSubmit={handleSubmit}>
         <input
@@ -165,10 +165,11 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         value={selectedPlane}
         onChange={(e) => setSelectedPlane(e.target.value)}
         className="border p-2 m-2"
+        data-testid="plane-select"
       >
         <option value="">Select a plane</option>
         {hanger.map(plane => (
-          <option key={plane.id} value={plane.id}>{plane.id}</option>
+          <option key={plane.id} value={plane.id} data-testid={`plane-item-${plane.id}`}>{plane.id}</option>
         ))}
       </select>
       <button
