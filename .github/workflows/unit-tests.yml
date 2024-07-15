@@ -29,8 +29,10 @@ jobs:
         node-version: '20'  # Latest LTS version as of now
 
     - name: Install Husky
-      run: HUSKY_GIT_DIR=${{ github.workspace }}/.git npx husky install --ci
+      run: npm install husky --save-dev && npx husky install
       working-directory: ${{ github.workspace }}
+      env:
+        HUSKY_GIT_DIR: ${{ github.workspace }}/.git
 
     - name: Install dependencies
       run: npm install --legacy-peer-deps
