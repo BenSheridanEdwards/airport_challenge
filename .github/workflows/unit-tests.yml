@@ -11,8 +11,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      HUSKY_GIT_DIR: ${{ github.workspace }}/.git
 
     steps:
     - name: Checkout repository
@@ -24,13 +22,11 @@ jobs:
         node-version: '20'  # Latest LTS version as of now
 
     - name: Install Husky
-      run: npx husky install --ci
+      run: HUSKY_GIT_DIR=${{ github.workspace }}/.git npx husky install --ci
       working-directory: ${{ github.workspace }}
 
     - name: Install dependencies
-      run: |
-        echo "HUSKY_GIT_DIR=$HUSKY_GIT_DIR"
-        npm install --legacy-peer-deps
+      run: npm install --legacy-peer-deps
       working-directory: ${{ github.workspace }}/javascript
 
     - name: Run tests
