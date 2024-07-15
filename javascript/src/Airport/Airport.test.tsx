@@ -72,28 +72,52 @@ describe('Airport Component', () => {
   const MockPlane = jest.requireActual('../Plane/Plane').default;
 
   beforeEach(() => {
+    console.log('Setting up test environment');
     jest.resetAllMocks();
     jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
     jest.requireMock('../Plane/Plane').instances.length = 0; // Clear the instances array before each test
     document.body.innerHTML = ''; // Clear toast notifications
+    console.log('Test environment set up complete');
   });
 
   it('renders Airport component', () => {
-    render(<Airport PlaneClass={MockPlane} />);
-    expect(screen.getByText('Airport')).toBeInTheDocument();
-    expect(screen.getByText('Capacity: 5')).toBeInTheDocument();
-    expect(screen.getByText('Planes in hanger: 0')).toBeInTheDocument();
+    try {
+      console.log('Test started: renders Airport component');
+      render(<Airport PlaneClass={MockPlane} />);
+      expect(screen.getByText('Airport')).toBeInTheDocument();
+      expect(screen.getByText('Capacity: 5')).toBeInTheDocument();
+      expect(screen.getByText('Planes in hanger: 0')).toBeInTheDocument();
+      console.log('Test completed: renders Airport component');
+    } catch (error) {
+      console.error('Error in test: renders Airport component', error);
+      throw error;
+    }
   });
 
   it('lands a plane successfully', async () => {
-    render(<Airport PlaneClass={MockPlane} />);
-    const landButton = screen.getByRole('button', { name: /land plane/i });
-    await userEvent.click(landButton);
-    await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
-      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: TIMEOUT });
+    try {
+      console.log('Test started: lands a plane successfully');
+      render(<Airport PlaneClass={MockPlane} />);
+      console.log('Airport component rendered');
+
+      const landButton = screen.getByRole('button', { name: /land plane/i });
+      console.log('Land button found');
+
+      await userEvent.click(landButton);
+      console.log('Land button clicked');
+
+      await waitFor(() => {
+        const hangerCount = screen.getByTestId('hanger-count');
+        console.log('Hanger count:', hangerCount.textContent);
+        expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+      }, { timeout: TIMEOUT });
+
+      console.log('Test completed: lands a plane successfully');
+    } catch (error) {
+      console.error('Error in test: lands a plane successfully', error);
+      throw error;
+    }
   });
 
   it('prevents landing when hanger is full', async () => {
