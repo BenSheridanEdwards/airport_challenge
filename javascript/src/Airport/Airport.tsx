@@ -154,7 +154,8 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
           type="submit"
           className="bg-teal-500 text-white p-2 m-2"
           disabled={!isValidPlaneId(planeId)}
-          data-testid="land-button"
+          data-testid="land-plane-button"
+          role="button"
           aria-label="Land Plane"
         >
           Land Plane
