@@ -91,6 +91,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       }
       const plane = createPlane(id);
       land(plane);
+      console.log('Plane landed. Updated state:', { hanger: [...hanger, plane], capacity });
       setPlaneId(''); // Clear the input after successful landing
       toast.success(`Plane ${plane.id} has landed`);
     } catch (error) {

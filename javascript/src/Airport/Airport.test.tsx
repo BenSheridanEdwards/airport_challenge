@@ -243,7 +243,7 @@ describe('Airport Component', () => {
     await waitFor(() => {
       const hangarPlanes = screen.getAllByTestId('plane-item');
       expect(hangarPlanes).toHaveLength(3);
-      expect(hangarPlanes.map(plane => plane.textContent)).toEqual(['Plane 1', 'Plane 4', 'Plane 5']);
+      expect(hangarPlanes.map(plane => plane.textContent)).toEqual(['plane-1', 'plane-4', 'plane-5']);
     }, { timeout: TIMEOUT });
   });
 
