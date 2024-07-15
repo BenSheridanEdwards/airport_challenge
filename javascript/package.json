@@ -20,7 +20,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --watchAll=false",
+    "test": "react-scripts test --watchAll=false --runInBand",
     "eject": "react-scripts eject",
     "prepare": "husky install",
     "postinstall": "export HUSKY_GIT_DIR=$GITHUB_WORKSPACE/.git && npx husky install .husky"
