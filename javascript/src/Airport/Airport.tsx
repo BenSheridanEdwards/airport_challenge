@@ -134,6 +134,10 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   return (
     <div className="p-4" data-testid="hanger-container">
+      {(() => {
+        console.log('Rendering Airport component', { hanger, capacity, planeId, isValidPlaneId: isValidPlaneId(planeId) });
+        return null;
+      })()}
       <h2 className="text-2xl">Airport</h2>
       <p>Airport Capacity: {capacity} planes</p>
       <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
@@ -150,6 +154,8 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
           type="submit"
           className="bg-teal-500 text-white p-2 m-2"
           disabled={!isValidPlaneId(planeId)}
+          data-testid="land-plane-button"
+          aria-label="Land Plane"
         >
           Land Plane
         </button>
