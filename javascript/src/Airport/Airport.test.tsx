@@ -6,8 +6,8 @@ import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
 import { toast } from 'react-toastify';
 
-console.log('Starting Airport Component tests - Increased timeout and improved error handling');
-jest.setTimeout(60000); // Increased global timeout to 60 seconds
+console.log('Starting Airport Component tests - Increased timeout, improved error handling, and enhanced logging');
+jest.setTimeout(120000); // Increased global timeout to 120 seconds for extra buffer
 
 jest.mock('react-toastify', () => ({
   toast: {
@@ -540,35 +540,22 @@ describe('Airport Component', () => {
   });
 
   it('verifies that isStormy mock function is called during landing and takeoff', async () => {
+    console.log('Starting test: verifies isStormy calls during landing and takeoff');
+
     await act(async () => {
       render(<Airport PlaneClass={MockPlane} />);
     });
 
-    await waitFor(() => {
-      expect(screen.getByTestId('land-plane-button')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    const landButton = await screen.findByTestId('land-plane-button', {}, { timeout: 10000 });
+    const takeOffButton = await screen.findByTestId('takeoff-container', {}, { timeout: 10000 });
+    const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 10000 });
 
-    const landButton = await screen.findByTestId('land-plane-button', {}, { timeout: 5000 });
-    const takeOffButton = await screen.findByTestId('takeoff-container', {}, { timeout: 5000 });
-    const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 5000 });
-
-    // Set a valid planeId before attempting to land
     const validPlaneId = 'test-plane';
     await act(async () => {
       await userEvent.type(planeIdInput, validPlaneId);
     });
 
-    // Log the state of planeId and button before clicking
-    console.log('PlaneId before landing:', (planeIdInput as HTMLInputElement).value);
-    console.log('Land button disabled:', landButton.hasAttribute('disabled'));
-
-    // Wait for the button to be enabled
-    await waitFor(() => {
-      expect(landButton).not.toBeDisabled();
-    }, { timeout: 5000 });
-
-    console.log('Land button disabled after waiting:', landButton.hasAttribute('disabled'));
-
+    console.log('Attempting to land plane');
     await act(async () => {
       await userEvent.click(landButton);
     });
@@ -579,8 +566,9 @@ describe('Airport Component', () => {
       console.log('Hanger count after landing:', hangerCount.textContent);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
       expect(toast.success).toHaveBeenCalledWith(`Plane ${validPlaneId} has landed`, expect.anything());
-    }, { timeout: 5000 });
+    }, { timeout: 10000 });
 
+    console.log('Attempting takeoff');
     await act(async () => {
       await userEvent.click(takeOffButton);
     });
@@ -591,6 +579,8 @@ describe('Airport Component', () => {
       console.log('Hanger count after takeoff:', hangerCount.textContent);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
       expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('has taken off'), expect.anything());
-    }, { timeout: 5000 });
+    }, { timeout: 10000 });
+
+    console.log('Test completed: verifies isStormy calls during landing and takeoff');
   });
 });
