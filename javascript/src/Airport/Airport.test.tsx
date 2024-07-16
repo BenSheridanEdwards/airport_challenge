@@ -51,7 +51,7 @@ const landMultiplePlanes = async (count: number) => {
   const landButton = await screen.findByTestId('land-plane-button');
   const planeIdInput = await screen.findByTestId('land-plane-input');
 
-  for (let i = 0; i < count; i++) {
+  await Promise.all(Array.from({ length: count }, async (_, i) => {
     const planeId = `plane-${i + 1}`;
     await userEvent.clear(planeIdInput);
     await userEvent.type(planeIdInput, planeId);
@@ -62,7 +62,7 @@ const landMultiplePlanes = async (count: number) => {
     await waitFor(() => {
       expect(screen.getByTestId('land-plane-input')).toHaveValue('');
     }, { timeout: 3000 });
-  }
+  }));
 };
 
 const takeOffMultiplePlanes = async (count: number) => {
