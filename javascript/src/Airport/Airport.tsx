@@ -118,6 +118,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   const handleLand = useCallback((planeId?: string) => {
     console.log('handleLand called with planeId:', planeId);
+    console.log('Current planeId state:', planeId);
+    console.log('Is valid planeId:', isValidPlaneId(planeId || ''));
+
     if (hangerFull()) {
       console.log('Hanger full, aborting landing');
       toast.error('Hanger full, abort landing!');
@@ -126,6 +129,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     try {
       const id = planeId?.trim() || generateUniqueId();
       console.log('Generated or trimmed planeId:', id);
+      console.log('Is valid trimmed/generated id:', isValidPlaneId(id));
 
       if (!isValidPlaneId(id)) {
         console.log('Invalid plane ID:', id);
@@ -138,6 +142,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       land(plane);
       setPlaneId('');
       console.log('Plane landed successfully, planeId reset');
+      console.log('New planeId state after reset:', '');
       toast.success(`Plane ${plane.id} has landed`);
     } catch (error: unknown) {
       console.error('Error during landing:', error);
@@ -183,7 +188,12 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         <input
           type="text"
           value={planeId}
-          onChange={(e) => setPlaneId(e.target.value.trim())}
+          onChange={(e) => {
+            const newValue = e.target.value.trim();
+            console.log('Input onChange - new value:', newValue);
+            setPlaneId(newValue);
+            console.log('After setPlaneId - planeId:', newValue, 'isValidPlaneId:', isValidPlaneId(newValue));
+          }}
           placeholder="Enter plane ID"
           className="border p-2"
           data-testid="land-plane-input"
