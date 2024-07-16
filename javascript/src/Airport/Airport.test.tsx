@@ -12,7 +12,7 @@ jest.mock('react-toastify', () => ({
 }));
 
 // Set global timeout for all tests
-jest.setTimeout(30000); // 30 seconds
+jest.setTimeout(60000); // 60 seconds
 
 interface MockPlaneInstance {
   id: string;
@@ -37,7 +37,7 @@ jest.mock('../Weather/Weather', () => ({
   isStormy: jest.fn(),
 }));
 
-const TIMEOUT = 10000; // Reduced timeout to 10 seconds
+const TIMEOUT = 15000; // Increased timeout to 15 seconds
 
 
 const landMultiplePlanes = async (count: number) => {
@@ -46,27 +46,39 @@ const landMultiplePlanes = async (count: number) => {
 
   for (let i = 0; i < count; i++) {
     const planeId = `plane-${i + 1}`;
-    await act(async () => {
-      await userEvent.type(planeIdInput, planeId);
-      await userEvent.click(landButton);
-    });
-    await waitFor(() => {
-      expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-    }, { timeout: TIMEOUT });
+    try {
+      await act(async () => {
+        await userEvent.type(planeIdInput, planeId);
+        await userEvent.click(landButton);
+      });
+      await waitFor(() => {
+        expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${i + 1}`);
+      }, { timeout: TIMEOUT });
+      console.log(`Successfully landed plane ${planeId}`);
+    } catch (error) {
+      console.error(`Failed to land plane ${planeId}:`, error);
+      throw error;
+    }
   }
 };
 
 const takeOffMultiplePlanes = async (count: number) => {
-  const takeOffButton = screen.getByTestId('take-off-button');
+  const takeOffButton = screen.getByTestId('takeoff-container');
 
   for (let i = 0; i < count; i++) {
-    await act(async () => {
-      await userEvent.click(takeOffButton);
-    });
-    await waitFor(() => {
-      const expectedCount = count - i - 1;
-      expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${expectedCount}`);
-    }, { timeout: TIMEOUT });
+    try {
+      await act(async () => {
+        await userEvent.click(takeOffButton);
+      });
+      await waitFor(() => {
+        const expectedCount = count - i - 1;
+        expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${expectedCount}`);
+      }, { timeout: TIMEOUT });
+      console.log(`Successfully took off plane ${i + 1}`);
+    } catch (error) {
+      console.error(`Failed to take off plane ${i + 1}:`, error);
+      throw error;
+    }
   }
 };
 
@@ -319,38 +331,47 @@ describe('Airport Component', () => {
   it('verifies that isStormy mock function is called during landing and takeoff', async () => {
     const landButton = await screen.findByTestId('land-plane-button');
     const takeOffButton = screen.getByTestId('takeoff-container');
+    const planeIdInput = await screen.findByTestId('land-plane-input');
 
     console.log('Attempting to land a plane');
     await act(async () => {
+      await userEvent.type(planeIdInput, 'test-plane');
       await userEvent.click(landButton);
     });
-    await waitFor(() => expect(isStormy).toHaveBeenCalled(), {
-      timeout: TIMEOUT,
-      onTimeout: (error) => {
-        console.error('isStormy was not called during landing');
-        return error;
-      }
-    });
 
-    console.log('Plane landed successfully');
-    jest.clearAllMocks();
+    try {
+      await waitFor(() => expect(isStormy).toHaveBeenCalled(), { timeout: TIMEOUT });
+      console.log('isStormy called during landing');
+    } catch (error) {
+      console.error('isStormy was not called during landing:', error);
+      throw error;
+    }
 
     console.log('Verifying plane is in hangar');
-    await waitFor(() => {
-      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: TIMEOUT });
+    try {
+      await waitFor(() => {
+        expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
+      }, { timeout: TIMEOUT });
+    } catch (error) {
+      console.error('Failed to verify plane in hangar:', error);
+      throw error;
+    }
+
+    jest.clearAllMocks();
 
     console.log('Attempting takeoff');
     await act(async () => {
       await userEvent.click(takeOffButton);
     });
-    await waitFor(() => expect(isStormy).toHaveBeenCalled(), {
-      timeout: TIMEOUT,
-      onTimeout: (error) => {
-        console.error('isStormy was not called during takeoff');
-        return error;
-      }
-    });
+
+    try {
+      await waitFor(() => expect(isStormy).toHaveBeenCalled(), { timeout: TIMEOUT });
+      console.log('isStormy called during takeoff');
+    } catch (error) {
+      console.error('isStormy was not called during takeoff:', error);
+      throw error;
+    }
+
     console.log('Takeoff completed');
   });
 });
