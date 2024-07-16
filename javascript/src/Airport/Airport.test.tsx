@@ -320,16 +320,37 @@ describe('Airport Component', () => {
     const landButton = await screen.findByTestId('land-plane-button');
     const takeOffButton = screen.getByTestId('takeoff-container');
 
+    console.log('Attempting to land a plane');
     await act(async () => {
       await userEvent.click(landButton);
     });
-    await waitFor(() => expect(isStormy).toHaveBeenCalled(), { timeout: TIMEOUT });
+    await waitFor(() => expect(isStormy).toHaveBeenCalled(), {
+      timeout: TIMEOUT,
+      onTimeout: (error) => {
+        console.error('isStormy was not called during landing');
+        return error;
+      }
+    });
 
+    console.log('Plane landed successfully');
     jest.clearAllMocks();
 
+    console.log('Verifying plane is in hangar');
+    await waitFor(() => {
+      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
+    }, { timeout: TIMEOUT });
+
+    console.log('Attempting takeoff');
     await act(async () => {
       await userEvent.click(takeOffButton);
     });
-    await waitFor(() => expect(isStormy).toHaveBeenCalled(), { timeout: TIMEOUT });
+    await waitFor(() => expect(isStormy).toHaveBeenCalled(), {
+      timeout: TIMEOUT,
+      onTimeout: (error) => {
+        console.error('isStormy was not called during takeoff');
+        return error;
+      }
+    });
+    console.log('Takeoff completed');
   });
 });
