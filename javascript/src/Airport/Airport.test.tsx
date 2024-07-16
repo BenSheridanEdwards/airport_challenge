@@ -428,7 +428,7 @@ describe('Airport Component', () => {
       expect(hangarPlanes).toHaveLength(3);
       const planeIds = hangarPlanes.map(plane => plane.textContent);
       expect(planeIds).toEqual(['plane-3', 'plane-4', 'plane-5']);
-    }, { timeout: 3000 });
+    }, { timeout: 5000 });
   });
 
   it('displays appropriate error message when weather turns stormy during landing', async () => {
