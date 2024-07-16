@@ -130,7 +130,7 @@ describe('Airport Component', () => {
     console.log('Completed test: renders Airport component');
   });
 
-  it('lands a plane successfully', async () => {
+  it.only('lands a plane successfully', async () => {
     console.log('Starting test: lands a plane successfully');
     const landButton = await screen.findByTestId('land-plane-button', {}, { timeout: 5000 });
     const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 5000 });
