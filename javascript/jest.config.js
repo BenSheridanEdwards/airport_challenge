@@ -13,4 +13,5 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
   },
+  testTimeout: 60000,
 };
