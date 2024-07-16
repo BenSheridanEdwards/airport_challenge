@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ERROR_MESSAGES } from './constants';
 
 type PlaneInstance = InstanceType<typeof Plane>;
 
@@ -26,10 +27,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   // useEffect for hangarCount removed as it's now updated directly in the land function
 
-  const checkWeather = () => {
-    const stormy = isStormy();
-    return stormy;
-  };
+  const checkWeather = () => isStormy();
 
   const createPlane = useCallback((id: string): PlaneInstance => {
     if (!id) {
@@ -48,7 +46,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   }, [hanger, capacity]);
 
   const landed = useCallback((plane: PlaneInstance): boolean => {
-    return hanger.some(p => p.id === plane.id);
+    return hanger.some(hangarPlane => hangarPlane.id === plane.id);
   }, [hanger]);
 
   const land = useCallback((plane: PlaneInstance): void => {
