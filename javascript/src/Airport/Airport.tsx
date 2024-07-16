@@ -26,15 +26,31 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
 
   const land = (plane: PlaneInstance): void => {
+    console.log(`Attempting to land plane ${plane.id}`);
+    console.log(`Current hanger state:`, hanger);
+    console.log(`Is hanger full?`, hangerFull());
+    console.log(`Is plane already landed?`, landed(plane));
+    console.log(`Checking weather conditions...`);
+    const stormy = isStormy();
+    console.log(`Is it stormy?`, stormy);
+
     if (hangerFull()) {
+      console.log('Hanger full, aborting landing');
       throw new Error('Hanger full, abort landing!');
     } else if (landed(plane)) {
+      console.log('Plane already landed, aborting landing');
       throw new Error('That plane is already here');
-    } else if (isStormy()) {
+    } else if (stormy) {
+      console.log('Stormy weather, aborting landing');
       throw new Error('Stormy weather, cannot land the plane!');
     } else {
+      console.log(`Landing plane ${plane.id}`);
       plane.landed();
-      setHanger(prevHanger => [...prevHanger, plane]);
+      setHanger(prevHanger => {
+        const newHanger = [...prevHanger, plane];
+        console.log('Updated hanger state:', newHanger);
+        return newHanger;
+      });
     }
   };
 
@@ -74,21 +90,34 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const handleLand = (planeId?: string) => {
+    console.log(`handleLand called with planeId:`, planeId);
+    console.log(`Current hanger state:`, hanger);
+    console.log(`Is hanger full?`, hangerFull());
+
     if (hangerFull()) {
+      console.log('Hanger full, aborting landing');
       toast.error('Hanger full, abort landing!');
       return;
     }
     try {
       const id = planeId?.trim() || generateUniqueId();
+      console.log(`Generated/Provided plane ID:`, id);
+      console.log(`Is plane ID valid?`, isValidPlaneId(id));
+
       if (!isValidPlaneId(id)) {
+        console.log('Invalid plane ID, aborting landing');
         toast.error('Invalid plane ID, please enter a valid ID');
         return;
       }
       const plane = createPlane(id);
+      console.log(`Created plane:`, plane);
+
       land(plane);
       setPlaneId(''); // Clear the input after successful landing
+      console.log(`Plane ${plane.id} has landed successfully`);
       toast.success(`Plane ${plane.id} has landed`);
     } catch (error) {
+      console.error('Error during landing:', error);
       toast.error((error as Error).message);
     }
   };
