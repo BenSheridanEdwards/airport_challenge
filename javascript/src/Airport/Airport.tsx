@@ -16,53 +16,60 @@ const defaultGenerateUniqueId = (): string => {
   return id;
 };
 
-const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
+const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }): JSX.Element => {
   const [hanger, setHanger] = useState<PlaneInstance[]>([]);
   const [planeId, setPlaneId] = useState<string>('');
   const [capacity, setCapacity] = useState(5);
   const [newCapacity, setNewCapacity] = useState<string>('');
   const [selectedPlane, setSelectedPlane] = useState<string>('');
+  const [hangarCount, setHangarCount] = useState(0);
 
+  useEffect(() => {
+    setHangarCount(hanger.length);
+  }, [hanger]);
 
+  const checkWeather = () => {
+    const stormy = isStormy();
+    console.log(`Is it stormy?`, stormy);
+    return stormy;
+  };
 
   const land = (plane: PlaneInstance): void => {
     console.log(`Attempting to land plane ${plane.id}`);
     console.log(`Current hanger state:`, hanger);
-    console.log(`Is hanger full?`, hangerFull());
-    console.log(`Is plane already landed?`, landed(plane));
-    console.log(`Checking weather conditions...`);
-    const stormy = isStormy();
-    console.log(`Is it stormy?`, stormy);
 
     if (hangerFull()) {
       console.log('Hanger full, aborting landing');
       throw new Error('Hanger full, abort landing!');
-    } else if (landed(plane)) {
+    }
+    if (landed(plane)) {
       console.log('Plane already landed, aborting landing');
       throw new Error('That plane is already here');
-    } else if (stormy) {
+    }
+    if (checkWeather()) {
       console.log('Stormy weather, aborting landing');
       throw new Error('Stormy weather, cannot land the plane!');
-    } else {
-      console.log(`Landing plane ${plane.id}`);
-      plane.landed();
-      setHanger(prevHanger => {
-        const newHanger = [...prevHanger, plane];
-        console.log('Updated hanger state:', newHanger);
-        return newHanger;
-      });
     }
+
+    console.log(`Landing plane ${plane.id}`);
+    plane.landed();
+    setHanger(prevHanger => {
+      const newHanger = [...prevHanger, plane];
+      console.log('Updated hanger state:', newHanger);
+      return newHanger;
+    });
   };
 
   const takeOff = (plane: PlaneInstance): void => {
     if (!landed(plane)) {
       throw new Error("No planes available for takeoff");
-    } else if (isStormy()) {
-      throw new Error('Stormy weather, unable to take off!');
-    } else {
-      plane.inTheAir();
-      setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
     }
+    if (checkWeather()) {
+      throw new Error('Stormy weather, unable to take off!');
+    }
+    plane.inTheAir();
+    setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
+    console.log(`Plane ${plane.id} has taken off`);
   };
 
   const hangerFull = (): boolean => {
@@ -116,9 +123,9 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       setPlaneId(''); // Clear the input after successful landing
       console.log(`Plane ${plane.id} has landed successfully`);
       toast.success(`Plane ${plane.id} has landed`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error during landing:', error);
-      toast.error((error as Error).message);
+      toast.error(error instanceof Error ? error.message : 'An unknown error occurred');
     }
   };
 
@@ -138,11 +145,16 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
         toast.error('Selected plane not found in hanger');
         return;
       }
+      if (checkWeather()) {
+        toast.error('Stormy weather, unable to take off!');
+        return;
+      }
       takeOff(plane);
       setSelectedPlane('');
       toast.success(`Plane ${plane.id} has taken off`);
-    } catch (error) {
-      toast.error((error as Error).message);
+    } catch (error: unknown) {
+      console.error('Error during takeoff:', error);
+      toast.error(error instanceof Error ? error.message : 'An unknown error occurred');
     }
   };
 
@@ -159,7 +171,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     <div className="p-4" data-testid="hanger-container">
       <h2 className="text-2xl" data-testid="airport-heading">Airport</h2>
       <p data-testid="airport-capacity">Airport Capacity: {capacity} planes</p>
-      <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
+      <p role="status" data-testid="hanger-count">Planes in hanger: {hangarCount}</p>
       <p data-testid="error-message"></p>
       <form onSubmit={handleSubmit}>
         <input
