@@ -25,7 +25,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [selectedPlane, setSelectedPlane] = useState<string>('');
   const [hangarCount, setHangarCount] = useState(0);
 
-  // useEffect for hangarCount removed as it's now updated directly in the land function
+
 
   const checkWeather = () => isStormy();
 
@@ -37,7 +37,6 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   }, [PlaneClass]);
 
   const isValidPlaneId = useCallback((id: string): boolean => {
-    // Check if the ID is non-empty, alphanumeric (including hyphens), and between 3 and 15 characters
     return /^[a-zA-Z0-9-]{3,15}$/.test(id);
   }, []);
 
