@@ -443,9 +443,7 @@ describe('Airport Component', () => {
     }, { timeout: 10000 });
 
     await act(async () => {
-      await waitFor(async () => {
-        await userEvent.clear(planeIdInput);
-      });
+      await userEvent.clear(planeIdInput);
       await userEvent.type(planeIdInput, 'another-plane');
       await userEvent.click(landButton);
     });
