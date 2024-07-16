@@ -1,5 +1,3 @@
-// Weather.tsx
-
 const FORECASTS: string[] = ['stormy', 'sunny', 'sunny', 'sunny'];
 
 export const isStormy = (): boolean => {
