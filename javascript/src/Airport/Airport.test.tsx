@@ -552,8 +552,16 @@ describe('Airport Component', () => {
     const takeOffButton = await screen.findByTestId('takeoff-container', {}, { timeout: 5000 });
     const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 5000 });
 
+    // Set a valid planeId before attempting to land
     await act(async () => {
       await userEvent.type(planeIdInput, 'test-plane');
+    });
+
+    // Log the state of planeId and button before clicking
+    console.log('PlaneId before landing:', (planeIdInput as HTMLInputElement).value);
+    console.log('Land button disabled:', landButton.hasAttribute('disabled'));
+
+    await act(async () => {
       await userEvent.click(landButton);
     });
 
