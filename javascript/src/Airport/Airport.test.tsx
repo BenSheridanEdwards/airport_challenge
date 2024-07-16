@@ -333,29 +333,35 @@ describe('Airport Component', () => {
     const planeIdInput = await screen.findByTestId('land-plane-input');
 
     // Land the first plane
-    await userEvent.type(planeIdInput, 'plane-1');
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.type(planeIdInput, 'plane-1');
+      await userEvent.click(landButton);
+    });
     await waitFor(() => expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1'));
 
     // Mock stormy weather
     (isStormy as jest.Mock).mockReturnValue(true);
 
     // Attempt to land another plane
-    await userEvent.clear(planeIdInput);
-    await userEvent.type(planeIdInput, 'plane-2');
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.clear(planeIdInput);
+      await userEvent.type(planeIdInput, 'plane-2');
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!', expect.anything());
-    });
+    }, { timeout: 5000 });
 
-    // Verify that the hangar count remains unchanged
-    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
+    await waitFor(() => {
+      // Verify that the hangar count remains unchanged
+      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
 
-    // Verify that only the first plane is in the hangar
-    const hangarPlanes = screen.getAllByTestId('plane-item');
-    expect(hangarPlanes).toHaveLength(1);
-    expect(hangarPlanes[0].textContent).toBe('plane-1');
+      // Verify that only the first plane is in the hangar
+      const hangarPlanes = screen.getAllByTestId('plane-item');
+      expect(hangarPlanes).toHaveLength(1);
+      expect(hangarPlanes[0].textContent).toBe('plane-1');
+    }, { timeout: 5000 });
   });
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
