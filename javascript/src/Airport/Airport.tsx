@@ -25,10 +25,10 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [hangarCount, setHangarCount] = useState(0);
 
   useEffect(() => {
-    console.log('useEffect for hangarCount. Current hanger:', hanger);
+    console.log('useEffect for hangarCount triggered');
+    console.log('Before setHangarCount - hanger:', hanger, 'hangarCount:', hangarCount);
     setHangarCount(hanger.length);
-    console.log('Updated hangarCount:', hanger.length);
-    console.log('Hanger state update completed');
+    console.log('After setHangarCount - hanger:', hanger, 'new hangarCount:', hanger.length);
   }, [hanger]);
 
   const checkWeather = () => {
@@ -58,8 +58,8 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   }, [hanger]);
 
   const land = useCallback((plane: PlaneInstance): void => {
-    console.log(`Attempting to land plane ${plane.id}`);
-    console.log(`Current hanger state:`, hanger);
+    console.log(`land function called for plane ${plane.id}`);
+    console.log(`Before setHanger - hanger:`, hanger, `hangarCount:`, hangarCount);
 
     if (hangerFull()) {
       console.log('Hanger full, aborting landing');
@@ -78,10 +78,12 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     plane.landed();
     setHanger(prevHanger => {
       const newHanger = [...prevHanger, plane];
-      console.log('Updated hanger state:', newHanger);
+      console.log('Inside setHanger callback - newHanger:', newHanger);
       return newHanger;
     });
-  }, [hanger, hangerFull, landed, checkWeather]);
+
+    console.log(`After setHanger call - hanger:`, hanger, `hangarCount:`, hangarCount);
+  }, [hanger, hangarCount, hangerFull, landed, checkWeather]);
 
   const takeOff = useCallback((plane: PlaneInstance): void => {
     console.log(`Attempting takeoff for plane ${plane.id}`);
@@ -122,9 +124,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   const handleLand = useCallback((planeId?: string) => {
     console.log(`handleLand called with planeId:`, planeId);
-    console.log(`Current hanger state:`, hanger);
-    console.log(`Current hangarCount:`, hangarCount);
-    console.log(`Is hanger full?`, hangerFull());
+    console.log(`Before landing - hanger:`, hanger, `hangarCount:`, hangarCount);
 
     if (hangerFull()) {
       console.log('Hanger full, aborting landing');
@@ -134,7 +134,6 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     try {
       const id = planeId?.trim() || generateUniqueId();
       console.log(`Generated/Provided plane ID:`, id);
-      console.log(`Is plane ID valid?`, isValidPlaneId(id));
 
       if (!isValidPlaneId(id)) {
         console.log('Invalid plane ID, aborting landing');
@@ -144,14 +143,13 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       const plane = createPlane(id);
       console.log(`Created plane:`, plane);
 
-      console.log(`Before land() call. Current state:`, { hanger, hangarCount });
       land(plane);
-      console.log(`After land() call. Updated state:`, { hanger, hangarCount });
-      setPlaneId(''); // Clear the input after successful landing
+      console.log(`Immediately after land() call - hanger:`, hanger, `hangarCount:`, hangarCount);
+      setPlaneId('');
       console.log(`Plane ${plane.id} has landed successfully`);
       setTimeout(() => {
-        console.log(`Delayed final state after landing:`, { hanger, hangarCount });
-      }, 0);
+        console.log(`Delayed after landing - hanger:`, hanger, `hangarCount:`, hangarCount);
+      }, 100);
       toast.success(`Plane ${plane.id} has landed`);
     } catch (error: unknown) {
       console.error('Error during landing:', error);
