@@ -123,39 +123,27 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const handleLand = useCallback((planeId?: string) => {
-    console.log(`handleLand called with planeId:`, planeId);
-    console.log(`Before landing - hanger:`, hanger, `hangarCount:`, hangarCount);
-
     if (hangerFull()) {
-      console.log('Hanger full, aborting landing');
       toast.error('Hanger full, abort landing!');
       return;
     }
     try {
       const id = planeId?.trim() || generateUniqueId();
-      console.log(`Generated/Provided plane ID:`, id);
 
       if (!isValidPlaneId(id)) {
-        console.log('Invalid plane ID, aborting landing');
         toast.error('Invalid plane ID, please enter a valid ID');
         return;
       }
       const plane = createPlane(id);
-      console.log(`Created plane:`, plane);
 
       land(plane);
-      console.log(`Immediately after land() call - hanger:`, hanger, `hangarCount:`, hangarCount);
       setPlaneId('');
-      console.log(`Plane ${plane.id} has landed successfully`);
-      setTimeout(() => {
-        console.log(`Delayed after landing - hanger:`, hanger, `hangarCount:`, hangarCount);
-      }, 100);
       toast.success(`Plane ${plane.id} has landed`);
     } catch (error: unknown) {
       console.error('Error during landing:', error);
       toast.error(error instanceof Error ? error.message : 'An unknown error occurred');
     }
-  }, [hanger, hangarCount, hangerFull, land, createPlane, generateUniqueId, isValidPlaneId, setPlaneId]);
+  }, [hangerFull, land, createPlane, generateUniqueId, isValidPlaneId, setPlaneId]);
 
 
 
