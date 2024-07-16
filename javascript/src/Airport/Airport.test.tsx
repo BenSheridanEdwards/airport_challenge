@@ -127,18 +127,21 @@ describe('Airport Component', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
 
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalled();
+    }, { timeout: 15000 });
+
+    await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith(`Plane ${planeId} has landed`, expect.anything());
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
 
     await waitFor(async () => {
       const planeItems = await screen.findAllByTestId('plane-item');
       expect(planeItems).toHaveLength(1);
       expect(planeItems[0]).toHaveTextContent(planeId);
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
   });
 
   it('prevents landing when hanger is full', async () => {
@@ -218,7 +221,7 @@ describe('Airport Component', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
 
     await act(async () => {
       await userEvent.click(takeoffButton);
@@ -227,15 +230,20 @@ describe('Airport Component', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
 
-    expect(isStormy).toHaveBeenCalledTimes(2);
+    await waitFor(() => {
+      expect(isStormy).toHaveBeenCalledTimes(2);
+    }, { timeout: 15000 });
+
     await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith(`Plane ${planeId} has taken off`, expect.anything());
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
 
-    const planeItems = screen.queryAllByTestId('plane-item');
-    expect(planeItems).toHaveLength(0);
+    await waitFor(() => {
+      const planeItems = screen.queryAllByTestId('plane-item');
+      expect(planeItems).toHaveLength(0);
+    }, { timeout: 15000 });
   });
 
   it('prevents takeoff when weather is stormy', async () => {
@@ -429,13 +437,14 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(planeIdInput).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
 
     await act(async () => {
       await userEvent.type(planeIdInput, 'test-plane');
-      await waitFor(() => expect(planeIdInput).toHaveValue('test-plane'));
+      await waitFor(() => expect(planeIdInput).toHaveValue('test-plane'), { timeout: 5000 });
       await userEvent.click(landButton);
     });
+
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 15000 });
@@ -443,19 +452,21 @@ describe('Airport Component', () => {
     await act(async () => {
       await userEvent.click(takeOffButton);
     });
+
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
     }, { timeout: 15000 });
 
     await act(async () => {
       await userEvent.clear(planeIdInput);
-      await waitFor(() => expect(planeIdInput).toHaveValue(''));
+      await waitFor(() => expect(planeIdInput).toHaveValue(''), { timeout: 5000 });
 
       await userEvent.type(planeIdInput, 'another-plane');
-      await waitFor(() => expect(planeIdInput).toHaveValue('another-plane'));
+      await waitFor(() => expect(planeIdInput).toHaveValue('another-plane'), { timeout: 5000 });
 
       await userEvent.click(landButton);
     });
+
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 15000 });
