@@ -140,41 +140,25 @@ describe('Airport Component', () => {
     const planeId = 'test-plane-1';
 
     console.log('Attempting to land plane');
-    await act(async () => {
-      console.log(`Typing plane ID: ${planeId}`);
-      await userEvent.type(planeIdInput, planeId);
-      console.log('Clicking land button');
-      await userEvent.click(landButton);
-    });
+    console.log(`Typing plane ID: ${planeId}`);
+    await userEvent.type(planeIdInput, planeId);
+    console.log('Clicking land button');
+    await userEvent.click(landButton);
     console.log('Plane landing operation completed');
 
     await waitFor(() => {
-      console.log('Checking hanger count');
+      console.log('Checking hanger count and success toast');
       const hangerCount = screen.getByTestId('hanger-count');
-      console.log(`Current hanger count: ${hangerCount.textContent}`);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 3000 });
-
-    await waitFor(() => {
-      console.log('Checking if isStormy was called');
       expect(isStormy).toHaveBeenCalled();
-      console.log('isStormy was called as expected');
-    }, { timeout: 3000 });
-
-    await waitFor(() => {
-      console.log('Checking if success toast was shown');
       expect(toast.success).toHaveBeenCalledWith(`Plane ${planeId} has landed`, expect.anything());
-      console.log('Success toast was shown as expected');
-    }, { timeout: 3000 });
+    }, { timeout: 5000 });
 
-    await waitFor(async () => {
-      console.log('Checking plane items in hanger');
-      const planeItems = await screen.findAllByTestId('plane-item');
-      console.log(`Number of plane items found: ${planeItems.length}`);
-      expect(planeItems).toHaveLength(1);
-      console.log(`Content of first plane item: ${planeItems[0].textContent}`);
-      expect(planeItems[0]).toHaveTextContent(planeId);
-    }, { timeout: 3000 });
+    const planeItems = await screen.findAllByTestId('plane-item', {}, { timeout: 5000 });
+    console.log(`Number of plane items found: ${planeItems.length}`);
+    expect(planeItems).toHaveLength(1);
+    console.log(`Content of first plane item: ${planeItems[0].textContent}`);
+    expect(planeItems[0]).toHaveTextContent(planeId);
 
     console.log('Test completed: lands a plane successfully');
   });
