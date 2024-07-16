@@ -540,9 +540,17 @@ describe('Airport Component', () => {
   });
 
   it('verifies that isStormy mock function is called during landing and takeoff', async () => {
-    const landButton = await screen.findByTestId('land-plane-button');
-    const takeOffButton = await screen.findByTestId('takeoff-container');
-    const planeIdInput = await screen.findByTestId('land-plane-input');
+    await act(async () => {
+      render(<Airport PlaneClass={MockPlane} />);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('land-plane-button')).toBeInTheDocument();
+    }, { timeout: 5000 });
+
+    const landButton = await screen.findByTestId('land-plane-button', {}, { timeout: 5000 });
+    const takeOffButton = await screen.findByTestId('takeoff-container', {}, { timeout: 5000 });
+    const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 5000 });
 
     await act(async () => {
       await userEvent.type(planeIdInput, 'test-plane');
@@ -552,9 +560,8 @@ describe('Airport Component', () => {
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
+      expect(toast.success).toHaveBeenCalledWith('Plane test-plane has landed', expect.anything());
     }, { timeout: 5000 });
-
-    expect(toast.success).toHaveBeenCalledWith('Plane test-plane has landed', expect.anything());
 
     await act(async () => {
       await userEvent.click(takeOffButton);
@@ -563,8 +570,7 @@ describe('Airport Component', () => {
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalledTimes(2);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
+      expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('has taken off'), expect.anything());
     }, { timeout: 5000 });
-
-    expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('has taken off'), expect.anything());
   });
 });
