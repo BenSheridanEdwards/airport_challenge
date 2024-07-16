@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 type PlaneInstance = InstanceType<typeof Plane>;
-
-const DEFAULT_CAPACITY = 5;
 
 interface AirportProps {
   PlaneClass?: typeof Plane;
@@ -18,128 +16,238 @@ const defaultGenerateUniqueId = (): string => {
   return id;
 };
 
-const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }) => {
+const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId = defaultGenerateUniqueId }): JSX.Element => {
   const [hanger, setHanger] = useState<PlaneInstance[]>([]);
   const [planeId, setPlaneId] = useState<string>('');
-  const [pendingOperations, setPendingOperations] = useState<number>(0);
+  const [capacity, setCapacity] = useState(5);
+  const [newCapacity, setNewCapacity] = useState<string>('');
+  const [selectedPlane, setSelectedPlane] = useState<string>('');
+  const [hangarCount, setHangarCount] = useState(0);
 
-  const land = async (plane: PlaneInstance): Promise<void> => {
-    if (hangerFull()) {
-      throw new Error('Hanger full, abort landing!');
-    } else if (landed(plane)) {
-      throw new Error('That plane is already here');
-    } else if (isStormy()) {
-      throw new Error('Stormy weather, cannot land the plane!');
-    } else {
-      plane.landed();
-      setPendingOperations(prev => prev + 1);
-      setHanger(prevHanger => {
-        const updatedHanger = [...prevHanger, plane];
-        return updatedHanger;
-      });
-    }
+  // useEffect for hangarCount removed as it's now updated directly in the land function
+
+  const checkWeather = () => {
+    const stormy = isStormy();
+    console.log(`Is it stormy?`, stormy);
+    return stormy;
   };
 
-  const takeOff = async (plane: PlaneInstance): Promise<void> => {
-    if (!landed(plane)) {
-      throw new Error("No planes available for takeoff");
-    } else if (isStormy()) {
-      throw new Error('Stormy weather, unable to take off!');
-    } else {
-      plane.inTheAir();
-      setPendingOperations(prev => prev + 1);
-      setHanger(prevHanger => {
-        const updatedHanger = prevHanger.filter(p => p.id !== plane.id);
-        return updatedHanger;
-      });
-    }
-  };
-
-  const hangerFull = (): boolean => {
-    return hanger.length >= DEFAULT_CAPACITY;
-  };
-
-  const landed = (plane: PlaneInstance): boolean => {
-    return hanger.some(p => p.id === plane.id);
-  };
-
-  const handleLand = async (planeId?: string) => {
-    if (hangerFull()) {
-      toast.error('Hanger full, abort landing!');
-      return;
-    }
-    try {
-      const id = planeId || generateUniqueId();
-      if (!id) {
-        toast.error('Error generating unique ID, aborting landing process');
-        return;
-      }
-      const plane = createPlane(id);
-      await land(plane);
-      setPlaneId(''); // Clear the input field after landing
-    } catch (error) {
-      toast.error((error as Error).message);
-    }
-  };
-
-  const handleTakeOff = async (planeId?: string) => {
-    try {
-      const plane = planeId ? hanger.find(p => p.id === planeId) : hanger[0];
-      if (plane) {
-        await takeOff(plane);
-      } else {
-        toast.error('No planes available for takeoff.');
-      }
-    } catch (error) {
-      toast.error((error as Error).message);
-    }
-  };
-
-  const createPlane = (id: string): PlaneInstance => {
+  const createPlane = useCallback((id: string): PlaneInstance => {
     if (!id) {
       throw new Error('Cannot create plane with undefined ID');
     }
     return new PlaneClass(id);
+  }, [PlaneClass]);
+
+  const isValidPlaneId = useCallback((id: string): boolean => {
+    // Check if the ID is non-empty, alphanumeric (including hyphens), and between 3 and 15 characters
+    return /^[a-zA-Z0-9-]{3,15}$/.test(id);
+  }, []);
+
+  const hangerFull = useCallback((): boolean => {
+    return hanger.length >= capacity;
+  }, [hanger, capacity]);
+
+  const landed = useCallback((plane: PlaneInstance): boolean => {
+    return hanger.some(p => p.id === plane.id);
+  }, [hanger]);
+
+  const land = useCallback((plane: PlaneInstance): void => {
+    console.log(`land function called for plane ${plane.id}`);
+
+    if (hangerFull()) {
+      console.log('Hanger full, aborting landing');
+      throw new Error('Hanger full, abort landing!');
+    }
+    if (landed(plane)) {
+      console.log('Plane already landed, aborting landing');
+      throw new Error('That plane is already here');
+    }
+    if (checkWeather()) {
+      console.log('Stormy weather, aborting landing');
+      throw new Error('Stormy weather, cannot land the plane!');
+    }
+
+    console.log(`Landing plane ${plane.id}`);
+    plane.landed();
+    setHanger(prevHanger => {
+      const newHanger = [...prevHanger, plane];
+      console.log('Inside setHanger callback - newHanger:', newHanger);
+      setHangarCount(newHanger.length);
+      console.log(`Updated hangarCount to ${newHanger.length}`);
+      return newHanger;
+    });
+  }, [hangerFull, landed, checkWeather]);
+
+  const takeOff = useCallback((plane: PlaneInstance): void => {
+    console.log(`Attempting takeoff for plane ${plane.id}`);
+    if (!landed(plane)) {
+      console.log(`Plane ${plane.id} not in hanger, cannot take off`);
+      throw new Error("No planes available for takeoff");
+    }
+    if (checkWeather()) {
+      console.log(`Stormy weather, plane ${plane.id} unable to take off`);
+      throw new Error('Stormy weather, unable to take off!');
+    }
+    plane.inTheAir();
+    setHanger(prevHanger => {
+      const newHanger = prevHanger.filter(p => p.id !== plane.id);
+      console.log(`Updated hanger after takeoff:`, newHanger);
+      return newHanger;
+    });
+    console.log(`Plane ${plane.id} has taken off successfully`);
+  }, [landed, checkWeather]);
+
+  const handleCapacityChange = () => {
+    const capacityValue = parseInt(newCapacity, 10);
+    if (!isNaN(capacityValue) && capacityValue > 0) {
+      setCapacity(capacityValue);
+      setNewCapacity('');
+      toast.success(`Airport capacity updated to ${capacityValue}`);
+    } else {
+      toast.error('Please enter a valid positive number for capacity');
+    }
   };
 
-  useEffect(() => {
-    if (pendingOperations > 0) {
-      setPendingOperations(prev => prev - 1);
-    } else if (pendingOperations === 0) {
-      // Perform actions that depend on state updates being complete
-      // For example, enable UI interactions or trigger final state updates
+
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleLand(planeId);
+  };
+
+  const handleLand = useCallback((planeId?: string) => {
+    console.log('handleLand called with planeId:', planeId);
+    console.log('Current planeId state:', planeId);
+    console.log('Is valid planeId:', isValidPlaneId(planeId || ''));
+
+    if (hangerFull()) {
+      console.log('Hanger full, aborting landing');
+      toast.error('Hanger full, abort landing!');
+      return;
     }
-  }, [hanger, pendingOperations]);
+    try {
+      const id = planeId?.trim() || generateUniqueId();
+      console.log('Generated or trimmed planeId:', id);
+      console.log('Is valid trimmed/generated id:', isValidPlaneId(id));
+
+      if (!isValidPlaneId(id)) {
+        console.log('Invalid plane ID:', id);
+        toast.error('Invalid plane ID, please enter a valid ID');
+        return;
+      }
+      const plane = createPlane(id);
+      console.log('Created plane:', plane);
+
+      land(plane);
+      setPlaneId('');
+      console.log('Plane landed successfully, planeId reset');
+      console.log('New planeId state after reset:', '');
+      toast.success(`Plane ${plane.id} has landed`);
+    } catch (error: unknown) {
+      console.error('Error during landing:', error);
+      toast.error(error instanceof Error ? error.message : 'An unknown error occurred');
+    }
+  }, [hangerFull, land, createPlane, generateUniqueId, isValidPlaneId, setPlaneId]);
+
+
+
+  const handleTakeOff = useCallback(() => {
+    if (!selectedPlane) {
+      toast.error('Please select a plane for takeoff');
+      return;
+    }
+    try {
+      const plane = hanger.find(p => p.id === selectedPlane);
+      if (!plane) {
+        toast.error('Selected plane not found in hanger');
+        return;
+      }
+      if (checkWeather()) {
+        toast.error('Stormy weather, unable to take off!');
+        return;
+      }
+      takeOff(plane);
+      setSelectedPlane('');
+      toast.success(`Plane ${plane.id} has taken off`);
+    } catch (error: unknown) {
+      console.error('Error during takeoff:', error);
+      toast.error(error instanceof Error ? error.message : 'An unknown error occurred');
+    }
+  }, [selectedPlane, hanger, checkWeather, takeOff, setSelectedPlane]);
+
+  console.log('Rendering Airport component, planeId:', planeId, 'isValidPlaneId:', isValidPlaneId(planeId));
 
   return (
     <div className="p-4" data-testid="hanger-container">
-      <h2 className="text-2xl">Airport</h2>
-      <p>Capacity: {DEFAULT_CAPACITY}</p>
-      <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
-      <input
-        type="text"
-        value={planeId}
-        onChange={(e) => setPlaneId(e.target.value)}
-        placeholder="Enter plane ID"
-        className="border p-2"
-        data-testid="plane-id-input"
-      />
-      <button
-        className="bg-teal-500 text-white p-2 m-2"
-        onClick={() => handleLand(planeId).catch(error => toast.error(error.message))}
+      <h2 className="text-2xl" data-testid="airport-heading">Airport</h2>
+      <p data-testid="airport-capacity">Airport Capacity: {capacity} planes</p>
+      <p role="status" data-testid="hanger-count">Planes in hanger: {hangarCount}</p>
+      <p data-testid="error-message"></p>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={planeId}
+          onChange={(e) => {
+            const newValue = e.target.value.trim();
+            console.log('Input onChange - new value:', newValue);
+            setPlaneId(newValue);
+            console.log('After setPlaneId - planeId:', newValue, 'isValidPlaneId:', isValidPlaneId(newValue));
+          }}
+          placeholder="Enter plane ID"
+          className="border p-2"
+          data-testid="land-plane-input"
+        />
+        <button
+          type="submit"
+          className="bg-teal-500 text-white p-2 m-2"
+          disabled={!isValidPlaneId(planeId)}
+          data-testid="land-plane-button"
+          role="button"
+          aria-label="Land Plane"
+        >
+          Land Plane
+        </button>
+      </form>
+      <select
+        value={selectedPlane}
+        onChange={(e) => setSelectedPlane(e.target.value)}
+        className="border p-2 m-2"
+        data-testid="plane-select"
       >
-        Land Plane
-      </button>
+        <option value="">Select a plane</option>
+        {hanger.map(plane => (
+          <option key={plane.id} value={plane.id} data-testid={`plane-item-${plane.id}`}>{plane.id}</option>
+        ))}
+      </select>
       <button
         className="bg-red-500 text-white p-2 m-2"
-        onClick={() => handleTakeOff().catch(error => toast.error(error.message))}
+        onClick={handleTakeOff}
+        disabled={!selectedPlane}
         data-testid="takeoff-container"
       >
         Take Off Plane
       </button>
+      <div className="mt-4">
+        <input
+          type="number"
+          value={newCapacity}
+          onChange={(e) => setNewCapacity(e.target.value)}
+          placeholder="New Capacity"
+          className="border p-2 mr-2"
+        />
+        <button
+          onClick={handleCapacityChange}
+          className="bg-blue-500 text-white p-2 rounded"
+        >
+          Update Capacity
+        </button>
+      </div>
       <ToastContainer />
     </div>
   );
 };
 
 export default Airport;
+
+// Trigger Husky pre-push
