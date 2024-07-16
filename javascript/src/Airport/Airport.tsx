@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Plane from '../Plane/Plane';
 import { isStormy } from '../Weather/Weather';
 import { toast, ToastContainer } from 'react-toastify';
@@ -37,7 +37,27 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     return stormy;
   };
 
-  const land = (plane: PlaneInstance): void => {
+  const createPlane = useCallback((id: string): PlaneInstance => {
+    if (!id) {
+      throw new Error('Cannot create plane with undefined ID');
+    }
+    return new PlaneClass(id);
+  }, [PlaneClass]);
+
+  const isValidPlaneId = useCallback((id: string): boolean => {
+    // Check if the ID is non-empty, alphanumeric, and between 3 and 10 characters
+    return /^[a-zA-Z0-9]{3,10}$/.test(id);
+  }, []);
+
+  const hangerFull = useCallback((): boolean => {
+    return hanger.length >= capacity;
+  }, [hanger, capacity]);
+
+  const landed = useCallback((plane: PlaneInstance): boolean => {
+    return hanger.some(p => p.id === plane.id);
+  }, [hanger]);
+
+  const land = useCallback((plane: PlaneInstance): void => {
     console.log(`Attempting to land plane ${plane.id}`);
     console.log(`Current hanger state:`, hanger);
 
@@ -61,27 +81,26 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       console.log('Updated hanger state:', newHanger);
       return newHanger;
     });
-  };
+  }, [hanger, hangerFull, landed, checkWeather]);
 
-  const takeOff = (plane: PlaneInstance): void => {
+  const takeOff = useCallback((plane: PlaneInstance): void => {
+    console.log(`Attempting takeoff for plane ${plane.id}`);
     if (!landed(plane)) {
+      console.log(`Plane ${plane.id} not in hanger, cannot take off`);
       throw new Error("No planes available for takeoff");
     }
     if (checkWeather()) {
+      console.log(`Stormy weather, plane ${plane.id} unable to take off`);
       throw new Error('Stormy weather, unable to take off!');
     }
     plane.inTheAir();
-    setHanger(prevHanger => prevHanger.filter(p => p.id !== plane.id));
-    console.log(`Plane ${plane.id} has taken off`);
-  };
-
-  const hangerFull = (): boolean => {
-    return hanger.length >= capacity;
-  };
-
-  const landed = (plane: PlaneInstance): boolean => {
-    return hanger.some(p => p.id === plane.id);
-  };
+    setHanger(prevHanger => {
+      const newHanger = prevHanger.filter(p => p.id !== plane.id);
+      console.log(`Updated hanger after takeoff:`, newHanger);
+      return newHanger;
+    });
+    console.log(`Plane ${plane.id} has taken off successfully`);
+  }, [landed, checkWeather]);
 
   const handleCapacityChange = () => {
     const capacityValue = parseInt(newCapacity, 10);
@@ -94,12 +113,14 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     }
   };
 
+
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleLand(planeId);
   };
 
-  const handleLand = (planeId?: string) => {
+  const handleLand = useCallback((planeId?: string) => {
     console.log(`handleLand called with planeId:`, planeId);
     console.log(`Current hanger state:`, hanger);
     console.log(`Current hangarCount:`, hangarCount);
@@ -136,14 +157,11 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       console.error('Error during landing:', error);
       toast.error(error instanceof Error ? error.message : 'An unknown error occurred');
     }
-  };
+  }, [hanger, hangarCount, hangerFull, land, createPlane, generateUniqueId, isValidPlaneId, setPlaneId]);
 
-  const isValidPlaneId = (id: string): boolean => {
-    // Check if the ID is non-empty, alphanumeric, and between 3 and 10 characters
-    return /^[a-zA-Z0-9]{3,10}$/.test(id);
-  };
 
-  const handleTakeOff = () => {
+
+  const handleTakeOff = useCallback(() => {
     if (!selectedPlane) {
       toast.error('Please select a plane for takeoff');
       return;
@@ -165,14 +183,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
       console.error('Error during takeoff:', error);
       toast.error(error instanceof Error ? error.message : 'An unknown error occurred');
     }
-  };
-
-  const createPlane = (id: string): PlaneInstance => {
-    if (!id) {
-      throw new Error('Cannot create plane with undefined ID');
-    }
-    return new PlaneClass(id);
-  };
+  }, [selectedPlane, hanger, checkWeather, takeOff, setSelectedPlane]);
 
   console.log('Rendering Airport component, planeId:', planeId, 'isValidPlaneId:', isValidPlaneId(planeId));
 

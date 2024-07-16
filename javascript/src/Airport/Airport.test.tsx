@@ -6,8 +6,8 @@ import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
 import { toast } from 'react-toastify';
 
-console.log('Starting Airport Component tests - Increased timeout, improved error handling, and enhanced logging');
-jest.setTimeout(120000); // Increased global timeout to 120 seconds for extra buffer
+console.log('Starting Airport Component tests - Improved error handling and enhanced logging');
+// Removed global timeout increase to avoid masking underlying issues
 
 jest.mock('react-toastify', () => ({
   toast: {
@@ -43,10 +43,7 @@ jest.mock('../Plane/Plane', () => {
 });
 
 jest.mock('../Weather/Weather', () => ({
-  isStormy: jest.fn().mockImplementation(() => {
-    console.log('isStormy mock called');
-    return false;
-  }),
+  isStormy: jest.fn().mockReturnValue(false),
 }));
 
 // Removed TIMEOUT constant
@@ -150,6 +147,7 @@ describe('Airport Component', () => {
     console.log('Before waitFor: Current hanger count:', screen.getByTestId('hanger-count').textContent);
     await waitFor(() => {
       console.log('Inside waitFor: Current hanger count:', screen.getByTestId('hanger-count').textContent);
+      screen.debug(); // Log current state of rendered component
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
       expect(isStormy).toHaveBeenCalled();
@@ -157,20 +155,22 @@ describe('Airport Component', () => {
     }, { timeout: 10000 });
     console.log('After waitFor: Current hanger count:', screen.getByTestId('hanger-count').textContent);
 
-    const planeItems = await screen.findAllByTestId('plane-item', {}, { timeout: 10000 });
-    console.log(`Number of plane items found: ${planeItems.length}`);
-    expect(planeItems).toHaveLength(1);
-    expect(planeItems.length).toBe(1);
-    console.log(`Content of first plane item: ${planeItems[0].textContent}`);
-    expect(planeItems[0]).toHaveTextContent(planeId);
-    expect(planeItems[0].textContent).toContain(planeId);
+    await act(async () => {
+      const planeItems = await screen.findAllByTestId(/^plane-item-/, {}, { timeout: 10000 });
+      console.log(`Number of plane items found: ${planeItems.length}`);
+      expect(planeItems).toHaveLength(1);
+      console.log(`Content of first plane item: ${planeItems[0].textContent}`);
+      expect(planeItems[0]).toHaveTextContent(planeId);
+    });
 
     console.log('Test completed: lands a plane successfully');
   });
 
   it('prevents landing when hanger is full', async () => {
     console.log('Starting test: prevents landing when hanger is full');
-    await landMultiplePlanes(5);
+    await act(async () => {
+      await landMultiplePlanes(5);
+    });
 
     console.log('Attempting to land plane when hanger is full');
     const landButton = await screen.findByTestId('land-plane-button');
