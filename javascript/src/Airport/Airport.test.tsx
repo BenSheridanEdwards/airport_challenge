@@ -80,6 +80,8 @@ describe('Airport Component', () => {
     document.body.innerHTML = '';
     jest.useFakeTimers();
     render(<Airport PlaneClass={MockPlane} />);
+    console.log('Initial render:');
+    screen.debug();
   });
 
   afterEach(() => {
@@ -88,6 +90,8 @@ describe('Airport Component', () => {
   });
 
   it('renders Airport component', () => {
+    console.log('Rendered Airport component:');
+    screen.debug();
     expect(screen.getByTestId('airport-heading')).toBeInTheDocument();
     expect(screen.getByTestId('airport-capacity')).toBeInTheDocument();
     expect(screen.getByTestId('hanger-count')).toBeInTheDocument();
@@ -95,7 +99,8 @@ describe('Airport Component', () => {
 
   it('lands a plane successfully', async () => {
     render(<Airport PlaneClass={MockPlane} />);
-    screen.debug(); // Use screen.debug() to log the rendered component structure
+    console.log('Initial render:');
+    screen.debug();
 
     const landButton = await screen.findByTestId('land-plane-button');
     const planeIdInput = await screen.findByTestId('land-plane-input');
@@ -105,6 +110,9 @@ describe('Airport Component', () => {
       await userEvent.type(planeIdInput, planeId);
       await userEvent.click(landButton);
     });
+
+    console.log('After landing plane:');
+    screen.debug();
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
