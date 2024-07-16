@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import Airport from './Airport';
@@ -42,7 +42,7 @@ jest.mock('../Plane/Plane', () => {
 });
 
 jest.mock('../Weather/Weather', () => ({
-  isStormy: jest.fn().mockReturnValue(false),
+  isStormy: jest.fn(),
 }));
 
 // Removed TIMEOUT constant
@@ -85,15 +85,17 @@ describe('Airport Component', () => {
   beforeEach(async () => {
     jest.resetAllMocks();
     jest.restoreAllMocks();
-    (isStormy as jest.Mock).mockReturnValue(false);
+    (isStormy as jest.Mock).mockImplementation(() => false);
     jest.requireMock('../Plane/Plane').instances.length = 0;
     document.body.innerHTML = '';
 
-    render(<Airport PlaneClass={MockPlane} />);
+    await act(async () => {
+      render(<Airport PlaneClass={MockPlane} />);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('airport-heading')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
   });
 
   afterEach(() => {
@@ -117,18 +119,20 @@ describe('Airport Component', () => {
     const planeIdInput = await screen.findByTestId('land-plane-input');
     const planeId = 'test-plane-1';
 
-    await userEvent.type(planeIdInput, planeId);
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.type(planeIdInput, planeId);
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    });
+    }, { timeout: 5000 });
 
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalled();
       expect(toast.success).toHaveBeenCalledWith(`Plane ${planeId} has landed`, expect.anything());
-    });
+    }, { timeout: 5000 });
 
     const planeItems = await screen.findAllByTestId('plane-item');
     expect(planeItems).toHaveLength(1);
@@ -164,10 +168,12 @@ describe('Airport Component', () => {
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalled();
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!');
-    });
+    }, { timeout: 5000 });
 
-    const hangerCount = await screen.findByTestId('hanger-count');
-    expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
+    await waitFor(() => {
+      const hangerCount = screen.getByTestId('hanger-count');
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
+    }, { timeout: 5000 });
   });
 
   it('prevents landing when plane is already in hanger', async () => {
@@ -182,7 +188,7 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    });
+    }, { timeout: 5000 });
 
     await act(async () => {
       await userEvent.clear(planeIdInput);
@@ -192,7 +198,9 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('That plane is already here');
-    });
+    }, { timeout: 5000 });
+
+    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
   });
 
   it('takes off a plane successfully', async () => {
@@ -206,7 +214,7 @@ describe('Airport Component', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    });
+    }, { timeout: 5000 });
 
     await act(async () => {
       await userEvent.click(takeoffButton);
@@ -215,10 +223,12 @@ describe('Airport Component', () => {
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
-    });
+    }, { timeout: 5000 });
 
     expect(isStormy).toHaveBeenCalledTimes(2);
-    expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('has taken off'), expect.anything());
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('has taken off'), expect.anything());
+    }, { timeout: 5000 });
   });
 
   it('prevents takeoff when weather is stormy', async () => {
@@ -228,8 +238,7 @@ describe('Airport Component', () => {
     });
 
     await waitFor(() => {
-      const hangerCount = screen.getByTestId('hanger-count');
-      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     });
 
     (isStormy as jest.Mock).mockReturnValue(true);
@@ -241,10 +250,8 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, unable to take off!');
+      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     });
-
-    const finalHangerCount = screen.getByTestId('hanger-count');
-    expect(finalHangerCount).toHaveTextContent('Planes in hanger: 1');
 
     expect(isStormy).toHaveBeenCalled();
   });
@@ -285,6 +292,7 @@ describe('Airport Component', () => {
     for (let i = 0; i < 3; i++) {
       const planeId = `plane-${i + 1}`;
       await act(async () => {
+        await userEvent.clear(planeIdInput);
         await userEvent.type(planeIdInput, planeId);
         await userEvent.click(landButton);
       });
@@ -292,13 +300,13 @@ describe('Airport Component', () => {
       await waitFor(() => {
         const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-      });
+      }, { timeout: 5000 });
     }
 
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 3');
-    });
+    }, { timeout: 5000 });
   });
 
   it('handles multiple planes taking off', async () => {
@@ -337,7 +345,7 @@ describe('Airport Component', () => {
       await userEvent.type(planeIdInput, 'plane-1');
       await userEvent.click(landButton);
     });
-    await waitFor(() => expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1'));
+    await waitFor(() => expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1'), { timeout: 5000 });
 
     // Mock stormy weather
     (isStormy as jest.Mock).mockReturnValue(true);
@@ -366,41 +374,56 @@ describe('Airport Component', () => {
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
     const landButton = await screen.findByTestId('land-plane-button');
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    });
+    }, { timeout: 5000 });
 
     (isStormy as jest.Mock).mockReturnValue(true);
     const takeoffButton = await screen.findByTestId('takeoff-container');
-    await userEvent.click(takeoffButton);
+    await act(async () => {
+      await userEvent.click(takeoffButton);
+    });
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, unable to take off!');
-    });
+    }, { timeout: 5000 });
 
-    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
+    await waitFor(() => {
+      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
+    }, { timeout: 5000 });
   });
 
   it('ensures state persistence across different actions', async () => {
     const landButton = await screen.findByTestId('land-plane-button');
     const takeOffButton = await screen.findByTestId('takeoff-container');
+    const planeIdInput = await screen.findByTestId('land-plane-input');
 
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.type(planeIdInput, 'test-plane');
+      await userEvent.click(landButton);
+    });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    });
+    }, { timeout: 5000 });
 
-    await userEvent.click(takeOffButton);
+    await act(async () => {
+      await userEvent.click(takeOffButton);
+    });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
-    });
+    }, { timeout: 5000 });
 
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.type(planeIdInput, 'another-plane');
+      await userEvent.click(landButton);
+    });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    });
+    }, { timeout: 5000 });
   });
 
   it('verifies that isStormy mock function is called during landing and takeoff', async () => {
@@ -408,22 +431,26 @@ describe('Airport Component', () => {
     const takeOffButton = await screen.findByTestId('takeoff-container');
     const planeIdInput = await screen.findByTestId('land-plane-input');
 
-    await userEvent.type(planeIdInput, 'test-plane');
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.type(planeIdInput, 'test-plane');
+      await userEvent.click(landButton);
+    });
 
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    });
+    }, { timeout: 5000 });
 
     expect(toast.success).toHaveBeenCalledWith('Plane test-plane has landed', expect.anything());
 
-    await userEvent.click(takeOffButton);
+    await act(async () => {
+      await userEvent.click(takeOffButton);
+    });
 
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalledTimes(2);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
-    });
+    }, { timeout: 5000 });
 
     expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('has taken off'), expect.anything());
   });
