@@ -124,6 +124,8 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
     return new PlaneClass(id);
   };
 
+  console.log('Rendering Airport component, planeId:', planeId, 'isValidPlaneId:', isValidPlaneId(planeId));
+
   return (
     <div className="p-4" data-testid="hanger-container">
       <h2 className="text-2xl" data-testid="airport-heading">Airport</h2>
