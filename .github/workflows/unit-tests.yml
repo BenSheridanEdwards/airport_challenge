@@ -28,6 +28,20 @@ jobs:
       with:
         node-version: '20'  # Latest LTS version as of now
 
+    - name: Cache node modules
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: |
+          ~/.npm
+          ${{ github.workspace }}/javascript/node_modules
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
     - name: Clear npm cache
       run: npm cache clean --force
       working-directory: ${{ github.workspace }}/javascript
@@ -43,5 +57,6 @@ jobs:
     - name: Run tests
       env:
         NODE_ENV: test
-      run: npm test
+        # Add any other necessary environment variables here
+      run: npm test -- --verbose
       working-directory: ${{ github.workspace }}/javascript
