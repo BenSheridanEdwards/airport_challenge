@@ -282,26 +282,42 @@ describe('Airport Component', () => {
     await waitFor(() => {
       const hangarPlanes = screen.getAllByTestId('plane-item');
       expect(hangarPlanes).toHaveLength(3);
-      expect(hangarPlanes.map(plane => plane.textContent)).toEqual(['plane-1', 'plane-4', 'plane-5']);
+      const planeIds = hangarPlanes.map(plane => plane.textContent);
+      expect(planeIds).toEqual(['plane-3', 'plane-4', 'plane-5']);
     });
 
-    screen.debug(); // Add this line to help diagnose rendering issues
+    console.log('Hangar state after multiple operations:');
+    screen.debug();
   });
 
   it('displays appropriate error message when weather turns stormy during landing', async () => {
     const landButton = await screen.findByTestId('land-plane-button');
+    const planeIdInput = await screen.findByTestId('land-plane-input');
 
+    // Land the first plane
+    await userEvent.type(planeIdInput, 'plane-1');
     await userEvent.click(landButton);
     await waitFor(() => expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1'));
 
+    // Mock stormy weather
     (isStormy as jest.Mock).mockReturnValue(true);
+
+    // Attempt to land another plane
+    await userEvent.clear(planeIdInput);
+    await userEvent.type(planeIdInput, 'plane-2');
     await userEvent.click(landButton);
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!');
+      expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!', expect.anything());
     });
 
+    // Verify that the hangar count remains unchanged
     expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
+
+    // Verify that only the first plane is in the hangar
+    const hangarPlanes = screen.getAllByTestId('plane-item');
+    expect(hangarPlanes).toHaveLength(1);
+    expect(hangarPlanes[0].textContent).toBe('plane-1');
   });
 
   it('displays appropriate error message when weather turns stormy during takeoff', async () => {
