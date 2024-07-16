@@ -80,7 +80,7 @@ describe('Airport Component', () => {
     jest.resetAllMocks();
     jest.restoreAllMocks();
     (isStormy as jest.Mock).mockReturnValue(false);
-    console.log('isStormy mock set to:', (isStormy as jest.Mock).mock.results[0].value);
+    console.log('isStormy mock set to:', (isStormy as jest.Mock).mock);
     jest.requireMock('../Plane/Plane').instances.length = 0;
     document.body.innerHTML = '';
     console.log('Rendering Airport component');
