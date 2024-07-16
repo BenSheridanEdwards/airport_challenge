@@ -23,9 +23,7 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   const [newCapacity, setNewCapacity] = useState<string>('');
   const [selectedPlane, setSelectedPlane] = useState<string>('');
 
-  useEffect(() => {
-    console.log('State updated:', { hanger, capacity });
-  }, [hanger, capacity]);
+
 
   const land = (plane: PlaneInstance): void => {
     if (hangerFull()) {
@@ -76,26 +74,21 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const handleLand = (planeId?: string) => {
-    console.log('handleLand called. Current state:', { hanger, capacity });
     if (hangerFull()) {
-      console.log('Unable to land plane. Capacity reached.');
       toast.error('Hanger full, abort landing!');
       return;
     }
     try {
       const id = planeId?.trim() || generateUniqueId();
       if (!isValidPlaneId(id)) {
-        console.log('Invalid plane ID');
         toast.error('Invalid plane ID, please enter a valid ID');
         return;
       }
       const plane = createPlane(id);
       land(plane);
-      console.log('Plane landed. Updated state:', { hanger: [...hanger, plane], capacity });
       setPlaneId(''); // Clear the input after successful landing
       toast.success(`Plane ${plane.id} has landed`);
     } catch (error) {
-      console.error('Error during landing:', error);
       toast.error((error as Error).message);
     }
   };
@@ -106,27 +99,20 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
   };
 
   const handleTakeOff = () => {
-    console.log('handleTakeOff called. Current state:', { hanger, capacity, selectedPlane });
     if (!selectedPlane) {
-      console.log('No plane selected for takeoff');
       toast.error('Please select a plane for takeoff');
       return;
     }
     try {
       const plane = hanger.find(p => p.id === selectedPlane);
       if (!plane) {
-        console.log('Selected plane not found in hanger');
         toast.error('Selected plane not found in hanger');
         return;
       }
-      console.log('Attempting takeoff for plane:', plane.id);
       takeOff(plane);
-      console.log('Takeoff successful. Updated state:', { hanger: hanger.filter(p => p.id !== plane.id), capacity });
       setSelectedPlane('');
       toast.success(`Plane ${plane.id} has taken off`);
     } catch (error) {
-      console.error('Error during takeoff:', error);
-      console.log('Takeoff failed. Current state:', { hanger, capacity });
       toast.error((error as Error).message);
     }
   };
@@ -140,10 +126,6 @@ const Airport: React.FC<AirportProps> = ({ PlaneClass = Plane, generateUniqueId 
 
   return (
     <div className="p-4" data-testid="hanger-container">
-      {(() => {
-        console.log('Rendering Airport component', { hanger, capacity, planeId, isValidPlaneId: isValidPlaneId(planeId) });
-        return null;
-      })()}
       <h2 className="text-2xl" data-testid="airport-heading">Airport</h2>
       <p data-testid="airport-capacity">Airport Capacity: {capacity} planes</p>
       <p role="status" data-testid="hanger-count">Planes in hanger: {hanger.length}</p>
