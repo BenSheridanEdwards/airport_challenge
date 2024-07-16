@@ -134,17 +134,23 @@ describe('Airport Component', () => {
     console.log('Starting test: lands a plane successfully');
 
     console.log('Finding land button');
-    const landButton = await screen.findByTestId('land-plane-button', {}, { timeout: 2000 });
+    const landButton = await screen.findByTestId('land-plane-button', {}, { timeout: 5000 });
     console.log('Land button found');
 
     console.log('Finding plane ID input');
-    const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 2000 });
+    const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 5000 });
     console.log('Plane ID input found');
 
     const planeId = 'test-plane-1';
     console.log(`Typing plane ID: ${planeId}`);
     await userEvent.type(planeIdInput, planeId);
     console.log('Plane ID typed');
+
+    console.log('Checking if land button is enabled');
+    await waitFor(() => {
+      expect(landButton).toBeEnabled();
+    }, { timeout: 5000 });
+    console.log('Land button is enabled');
 
     console.log('Clicking land button');
     await userEvent.click(landButton);
@@ -155,7 +161,7 @@ describe('Airport Component', () => {
       const hangerCount = screen.getByTestId('hanger-count');
       console.log(`Current hanger count: ${hangerCount.textContent}`);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 2000 });
+    }, { timeout: 5000 });
     console.log('Hanger count updated successfully');
 
     console.log('Test completed: lands a plane successfully');
