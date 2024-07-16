@@ -6,7 +6,6 @@ import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
 import { toast } from 'react-toastify';
 
-console.log('Starting Airport Component tests - Improved error handling and enhanced logging');
 // Removed global timeout increase to avoid masking underlying issues
 
 jest.mock('react-toastify', () => ({
@@ -49,43 +48,33 @@ jest.mock('../Weather/Weather', () => ({
 // Removed TIMEOUT constant
 
 const landMultiplePlanes = async (count: number) => {
-  console.log(`Starting to land ${count} planes`);
   const landButton = await screen.findByTestId('land-plane-button');
   const planeIdInput = await screen.findByTestId('land-plane-input');
 
-  for (let i = 0; i < count; i++) {
-    console.log(`Landing plane ${i + 1} of ${count}`);
+  await Promise.all(Array.from({ length: count }, async (_, i) => {
     const planeId = `plane-${i + 1}`;
     await userEvent.clear(planeIdInput);
     await userEvent.type(planeIdInput, planeId);
     await userEvent.click(landButton);
     await waitFor(() => {
-      console.log(`Checking hanger count for plane ${i + 1}`);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${i + 1}`);
     }, { timeout: 3000 });
     await waitFor(() => {
-      console.log(`Checking if input is cleared after landing plane ${i + 1}`);
       expect(screen.getByTestId('land-plane-input')).toHaveValue('');
     }, { timeout: 3000 });
-  }
-  console.log(`Finished landing ${count} planes`);
+  }));
 };
 
 const takeOffMultiplePlanes = async (count: number) => {
-  console.log(`Starting takeOffMultiplePlanes with count: ${count}`);
   const takeOffButton = await screen.findByTestId('takeoff-container');
 
   for (let i = 0; i < count; i++) {
-    console.log(`Attempting to take off plane ${i + 1} of ${count}`);
     await userEvent.click(takeOffButton);
     await waitFor(() => {
       const expectedCount = count - i - 1;
-      console.log(`Checking hanger count. Expected: ${expectedCount}`);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${expectedCount}`);
     }, { timeout: 3000 });
-    console.log(`Plane ${i + 1} took off successfully`);
   }
-  console.log(`Completed takeOffMultiplePlanes. Final count: ${count - count}`);
 };
 
 describe('Airport Component', () => {
@@ -113,72 +102,44 @@ describe('Airport Component', () => {
   });
 
   it('renders Airport component', async () => {
-    console.log('Starting test: renders Airport component');
-
     const airportHeading = await screen.findByTestId('airport-heading');
-    console.log('Checking airport heading');
     expect(airportHeading).toBeInTheDocument();
 
     const airportCapacity = await screen.findByTestId('airport-capacity');
-    console.log('Checking airport capacity');
     expect(airportCapacity).toBeInTheDocument();
 
     const hangerCount = await screen.findByTestId('hanger-count');
-    console.log('Checking hanger count');
     expect(hangerCount).toBeInTheDocument();
-
-    console.log('Completed test: renders Airport component');
   });
 
   it.only('lands a plane successfully', async () => {
-    console.log('Starting test: lands a plane successfully');
-
-    console.log('Finding land button');
     const landButton = await screen.findByTestId('land-plane-button', {}, { timeout: 5000 });
-    console.log('Land button found');
-
-    console.log('Finding plane ID input');
     const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 5000 });
-    console.log('Plane ID input found');
 
     const planeId = 'test1';
-    console.log(`Typing plane ID: ${planeId}`);
     await userEvent.type(planeIdInput, planeId);
-    console.log('Plane ID typed');
 
-    console.log('Checking if land button is enabled');
     await waitFor(() => {
       expect(landButton).toBeEnabled();
     }, { timeout: 5000 });
-    console.log('Land button is enabled');
 
-    console.log('Clicking land button');
     await userEvent.click(landButton);
-    console.log('Land button clicked');
 
-    console.log('Waiting for hanger count update');
     await waitFor(() => {
       const hangerCount = screen.getByTestId('hanger-count');
-      console.log(`Current hanger count: ${hangerCount.textContent}`);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 5000 });
-    console.log('Hanger count updated successfully');
-
-    console.log('Test completed: lands a plane successfully');
   });
 
   it('prevents landing when hanger is full', async () => {
-    console.log('Starting test: prevents landing when hanger is full');
     await act(async () => {
       await landMultiplePlanes(5);
     });
 
-    console.log('Attempting to land plane when hanger is full');
     const landButton = await screen.findByTestId('land-plane-button');
     await userEvent.click(landButton);
 
     await waitFor(() => {
-      console.log('Checking hanger count and error message');
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
       expect(toast.error).toHaveBeenCalledWith('Hanger full, abort landing!');
@@ -190,37 +151,29 @@ describe('Airport Component', () => {
     expect(toast.error).toHaveBeenCalledTimes(1);
     expect(toast.error).toHaveBeenCalledWith('Hanger full, abort landing!');
 
-    console.log('Verifying isStormy was called');
     expect(isStormy).toHaveBeenCalled();
-    console.log('Test completed: prevents landing when hanger is full');
   }, 10000);
 
   it('prevents landing when weather is stormy', async () => {
-    console.log('Starting test: prevents landing when weather is stormy');
     (isStormy as jest.Mock).mockReturnValue(true);
 
     const landButton = await screen.findByTestId('land-plane-button');
     const planeIdInput = await screen.findByTestId('land-plane-input');
 
-    console.log('Attempting to land plane in stormy weather');
     await act(async () => {
       await userEvent.type(planeIdInput, 'test-plane');
       await userEvent.click(landButton);
     });
 
     await waitFor(() => {
-      console.log('Checking if isStormy was called and error toast was shown');
       expect(isStormy).toHaveBeenCalled();
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!');
     }, { timeout: 3000 });
 
     await waitFor(() => {
-      console.log('Verifying hanger count remains unchanged');
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
     }, { timeout: 3000 });
-
-    console.log('Test completed: prevents landing when weather is stormy');
   });
 
   it('prevents landing when plane is already in hanger', async () => {
@@ -251,53 +204,41 @@ describe('Airport Component', () => {
   });
 
   it('takes off a plane successfully', async () => {
-    console.log('Starting test: takes off a plane successfully');
     const landButton = await screen.findByTestId('land-plane-button');
     const takeoffButton = await screen.findByTestId('takeoff-container');
     const planeId = 'test-plane-1';
 
-    console.log('Attempting to land plane');
     await act(async () => {
       await userEvent.type(screen.getByTestId('land-plane-input'), planeId);
       await userEvent.click(landButton);
     });
-    console.log('Plane landing operation completed');
 
     await waitFor(() => {
-      console.log('Checking hanger count after landing');
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 3000 });
 
-    console.log('Attempting to take off plane');
     await act(async () => {
       await userEvent.click(takeoffButton);
     });
-    console.log('Plane takeoff operation completed');
 
     await waitFor(() => {
-      console.log('Checking hanger count after takeoff');
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
     }, { timeout: 3000 });
 
     await waitFor(() => {
-      console.log('Checking isStormy call count');
       expect(isStormy).toHaveBeenCalledTimes(2);
     }, { timeout: 3000 });
 
     await waitFor(() => {
-      console.log('Checking toast success message');
       expect(toast.success).toHaveBeenCalledWith(`Plane ${planeId} has taken off`, expect.anything());
     }, { timeout: 3000 });
 
     await waitFor(() => {
-      console.log('Checking plane items in hanger');
       const planeItems = screen.queryAllByTestId('plane-item');
       expect(planeItems).toHaveLength(0);
     }, { timeout: 3000 });
-
-    console.log('Test completed: takes off a plane successfully');
   });
 
   it('prevents takeoff when weather is stormy', async () => {
@@ -355,13 +296,11 @@ describe('Airport Component', () => {
   });
 
   it('handles multiple planes landing', async () => {
-    console.log('Starting test: handles multiple planes landing');
     const landButton = await screen.findByTestId('land-plane-button');
     const planeIdInput = await screen.findByTestId('land-plane-input');
 
     for (let i = 0; i < 3; i++) {
       const planeId = `plane-${i + 1}`;
-      console.log(`Attempting to land plane: ${planeId}`);
       await act(async () => {
         await userEvent.clear(planeIdInput);
         await userEvent.type(planeIdInput, planeId);
@@ -369,14 +308,12 @@ describe('Airport Component', () => {
       });
 
       await waitFor(() => {
-        console.log(`Checking hanger count for plane: ${planeId}`);
         const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
       }, { timeout: 3000 });
     }
 
     await waitFor(() => {
-      console.log('Verifying final hanger state');
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 3');
       const planeItems = screen.getAllByTestId('plane-item');
@@ -385,37 +322,27 @@ describe('Airport Component', () => {
         expect(item).toHaveTextContent(`plane-${index + 1}`);
       });
     }, { timeout: 3000 });
-    console.log('Test completed: handles multiple planes landing');
   });
 
   it('handles multiple planes taking off', async () => {
-    console.log('Starting test: handles multiple planes taking off');
-
     await act(async () => {
-      console.log('Landing multiple planes');
       await landMultiplePlanes(3);
     });
 
     await waitFor(() => {
-      console.log('Checking hanger count after landing');
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
     }, { timeout: 3000 });
 
     await act(async () => {
-      console.log('Taking off multiple planes');
       await takeOffMultiplePlanes(2);
     });
 
     await waitFor(() => {
-      console.log('Checking hanger count after takeoff');
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
     }, { timeout: 3000 });
 
-    console.log('Verifying remaining planes');
     const planeItems = await screen.findAllByTestId('plane-item');
     expect(planeItems).toHaveLength(1);
-
-    console.log('Test completed: handles multiple planes taking off');
   });
 
   it('verifies plane IDs in the hangar after multiple operations', async () => {
@@ -541,8 +468,6 @@ describe('Airport Component', () => {
   });
 
   it('verifies that isStormy mock function is called during landing and takeoff', async () => {
-    console.log('Starting test: verifies isStormy calls during landing and takeoff');
-
     await act(async () => {
       render(<Airport PlaneClass={MockPlane} />);
     });
@@ -556,7 +481,6 @@ describe('Airport Component', () => {
       await userEvent.type(planeIdInput, validPlaneId);
     });
 
-    console.log('Attempting to land plane');
     await act(async () => {
       await userEvent.click(landButton);
     });
@@ -564,12 +488,10 @@ describe('Airport Component', () => {
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalledTimes(1);
       const hangerCount = screen.getByTestId('hanger-count');
-      console.log('Hanger count after landing:', hangerCount.textContent);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
       expect(toast.success).toHaveBeenCalledWith(`Plane ${validPlaneId} has landed`, expect.anything());
     }, { timeout: 10000 });
 
-    console.log('Attempting takeoff');
     await act(async () => {
       await userEvent.click(takeOffButton);
     });
@@ -577,11 +499,8 @@ describe('Airport Component', () => {
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalledTimes(2);
       const hangerCount = screen.getByTestId('hanger-count');
-      console.log('Hanger count after takeoff:', hangerCount.textContent);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
       expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('has taken off'), expect.anything());
     }, { timeout: 10000 });
-
-    console.log('Test completed: verifies isStormy calls during landing and takeoff');
   });
 });
