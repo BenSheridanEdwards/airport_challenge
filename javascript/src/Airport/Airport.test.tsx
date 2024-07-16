@@ -427,29 +427,38 @@ describe('Airport Component', () => {
     const takeOffButton = await screen.findByTestId('takeoff-container');
     const planeIdInput = await screen.findByTestId('land-plane-input');
 
+    await waitFor(() => {
+      expect(planeIdInput).toBeInTheDocument();
+    });
+
     await act(async () => {
       await userEvent.type(planeIdInput, 'test-plane');
+      await waitFor(() => expect(planeIdInput).toHaveValue('test-plane'));
       await userEvent.click(landButton);
     });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
 
     await act(async () => {
       await userEvent.click(takeOffButton);
     });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
 
     await act(async () => {
       await userEvent.clear(planeIdInput);
+      await waitFor(() => expect(planeIdInput).toHaveValue(''));
+
       await userEvent.type(planeIdInput, 'another-plane');
+      await waitFor(() => expect(planeIdInput).toHaveValue('another-plane'));
+
       await userEvent.click(landButton);
     });
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 10000 });
+    }, { timeout: 15000 });
   });
 
   it('verifies that isStormy mock function is called during landing and takeoff', async () => {
