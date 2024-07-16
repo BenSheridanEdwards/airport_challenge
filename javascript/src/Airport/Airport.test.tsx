@@ -147,13 +147,15 @@ describe('Airport Component', () => {
     });
     console.log('Plane landing operation completed');
 
+    console.log('Before waitFor: Current hanger count:', screen.getByTestId('hanger-count').textContent);
     await waitFor(() => {
-      console.log('Checking hanger count and success toast');
+      console.log('Inside waitFor: Current hanger count:', screen.getByTestId('hanger-count').textContent);
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
       expect(isStormy).toHaveBeenCalled();
       expect(toast.success).toHaveBeenCalledWith(`Plane ${planeId} has landed`, expect.anything());
     }, { timeout: 10000 });
+    console.log('After waitFor: Current hanger count:', screen.getByTestId('hanger-count').textContent);
 
     const planeItems = await screen.findAllByTestId('plane-item', {}, { timeout: 10000 });
     console.log(`Number of plane items found: ${planeItems.length}`);
