@@ -553,13 +553,21 @@ describe('Airport Component', () => {
     const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 5000 });
 
     // Set a valid planeId before attempting to land
+    const validPlaneId = 'test-plane';
     await act(async () => {
-      await userEvent.type(planeIdInput, 'test-plane');
+      await userEvent.type(planeIdInput, validPlaneId);
     });
 
     // Log the state of planeId and button before clicking
     console.log('PlaneId before landing:', (planeIdInput as HTMLInputElement).value);
     console.log('Land button disabled:', landButton.hasAttribute('disabled'));
+
+    // Wait for the button to be enabled
+    await waitFor(() => {
+      expect(landButton).not.toBeDisabled();
+    }, { timeout: 5000 });
+
+    console.log('Land button disabled after waiting:', landButton.hasAttribute('disabled'));
 
     await act(async () => {
       await userEvent.click(landButton);
@@ -567,8 +575,10 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalledTimes(1);
-      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-      expect(toast.success).toHaveBeenCalledWith('Plane test-plane has landed', expect.anything());
+      const hangerCount = screen.getByTestId('hanger-count');
+      console.log('Hanger count after landing:', hangerCount.textContent);
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
+      expect(toast.success).toHaveBeenCalledWith(`Plane ${validPlaneId} has landed`, expect.anything());
     }, { timeout: 5000 });
 
     await act(async () => {
@@ -577,7 +587,9 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(isStormy).toHaveBeenCalledTimes(2);
-      expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 0');
+      const hangerCount = screen.getByTestId('hanger-count');
+      console.log('Hanger count after takeoff:', hangerCount.textContent);
+      expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
       expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('has taken off'), expect.anything());
     }, { timeout: 5000 });
   });
