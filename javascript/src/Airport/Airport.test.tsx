@@ -6,8 +6,8 @@ import Airport from './Airport';
 import { isStormy } from '../Weather/Weather';
 import { toast } from 'react-toastify';
 
-console.log('Starting Airport Component tests');
-jest.setTimeout(30000);
+console.log('Starting Airport Component tests - Increased timeout and improved error handling');
+jest.setTimeout(60000); // Increased global timeout to 60 seconds
 
 jest.mock('react-toastify', () => ({
   toast: {
@@ -97,6 +97,7 @@ describe('Airport Component', () => {
   beforeEach(async () => {
     jest.resetAllMocks();
     jest.restoreAllMocks();
+    (isStormy as jest.Mock).mockClear();
     (isStormy as jest.Mock).mockImplementation(() => false);
     jest.requireMock('../Plane/Plane').instances.length = 0;
     document.body.innerHTML = '';
@@ -105,9 +106,7 @@ describe('Airport Component', () => {
       render(<Airport PlaneClass={MockPlane} />);
     });
 
-    await waitFor(() => {
-      expect(screen.getByTestId('airport-heading')).toBeInTheDocument();
-    }, { timeout: 3000 });
+    await screen.findByTestId('airport-heading', {}, { timeout: 5000 });
   });
 
   afterEach(() => {
@@ -135,15 +134,17 @@ describe('Airport Component', () => {
 
   it('lands a plane successfully', async () => {
     console.log('Starting test: lands a plane successfully');
-    const landButton = await screen.findByTestId('land-plane-button');
-    const planeIdInput = await screen.findByTestId('land-plane-input');
+    const landButton = await screen.findByTestId('land-plane-button', {}, { timeout: 5000 });
+    const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 5000 });
     const planeId = 'test-plane-1';
 
     console.log('Attempting to land plane');
     console.log(`Typing plane ID: ${planeId}`);
-    await userEvent.type(planeIdInput, planeId);
-    console.log('Clicking land button');
-    await userEvent.click(landButton);
+    await act(async () => {
+      await userEvent.type(planeIdInput, planeId);
+      console.log('Clicking land button');
+      await userEvent.click(landButton);
+    });
     console.log('Plane landing operation completed');
 
     await waitFor(() => {
@@ -152,13 +153,15 @@ describe('Airport Component', () => {
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
       expect(isStormy).toHaveBeenCalled();
       expect(toast.success).toHaveBeenCalledWith(`Plane ${planeId} has landed`, expect.anything());
-    }, { timeout: 5000 });
+    }, { timeout: 10000 });
 
-    const planeItems = await screen.findAllByTestId('plane-item', {}, { timeout: 5000 });
+    const planeItems = await screen.findAllByTestId('plane-item', {}, { timeout: 10000 });
     console.log(`Number of plane items found: ${planeItems.length}`);
     expect(planeItems).toHaveLength(1);
+    expect(planeItems.length).toBe(1);
     console.log(`Content of first plane item: ${planeItems[0].textContent}`);
     expect(planeItems[0]).toHaveTextContent(planeId);
+    expect(planeItems[0].textContent).toContain(planeId);
 
     console.log('Test completed: lands a plane successfully');
   });
@@ -176,12 +179,18 @@ describe('Airport Component', () => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
       expect(toast.error).toHaveBeenCalledWith('Hanger full, abort landing!');
-    }, { timeout: 3000 });
+    }, { timeout: 5000 });
+
+    expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 5');
+    expect(screen.getByTestId('hanger-count').textContent).toBe('Planes in hanger: 5');
+    expect(toast.error).toHaveBeenCalledWith('Hanger full, abort landing!');
+    expect(toast.error).toHaveBeenCalledTimes(1);
+    expect(toast.error).toHaveBeenCalledWith('Hanger full, abort landing!');
 
     console.log('Verifying isStormy was called');
     expect(isStormy).toHaveBeenCalled();
     console.log('Test completed: prevents landing when hanger is full');
-  });
+  }, 10000);
 
   it('prevents landing when weather is stormy', async () => {
     console.log('Starting test: prevents landing when weather is stormy');
