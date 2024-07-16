@@ -65,11 +65,11 @@ const landMultiplePlanes = async (count: number) => {
     await waitFor(() => {
       console.log(`Checking hanger count for plane ${i + 1}`);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
     await waitFor(() => {
       console.log(`Checking if input is cleared after landing plane ${i + 1}`);
       expect(screen.getByTestId('land-plane-input')).toHaveValue('');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
   }
   console.log(`Finished landing ${count} planes`);
 };
@@ -85,7 +85,7 @@ const takeOffMultiplePlanes = async (count: number) => {
       const expectedCount = count - i - 1;
       console.log(`Checking hanger count. Expected: ${expectedCount}`);
       expect(screen.getByTestId('hanger-count')).toHaveTextContent(`Planes in hanger: ${expectedCount}`);
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
     console.log(`Plane ${i + 1} took off successfully`);
   }
   console.log(`Completed takeOffMultiplePlanes. Final count: ${count - count}`);
@@ -107,7 +107,7 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('airport-heading')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
   });
 
   afterEach(() => {
@@ -153,19 +153,19 @@ describe('Airport Component', () => {
       const hangerCount = screen.getByTestId('hanger-count');
       console.log(`Current hanger count: ${hangerCount.textContent}`);
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 15000 });
+    }, { timeout: 3000 });
 
     await waitFor(() => {
       console.log('Checking if isStormy was called');
       expect(isStormy).toHaveBeenCalled();
       console.log('isStormy was called as expected');
-    }, { timeout: 15000 });
+    }, { timeout: 3000 });
 
     await waitFor(() => {
       console.log('Checking if success toast was shown');
       expect(toast.success).toHaveBeenCalledWith(`Plane ${planeId} has landed`, expect.anything());
       console.log('Success toast was shown as expected');
-    }, { timeout: 15000 });
+    }, { timeout: 3000 });
 
     await waitFor(async () => {
       console.log('Checking plane items in hanger');
@@ -174,7 +174,7 @@ describe('Airport Component', () => {
       expect(planeItems).toHaveLength(1);
       console.log(`Content of first plane item: ${planeItems[0].textContent}`);
       expect(planeItems[0]).toHaveTextContent(planeId);
-    }, { timeout: 15000 });
+    }, { timeout: 3000 });
 
     console.log('Test completed: lands a plane successfully');
   });
@@ -192,7 +192,7 @@ describe('Airport Component', () => {
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 5');
       expect(toast.error).toHaveBeenCalledWith('Hanger full, abort landing!');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     console.log('Verifying isStormy was called');
     expect(isStormy).toHaveBeenCalled();
@@ -216,13 +216,13 @@ describe('Airport Component', () => {
       console.log('Checking if isStormy was called and error toast was shown');
       expect(isStormy).toHaveBeenCalled();
       expect(toast.error).toHaveBeenCalledWith('Stormy weather, cannot land the plane!');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     await waitFor(() => {
       console.log('Verifying hanger count remains unchanged');
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     console.log('Test completed: prevents landing when weather is stormy');
   });
@@ -239,7 +239,7 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     await act(async () => {
       await userEvent.clear(planeIdInput);
@@ -249,7 +249,7 @@ describe('Airport Component', () => {
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('That plane is already here');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
   });
@@ -271,7 +271,7 @@ describe('Airport Component', () => {
       console.log('Checking hanger count after landing');
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     console.log('Attempting to take off plane');
     await act(async () => {
@@ -283,23 +283,23 @@ describe('Airport Component', () => {
       console.log('Checking hanger count after takeoff');
       const hangerCount = screen.getByTestId('hanger-count');
       expect(hangerCount).toHaveTextContent('Planes in hanger: 0');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     await waitFor(() => {
       console.log('Checking isStormy call count');
       expect(isStormy).toHaveBeenCalledTimes(2);
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     await waitFor(() => {
       console.log('Checking toast success message');
       expect(toast.success).toHaveBeenCalledWith(`Plane ${planeId} has taken off`, expect.anything());
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     await waitFor(() => {
       console.log('Checking plane items in hanger');
       const planeItems = screen.queryAllByTestId('plane-item');
       expect(planeItems).toHaveLength(0);
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     console.log('Test completed: takes off a plane successfully');
   });
@@ -376,7 +376,7 @@ describe('Airport Component', () => {
         console.log(`Checking hanger count for plane: ${planeId}`);
         const hangerCount = screen.getByTestId('hanger-count');
         expect(hangerCount).toHaveTextContent(`Planes in hanger: ${i + 1}`);
-      }, { timeout: 5000 });
+      }, { timeout: 3000 });
     }
 
     await waitFor(() => {
@@ -388,7 +388,7 @@ describe('Airport Component', () => {
       planeItems.forEach((item, index) => {
         expect(item).toHaveTextContent(`plane-${index + 1}`);
       });
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
     console.log('Test completed: handles multiple planes landing');
   });
 
@@ -403,7 +403,7 @@ describe('Airport Component', () => {
     await waitFor(() => {
       console.log('Checking hanger count after landing');
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 3');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     await act(async () => {
       console.log('Taking off multiple planes');
@@ -413,7 +413,7 @@ describe('Airport Component', () => {
     await waitFor(() => {
       console.log('Checking hanger count after takeoff');
       expect(screen.getByTestId('hanger-count')).toHaveTextContent('Planes in hanger: 1');
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
     console.log('Verifying remaining planes');
     const planeItems = await screen.findAllByTestId('plane-item');
@@ -438,7 +438,7 @@ describe('Airport Component', () => {
       expect(hangarPlanes).toHaveLength(3);
       const planeIds = hangarPlanes.map(plane => plane.textContent);
       expect(planeIds).toEqual(['plane-3', 'plane-4', 'plane-5']);
-    }, { timeout: 10000 });
+    }, { timeout: 3000 });
   });
 
   it('displays appropriate error message when weather turns stormy during landing', async () => {
