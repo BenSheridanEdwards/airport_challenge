@@ -141,7 +141,7 @@ describe('Airport Component', () => {
     const planeIdInput = await screen.findByTestId('land-plane-input', {}, { timeout: 5000 });
     console.log('Plane ID input found');
 
-    const planeId = 'test-plane-1';
+    const planeId = 'test1';
     console.log(`Typing plane ID: ${planeId}`);
     await userEvent.type(planeIdInput, planeId);
     console.log('Plane ID typed');
